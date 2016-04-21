@@ -1,0 +1,162 @@
+/**
+ * @package		Zen Tools
+ * @subpackage	Zen Tools
+ * @author		Joomla Bamboo - design@joomlabamboo.com
+ * @copyright 	Copyright (c) 2013 Copyright (C), Joomlabamboo. All Rights Reserved.. All rights reserved.
+ * @license		license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * @version		1.9.4
+ */
+
+/* Grid Layout - Can remove in zgf v2
+-----------------------------------------------------------------------------*/
+.container {
+width: 960px;
+}
+
+body.center .container {margin: 0 auto;}
+body.left .container {float: left;}
+body.right .container {float: right;}
+
+.row {
+width: 94%;
+margin: 0 auto;
+overflow: hidden;
+}
+
+.container.left .row,.container.right .row {
+margin: 0;
+}
+
+.grid_one,.grid_two,.grid_three,.grid_four,.grid_five,.grid_six,.grid_seven,.grid_eight,.grid_nine,.grid_ten,.grid_eleven,.grid_3,.grid_4,.grid_2,.grid_1,.grid_5,.grid_7,.grid_8,.grid_9,.grid_10,.grid_11
+{
+margin-right: 3.8%;
+float: left;
+position: relative;
+min-height: 1px
+}
+
+
+
+.grid_one
+{
+width: 4.85%
+}
+
+.grid_11 {
+width: 5.7%;
+}
+
+.grid_10 {
+width: 6.7%;
+}
+
+.grid_9 {
+width: 7.9%;
+}
+
+.grid_8 {
+width: 9.3%;
+}
+
+.grid_7 {
+width: 11.1%;
+}
+
+.grid_two
+{
+width: 13.45%
+}
+
+.grid_5 {
+width: 16.2%;
+}
+
+.grid_three,.grid_4
+{
+width: 22.05%
+}
+
+.grid_four,.grid_3
+{
+width: 30.75%
+}
+
+.grid_five
+{
+width: 39.45%
+}
+
+.grid_six,.grid_2
+{
+width: 48%
+}
+
+.grid_seven
+{
+width: 56.75%
+}
+
+.grid_eight
+{
+width: 65.4%
+}
+
+.grid_nine
+{
+width: 74.05%
+}
+
+.grid_ten
+{
+width: 82.7%
+}
+
+.grid_eleven
+{
+width: 91.35%
+}
+
+.grid_twelve,grid_,.grid_1
+{
+width: 100%;
+float: left
+}
+
+.zenlast,.jblast  {
+float: right;margin: 0;
+}
+
+
+
+.onecols_push {left: 8.85%;}
+.twocols_push {left: 17.25%;}
+.threecols_push {left: 25.85%;}
+.fourcols_push {left: 60.55%;}
+.fivecols_push {left: 43.25%}
+.sixcols_push {left: 51.80%;}
+.sevencols_push {left: 60.55%;}
+.eightcols_push {left: 69.20%;}
+.ninecols_push {left: 77.85%;}
+.tencols_push {left: 86.5%;}
+.elevencols_push {left: 94.85%}
+
+.onecols_pull{left: -8.85%;}
+.twocols_pull{left: -17.25%;}
+.threecols_pull{left: -25.85%;}
+.fourcols_pull{left: -34.55%;}
+.fivecols_pull{left: -43.25%;}
+.sixcols_pull {left: -51%;}
+.sevencols_pull{left: -60.55%;}
+.eightcols_pull{left: -69.20%;}
+.ninecols_pull{left: -77.85%;}
+.tencols_pull{left: -86.25%;}
+.elevencols_pull{left: -94.85%;}
+
+
+@media only screen and (max-width: 520px) {
+.grid_3,.grid_4,.grid_5,.grid_7,.grid_8,.grid_9,.grid_10,.grid_11
+{
+	float: left;
+	width: 100% !important
+}
+}

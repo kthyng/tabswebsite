@@ -1,0 +1,6 @@
+Gloseal image path - /Tglo/Images/gloseal.png
+Gerg logo path - /Tglo/images/gerg-logo.png
+
+
+<img alt="Buoy Map - You may also select buoys below" usemap="#tabs-imagemap-20101202" border="0"
+ src=/tglo/images/tglo.map.vec.png>

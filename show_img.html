@@ -1,0 +1,599 @@
+
+<head>
+<link rel="stylesheet" type="text/css" href="calendar.css">
+<link rel="stylesheet" type="text/css" href="../share/styles/nept.css">
+<link rel="stylesheet" type="text/css" href="slide.css">
+
+<SCRIPT LANGUAGE="JavaScript" SRC="CalendarPopup.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+function overimg(ob){
+  ob.style.borderColor='red';
+}
+function outimg(ob){
+  ob.style.borderColor='#cccccc';
+}
+
+function show_main_elem(id,vis){
+   ob=this.parent.document.getElementById(id);
+   if (vis)
+     ob.style.display='';
+   else
+     ob.style.display='none';
+}
+
+
+function setdata(vari,level,pred,submit){
+	document.getElementById('var').value   = vari;
+	document.getElementById('level').value = level;
+	document.getElementById('pred').value  = pred;
+	
+        if (vari=='sst'){
+          show_main_elem('div_osi_saf_info',1);
+        }else{
+          show_main_elem('div_osi_saf_info',0);
+        }
+
+	if (submit){
+//		document.main_form.submit();
+          submit_form();
+	}
+}
+
+function setdate(date,submit){
+	document.getElementById('date1xx').value   = date;
+	
+	if (submit){
+		document.main_form.submit();
+//             submit_form();
+	}
+}
+
+function setsome(id,value,submit){
+	document.getElementById(id).value   = value;
+	
+	if (submit){
+		submit_form();
+	}
+}
+
+function setdaily(id,value,submit){
+	document.getElementById(id).value   = value;
+	
+	/*b=document.getElementById('evol_submit');
+    if (value)
+    b.disabled=true;
+    else
+    b.disabled=false;
+	*/
+
+	if (submit){
+		submit_form();
+	}
+}
+
+function submit_form(){
+	sd=document.getElementById('showDaily').value;
+	ifr=parent.document.getElementById('data_output');
+	mtd=parent.document.getElementById('main_td');
+
+	sd=parseInt(sd);
+	if (sd){
+		//alert('hhhh 1 =='+sd+'==');
+		ifr.style.position='relative';
+		ifr.style.width='100%';
+        h=440+120;
+		ifr.style.height=h+'px'
+		mtd.style.height=h+'px';
+
+	}else{
+		//alert('hhhh 2 =='+sd+'==');
+		ncols=document.getElementById('ncolumns').value;
+		nims=document.getElementById('nshown').value;
+                vname=document.getElementById('var').value;
+                if (vname=='windr'){
+                  imW=120;
+                  imH=99;
+                }else{
+ //                 imW=112;
+//                  imH=160;
+
+                  imW=144;
+                  imH=140;
+                }
+
+		nlines=Math.ceil(nims/ncols);
+		w=ncols*(imW+15) +10;
+		h=nlines*(imH+25) + 150;
+
+		w=Math.max(w,590);
+                //alert(w);
+		ifr.style.position='absolute';
+		ifr.style.width=w+'px';
+//                alert(w);
+		ifr.style.height=h+'px';
+		mtd.style.height=h+20+'px';
+
+		//alert(w)
+		//alert(nlines+'  '+ncols);
+	}
+
+	
+	document.main_form.submit();
+}
+
+function OpenNewWindow(cPicture,nWidth,nHeight,cMessage,nBorder){
+    NewWindow=window.open("","NewOne","HEIGHT="+nHeight+",WIDTH="+nWidth+",scrollbars=no,resizable=no,top=5,left=5");
+    NewWindow.document.write ("<HTML><HEAD><TITLE>"+cMessage);
+    NewWindow.document.write ("</TITLE></HEAD>");
+    NewWindow.document.write ("<BODY'>");    
+    NewWindow.document.write ("<P ALIGN=CENTER>");
+
+    str=document.getElementById(cPicture).src;
+    cPicture=str.replace(/_thumb.png/, ".png");
+      
+    NewWindow.document.write ("<IMG SRC=");
+    NewWindow.document.write (cPicture);
+    NewWindow.document.write (">");
+       
+
+    NewWindow.document.write ("</P>");
+    NewWindow.document.write ("<center><FORM><INPUT TYPE='button' VALUE='Close This Window' onClick='self.close()'>");
+    NewWindow.document.write ("</FORM></CENTER></BODY></HTML>");
+    NewWindow.document.write ("</BODY></HTML>");
+    NewWindow.document.close();
+
+    return false;
+}
+
+function newsst(id,val){
+	document.getElementById(id).src=val;
+}
+
+
+//Preloaded slideshow script- By Jason Moon
+//For this script and more
+//Visit http://www.dynamicdrive.com
+
+// PUT THE URL'S OF YOUR IMAGES INTO THIS ARRAY...
+var Slides = new Array('images/20140420_f_n0_avg_1_temp_k_surface_thumb.png','images/20140421_f_n0_avg_1_temp_k_surface_thumb.png','images/20140422_f_n0_avg_1_temp_k_surface_thumb.png');
+
+// DO NOT EDIT BELOW THIS LINE!
+function CacheImage(ImageSource) { // TURNS THE STRING INTO AN IMAGE OBJECT
+   var ImageObject = new Image();
+   ImageObject.src = ImageSource;
+   return ImageObject;
+}
+
+function ShowSlide(Direction) {
+   if (SlideReady) {
+      NextSlide = CurrentSlide + Direction;
+      // THIS WILL DISABLE THE BUTTONS (IE-ONLY)
+      document.SlideShow.Previous.disabled = (NextSlide == 0);
+      document.SlideShow.Next.disabled = (NextSlide == 
+(Slides.length-1));    
+ if ((NextSlide >= 0) && (NextSlide < Slides.length)) {
+            document.images['Screen'].src = Slides[NextSlide].src;
+            CurrentSlide = NextSlide++;
+            Message = 'Picture ' + (CurrentSlide+1) + ' of ' + 
+Slides.length;
+            self.defaultStatus = Message;
+            if (Direction == 1) CacheNextSlide();
+      }
+      return true;
+   }
+}
+
+function Download() {
+   if (Slides[NextSlide].complete) {
+      SlideReady = true;
+      self.defaultStatus = Message;
+   }
+   else setTimeout("Download()", 100); // CHECKS DOWNLOAD STATUS EVERY 100 MS
+   return true;
+}
+
+function CacheNextSlide() {
+   if ((NextSlide < Slides.length) && (typeof Slides[NextSlide] == 
+'string'))
+{ // ONLY CACHES THE IMAGES ONCE
+      SlideReady = false;
+      self.defaultStatus = 'Downloading next picture...';
+      Slides[NextSlide] = CacheImage(Slides[NextSlide]);
+      Download();
+   }
+   return true;
+}
+
+function StartSlideShow() {
+   CurrentSlide = -1;
+   Slides[0] = CacheImage(Slides[0]);
+   SlideReady = true;
+   ShowSlide(1);
+}
+
+$(document).ready(function () {
+    $('#slideshow-div').rsfSlideshow();
+});
+
+$('#slideshow-controls').rsfSlideshow({
+    controls: {
+        playPause: {auto: true},
+        previousSlide: {auto: true},
+        nextSlide: {auto: true},
+        index: {auto: true}
+    }
+});
+
+
+</SCRIPT>
+</head>
+<body onload="StartSlideShow()" style='background-color: white'>
+
+
+
+
+<form name='main_form' id='main_form' method="get">
+
+<table border=0 width=100% cellpadding=5 bgcolor='white'>
+<tr>
+<td>
+
+<table border=0 width=570px  cellspacing=1 bgcolor='#002266'>
+<tr  bgcolor=white>
+  <td valign=top>
+
+	<table border=0 width=200px cellpadding=0 cellspacing=0 bgcolor=white height=65px>
+	<tr>
+	<td valign=top bgcolor='#f5f5f5'>
+	
+	<table border=0 width=122px cellpadding=0 cellspacing=0 >
+	<tr>
+		<td>&nbsp;</td>
+		<td>0</td>
+		<td>10</td>
+		<td>50</td>
+		<td>100</td>
+		<td>200</td>
+		<td>bot</td>
+			</tr>
+	
+	<tr>
+		<td>temp</td>
+		<td>
+		<img onclick='setdata("temp","s",0,1)' src='/~mma/oof/share/images/true3_.gif' style="border: 1px solid red; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("temp",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>		
+		<td>
+		<img onclick='setdata("temp",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>
+		<td>
+		<img onclick='setdata("temp",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("temp",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+                <td>&nbsp;</td>
+
+	</tr>
+	<tr>
+		<td>salt</td>
+		<td>
+		<img onclick='setdata("salt","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("salt",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>		
+		<td>
+		<img onclick='setdata("salt",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>
+		<td>
+		<img onclick='setdata("salt",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("salt",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+                <td>&nbsp;</td>
+	</tr>
+
+        <tr>
+          <td>zeta</td>
+          <td colspan=6>
+          <img onclick='setdata("zeta","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+        </tr>
+
+
+        <tr>
+          <td>O2</td>
+          <td>
+                    </td>
+          <td>
+                    </td>
+          <td>
+                    </td>
+          <td>
+                   </td>
+          <td>
+                   </td>
+          <td>
+          <img onclick='setdata("dye_01",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+       </tr>
+
+        <tr>
+          <td>Miss</td>
+          <td>
+          <img onclick='setdata("dye_02","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+          <td>
+          <img onclick='setdata("dye_02",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+         <td>&nbsp;</td>
+       </tr>
+
+
+
+
+
+
+
+
+	<tr>
+		<td colspan=6 align="right">
+		
+		<div style='cursor:pointer; width: 100px' onclick='setsome("showCurr",1,1)'>
+		show currents  &nbsp;
+		</div>		</td>	
+	</tr>	
+	</table>
+	
+	</td>
+	<td valign=top bgcolor='#e2e2e2'>
+	  	<table border=0 width=100% cellpadding=0 cellspacing=0>
+			<tr>
+			<td style='padding-left: 5px'>sst</td>
+			<td>
+			<img onclick='setdata("sst",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+			</td>
+			</tr>
+			<tr>
+                        			<td style='padding-left: 5px'>wind</td>
+			<td>
+			<img onclick='setdata("wind",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >				
+			</td>
+			</tr>
+
+
+                        
+		</table>
+	
+	<td>
+	</td>
+	</tr>
+	</table>
+
+  </td>
+
+  
+  <td valign=top width=140px>
+    <style>
+    	.sel {height: 15px; width:40px;
+    		border: 1px solid #002266;
+    		background-color: #f5f5f5;
+    	}
+    </style>
+    
+
+    
+    <table border=0 width=100% cellpadding=0 cellspacing=1 >
+    <tr>
+    	<td colspan=3>evolution options</td>
+    </tr>
+    <tr>
+    	<td>n showm</td>
+    	<td>
+    	<select name='nshown' id='nshown'  class=sel>
+    	<option value='3' >3</option><option value='5' >5</option><option value='7' >7</option><option value='8' selected>8</option><option value='10' >10</option><option value='14' >14</option>		</select>
+    	</td>
+    	<td>&nbsp;</td>
+    </tr>   
+    <tr>
+    	<td>n columns</td>
+    	<td>
+    	<select name='ncolumns' id='ncolumns'  class=sel>
+    	<option value='3' >3</option><option value='4' selected>4</option><option value='5' >5</option><option value='6' >6</option><option value='7' >7</option>		</select>
+    	</td>
+    	<td>&nbsp;</td>
+    </tr> 
+    <tr>
+    	<td>dt days</td>
+    	<td>
+    	<select name='dtdays' id='dtdays'  class=sel>
+    	<option value='1' selected>1</option><option value='2' >2</option><option value='3' >3</option><option value='4' >4</option><option value='7' >7</option><option value='14' >14</option>		</select>
+    	</td>
+    	<td><input  id='evol_submit' type="button" onclick="submit_form()" value='ok' class='sel' style='width: 20px'></td>
+    </tr>            
+    </table>
+    
+  </td>  
+  
+  <td valign=top>
+  
+  	<table border=0 width=100% cellpadding=0 cellspacing=0>
+	<tr>
+		<td>
+
+		<SCRIPT LANGUAGE="JavaScript" ID="jscal1xx">
+		var cal1xx = new CalendarPopup("testdiv1");
+		//cal1xx.showNavigationDropdowns();
+		cal1xx.showYearNavigation();
+		</SCRIPT>
+		
+
+        <table border=0		<tr>
+		<td>
+			<img src=/~mma/oof/share/images/go_r15_.gif border=0 onclick='setdate("22-04-2014",1)' style='cursor:pointer'>
+		</td>
+		<td>
+			<INPUT TYPE="text" NAME="date1xx" id="date1xx" value="23-04-2014" SIZE=10 style='border: 1px solid #cccccc'>
+		</td>
+		<td>
+			<img src=/~mma/oof/share/images/go_r15.gif border=0 onclick='setdate("24-04-2014",1)' style='cursor:pointer'>
+		</td>
+		<td>
+			<A HREF="#" onClick="cal1xx.select(document.forms[0].date1xx,'anchor1xx','dd-MM-yyyy'); return false;" TITLE="" NAME="anchor1xx" ID="anchor1xx">
+			<img src=/~mma/oof/share/images/calendar.gif border=0>
+			</A>
+		</td>
+		<td>
+			<input type=submit value='go'>
+		</td>
+		</tr>
+		
+
+                <tr>
+                  <td colspan=2>&nbsp;</td>
+                  <td colspan=3><img border=0 style='vertical-align: middle' src=/~mma/oof/share/images/interr_.gif><a href='usage.php?lang=en' target='_top'>usage</a></td>
+                </tr>
+                <tr>
+                  <td colspan=2>
+                    <div style='cursor:pointer' onclick='setdaily("showDaily",1,1)'>
+                    show daily                    </div>
+                  </td>
+                  <td colspan=3>
+                    <a href='disclaimer.php?lang=en' target='_top'><img border=0 style='vertical-align: middle' src=/~mma/oof/share/images/excl_.gif>disclaimer</a>
+                  </td>
+                </tr>
+
+		</table>
+
+		<DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
+		
+		
+		<input type="hidden" name='var'   id='var'   value='temp'>
+		<input type="hidden" name='level' id='level' value='s'>
+		<input type="hidden" name='pred'  id='pred'  value='0'>
+
+		<input type="hidden" name='showCurr'  id='showCurr'  value='0'>
+		<input type="hidden" name='showDaily' id='showDaily' value='0'>
+		
+		
+		
+		</td>
+	</tr>
+	</table>
+	
+  </td>  
+</tr>
+</table>
+
+
+</td>
+</tr>
+<tr  bgcolor=white>
+<td>
+
+<table border=0 bgcolor='#002266' cellpadding=5 cellspacing=0><tr bgcolor='white'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div id="slideshow-div" class="rs-slideshow">
+     
+    <!-- 
+    Set up an initial slide -- this provides an image for users without JavaScript 
+    -->
+    <div class="slide-container">
+        <img src="images/20140420_f_n0_avg_1_temp_k_surface_thumb.png"
+            alt="The first image in a slideshow demo."/> 
+     
+    <!-- 
+    This list contains data about each slide. 
+    So that the slide images aren't loaded with the page, we use <a> tags. 
+    With some extra CSS rules, this allows for users without JavaScript to 
+    access the images by clicking the links. 
+    -->
+    <!-- <ol class="slides">
+        <li>
+            <a href="demo/images/morzine-2011-c.png">morzine-2011-c.png</a>
+        </li>
+        <li>
+            <a href="demo/images/morzine-2011-a.png">morzine-2011-a</a>
+        </li>
+        <li>
+            <a href="demo/images/morzine-2011-b.png">morzine-2011-a</a>
+        </li>
+    </ol> -->
+     
+</div>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Sun 20 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_0',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_0' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_1_temp_k_surface_thumb.png' border=0>
+
+			</div>
+			</a> 
+			</td></tr'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Mon 21 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_1',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_1' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_2_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Tue 22 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_2',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_2' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_3_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Wed 23 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_3',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_3' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_4_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><tr bgcolor='white'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Thu 24 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_4',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_4' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td></tr'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Fri 25 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_5',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_5' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Sat 26 Apr 2014</div>
+			<a onClick="OpenNewWindow('im_6',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_6' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Sun 27 Apr 2014</div>
+			<a onClick="OpenNewWindow('im_7',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_7' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			<form name="SlideShow">
+			<table>
+			<tr>
+			<td colspan=2><img name="Screen" width=108 height=135></td>
+			</tr>
+			<tr>
+			<td><input type="button" name="Previous" 
+			value=" << "
+				onClick="ShowSlide(-1)"></td>
+			<td align="right"><input type="button" name="Next"
+			value=" >> " onClick="ShowSlide(1)"></td>
+			</table>
+			</form>
+			</a> 
+			</td></table>
+
+</td>
+</tr>
+</table>
+
+</form>
+

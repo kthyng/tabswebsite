@@ -1,0 +1,358 @@
+
+<head>
+<link rel="stylesheet" type="text/css" href="calendar.css">
+<link rel="stylesheet" type="text/css" href="../share/styles/nept.css">
+<link rel="stylesheet" type="text/css" href="slide.css">
+
+                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+</head>
+<body onload="StartSlideShow()" style='background-color: white'>
+
+
+
+
+<form name='main_form' id='main_form' method="get">
+
+<table border=0 width=100% cellpadding=5 bgcolor='white'>
+<tr>
+<td>
+
+<table border=0 width=570px  cellspacing=1 bgcolor='#002266'>
+<tr  bgcolor=white>
+  <td valign=top>
+
+	<table border=0 width=200px cellpadding=0 cellspacing=0 bgcolor=white height=65px>
+	<tr>
+	<td valign=top bgcolor='#f5f5f5'>
+	
+	<table border=0 width=122px cellpadding=0 cellspacing=0 >
+	<tr>
+		<td>&nbsp;</td>
+		<td>0</td>
+		<td>10</td>
+		<td>50</td>
+		<td>100</td>
+		<td>200</td>
+		<td>bot</td>
+			</tr>
+	
+	<tr>
+		<td>temp</td>
+		<td>
+		<img onclick='setdata("temp","s",0,1)' src='/~mma/oof/share/images/true3_.gif' style="border: 1px solid red; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("temp",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>		
+		<td>
+		<img onclick='setdata("temp",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>
+		<td>
+		<img onclick='setdata("temp",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("temp",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+                <td>&nbsp;</td>
+
+	</tr>
+	<tr>
+		<td>salt</td>
+		<td>
+		<img onclick='setdata("salt","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("salt",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>		
+		<td>
+		<img onclick='setdata("salt",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+		</td>
+		<td>
+		<img onclick='setdata("salt",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+		<td>
+		<img onclick='setdata("salt",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		</td>
+                <td>&nbsp;</td>
+	</tr>
+
+        <tr>
+          <td>zeta</td>
+          <td colspan=6>
+          <img onclick='setdata("zeta","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+        </tr>
+
+
+        <tr>
+          <td>O2</td>
+          <td>
+                    </td>
+          <td>
+                    </td>
+          <td>
+                    </td>
+          <td>
+                   </td>
+          <td>
+                   </td>
+          <td>
+          <img onclick='setdata("dye_01",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+       </tr>
+
+        <tr>
+          <td>Miss</td>
+          <td>
+          <img onclick='setdata("dye_02","s",0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",10,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",50,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >          </td>
+          <td>
+          <img onclick='setdata("dye_02",100,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+          <td>
+          <img onclick='setdata("dye_02",200,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >         </td>
+         <td>&nbsp;</td>
+       </tr>
+
+
+
+
+
+
+
+
+	<tr>
+		<td colspan=6 align="right">
+		
+		<div style='cursor:pointer; width: 100px' onclick='setsome("showCurr",1,1)'>
+		show currents  &nbsp;
+		</div>		</td>	
+	</tr>	
+	</table>
+	
+	</td>
+	<td valign=top bgcolor='#e2e2e2'>
+	  	<table border=0 width=100% cellpadding=0 cellspacing=0>
+			<tr>
+			<td style='padding-left: 5px'>sst</td>
+			<td>
+			<img onclick='setdata("sst",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >		
+			</td>
+			</tr>
+			<tr>
+                        			<td style='padding-left: 5px'>wind</td>
+			<td>
+			<img onclick='setdata("wind",0,0,1)' src='/~mma/oof/share/images/true3_.gif' onmouseover=overimg(this) onmouseout=outimg(this) style="border: 1px solid #cccccc; cursor: pointer" >				
+			</td>
+			</tr>
+
+
+                        
+		</table>
+	
+	<td>
+	</td>
+	</tr>
+	</table>
+
+  </td>
+
+  
+  <td valign=top width=140px>
+    <style>
+    	.sel {height: 15px; width:40px;
+    		border: 1px solid #002266;
+    		background-color: #f5f5f5;
+    	}
+    </style>
+    
+
+    
+    <table border=0 width=100% cellpadding=0 cellspacing=1 >
+    <tr>
+    	<td colspan=3>evolution options</td>
+    </tr>
+    <tr>
+    	<td>n showm</td>
+    	<td>
+    	<select name='nshown' id='nshown'  class=sel>
+    	<option value='3' >3</option><option value='5' >5</option><option value='7' >7</option><option value='8' selected>8</option><option value='10' >10</option><option value='14' >14</option>		</select>
+    	</td>
+    	<td>&nbsp;</td>
+    </tr>   
+    <tr>
+    	<td>n columns</td>
+    	<td>
+    	<select name='ncolumns' id='ncolumns'  class=sel>
+    	<option value='3' >3</option><option value='4' selected>4</option><option value='5' >5</option><option value='6' >6</option><option value='7' >7</option>		</select>
+    	</td>
+    	<td>&nbsp;</td>
+    </tr> 
+    <tr>
+    	<td>dt days</td>
+    	<td>
+    	<select name='dtdays' id='dtdays'  class=sel>
+    	<option value='1' selected>1</option><option value='2' >2</option><option value='3' >3</option><option value='4' >4</option><option value='7' >7</option><option value='14' >14</option>		</select>
+    	</td>
+    	<td><input  id='evol_submit' type="button" onclick="submit_form()" value='ok' class='sel' style='width: 20px'></td>
+    </tr>            
+    </table>
+    
+  </td>  
+  
+  <td valign=top>
+  
+  	<table border=0 width=100% cellpadding=0 cellspacing=0>
+	<tr>
+		<td>
+
+		                                                                                                                                                                               
+		
+
+        <table border=0		<tr>
+		<td>
+			<img src=/~mma/oof/share/images/go_r15_.gif border=0 onclick='setdate("22-04-2014",1)' style='cursor:pointer'>
+		</td>
+		<td>
+			<INPUT TYPE="text" NAME="date1xx" id="date1xx" value="23-04-2014" SIZE=10 style='border: 1px solid #cccccc'>
+		</td>
+		<td>
+			<img src=/~mma/oof/share/images/go_r15.gif border=0 onclick='setdate("24-04-2014",1)' style='cursor:pointer'>
+		</td>
+		<td>
+			<A HREF="#" onClick="cal1xx.select(document.forms[0].date1xx,'anchor1xx','dd-MM-yyyy'); return false;" TITLE="" NAME="anchor1xx" ID="anchor1xx">
+			<img src=/~mma/oof/share/images/calendar.gif border=0>
+			</A>
+		</td>
+		<td>
+			<input type=submit value='go'>
+		</td>
+		</tr>
+		
+
+                <tr>
+                  <td colspan=2>&nbsp;</td>
+                  <td colspan=3><img border=0 style='vertical-align: middle' src=/~mma/oof/share/images/interr_.gif><a href='usage.php?lang=en' target='_top'>usage</a></td>
+                </tr>
+                <tr>
+                  <td colspan=2>
+                    <div style='cursor:pointer' onclick='setdaily("showDaily",1,1)'>
+                    show daily                    </div>
+                  </td>
+                  <td colspan=3>
+                    <a href='disclaimer.php?lang=en' target='_top'><img border=0 style='vertical-align: middle' src=/~mma/oof/share/images/excl_.gif>disclaimer</a>
+                  </td>
+                </tr>
+
+		</table>
+
+		<DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
+		
+		
+		<input type="hidden" name='var'   id='var'   value='temp'>
+		<input type="hidden" name='level' id='level' value='s'>
+		<input type="hidden" name='pred'  id='pred'  value='0'>
+
+		<input type="hidden" name='showCurr'  id='showCurr'  value='0'>
+		<input type="hidden" name='showDaily' id='showDaily' value='0'>
+		
+		
+		
+		</td>
+	</tr>
+	</table>
+	
+  </td>  
+</tr>
+</table>
+
+
+</td>
+</tr>
+<tr  bgcolor=white>
+<td>
+
+<table border=0 bgcolor='#002266' cellpadding=5 cellspacing=0><tr bgcolor='white'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div id="slideshow-div" class="rs-slideshow">
+     
+                                                                                                       
+    <div class="slide-container">
+        <img src="images/20140420_f_n0_avg_1_temp_k_surface_thumb.png"
+            alt="The first image in a slideshow demo."/> 
+     
+                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                 
+     
+</div>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Sun 20 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_0',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_0' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_1_temp_k_surface_thumb.png' border=0>
+
+			</div>
+			</a> 
+			</td></tr'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Mon 21 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_1',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_1' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_2_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Tue 22 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_2',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_2' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_3_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #d0b3b3; border-bottom: 1px solid #d2d9e7'>Wed 23 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_3',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_3' src='/~mma/oof/plots/2014/04_19/20140419_f_n0_avg_4_temp_k_surface_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><tr bgcolor='white'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Thu 24 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_4',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_4' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td></tr'><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Fri 25 Apr 2014</div>
+			<a  onClick="OpenNewWindow('im_5',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_5' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Sat 26 Apr 2014</div>
+			<a onClick="OpenNewWindow('im_6',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_6' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			</a> 
+			</td><td align=center  style='padding-left: 0px; padding-right: 10px'>
+			<div style='border: 1px solid #d2d9e7'>
+			<div style='background-color: #f0f0f0; border-bottom: 1px solid #d2d9e7'>Sun 27 Apr 2014</div>
+			<a onClick="OpenNewWindow('im_7',656,600,'no title', 0);return false;" style='cursor: pointer'>
+			<img id='im_7' src='/~mma/oof/plots/plt0_thumb.png' border=0>
+			</div>
+			<form name="SlideShow">
+			<table>
+			<tr>
+			<td colspan=2><img name="Screen" width=108 height=135></td>
+			</tr>
+			<tr>
+			<td><input type="button" name="Previous" 
+			value=" << "
+				onClick="ShowSlide(-1)"></td>
+			<td align="right"><input type="button" name="Next"
+			value=" >> " onClick="ShowSlide(1)"></td>
+			</table>
+			</form>
+			</a> 
+			</td></table>
+
+</td>
+</tr>
+</table>
+
+</form>
+

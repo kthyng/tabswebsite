@@ -1,0 +1,350 @@
+
+<HEAD>
+<link href="/tglo/newtabs.css" rel="stylesheet" type="text/css">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<TITLE>TABS, Texas Automated Buoy System, Gulf of Mexico Ocean Observatory, Texas Coastal Ocean Observation, Real Time
+Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
+
+
+
+
+
+<meta HTTP-EQUIV="REFRESH" CONTENT="300">
+<meta HTTP-EQUIV="Expires" CONTENT="1800">
+<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+
+<link href="css/leaflet.css"  rel="stylesheet" type="text/css">
+<link rel="stylesheet" media="screen and (min-width: 0px)" href="small.css"> 
+<link rel="stylesheet" media="screen and (max-width: 1000px)" href="medium.css"> 
+<link rel="stylesheet" media="screen and (min-width: 1000px)" href="large.css"> 
+
+
+<link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css">
+<link href="css/default.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/style.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css">
+
+
+<script type="text/javascript" src="js/jquery.min.js?v=1.8.2"></script>
+<script type="text/javascript" src="js/jquery.once.js?v=1.2"></script>
+<script type="text/javascript" src="js/tamustyle.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+ <script type="text/javascript" src="js/leaflet.js"></script>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<!--[if lte IE 8]>
+     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+ <![endif]-->
+  <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-21828695-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })
+  //example user location
+//var userLocation = new L.LatLng();
+   function initmap() {
+	var userLocation = new L.LatLng(30.623944, -96.354405);
+
+var map = L.map('map').setView(userLocation, 13)
+	
+	L.tileLayer('http://{s}.tile.cloudmade.com/f6a65c832e93471b9c3f55e6a1cc1f83/997/256/{z}/{x}/{y}.png', {
+	    maxZoom: 18,
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	}).addTo(map);
+
+
+	var marker = new L.Marker(userLocation);
+	map.addLayer(marker);
+
+</script>
+
+
+</HEAD>
+
+<body bgcolor="#FFFFFF">
+<p align=left>
+<div id="head">
+<table width=1000 border=0>
+<tr align=left>
+<td>
+
+<table align="right" cellspacing="0" width="900" border="0" nowrap>
+<tr> <td colspan=4> 
+<IMG ALIGN="TOP" height="2" width=100% SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
+</td> </tr>
+<tr> <td align="left" width=70>
+<a href="http://www.glo.texas.gov/what-we-do/caring-for-the-coast/oil-spills/index.html">
+<IMG alt="Texas General Land Office" align="middle" SRC="C:/xampp/htdocs/TABS/gloseal.png" border="0">
+</a>
+</td>
+<td class=bksm nowrap align="left" width=200>
+<b>&nbsp;Texas General<br>&nbsp;Land Office<BR>
+&nbsp;Oil Spill Prevention<br>&nbsp;& Response</b>
+</td>
+<td align="center" width=300>
+<a href="/tglo" style="text-decoration: none">
+<B>
+<font class=grbig>T</font><font class=bknorm>exas</font>
+<font class=grbig>A</font><font class=bknorm>utomated</font>
+<font class=grbig>B</font><font class=bknorm>uoy</font>
+<font class=grbig>S</font><font class=bknorm>ystem</font>
+</B>
+<BR>
+<font class=bksm>
+Real Time Ocean Observations
+<BR>
+Supporting Oil Spill Prevention and Response since 1995
+</font>
+</a>
+</td>
+<td align="center" width=350>
+<a href="http://gerg.tamu.edu">
+<IMG align="Middle" SRC="C:/xampp/htdocs/TABS/gerg-logo.png" alt="Geochemical and Environmental Research Group" border="0">
+</a>
+</td>
+<tr> <td colspan=4>
+<IMG ALIGN="TOP" height="2" width=100% SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
+</td> </tr>
+
+</table>
+<br>
+</td>
+</tr>
+</table>
+</div>
+
+
+<link href="/tglo/newtabs.css" rel="stylesheet" type="text/css">
+<style type = "text/css">
+ body {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
+	background-color: rgba(248, 248, 248, 0.9);
+}
+#leftmenu {
+		width: 15%;
+		min-width: 150px;
+}
+#leftmenu > details { }
+#leftmenu > details > summary{
+	cursor:pointer;
+	margin:4px;
+	padding:6px;	
+	-webkit-details-marker{font-size: 0px;}}
+#leftmenu > details > summary: hover {
+	background: EFEFEF;
+}
+#leftmenu > details > summary::-webkit-details-marker{
+display:none;
+}
+
+
+</style>
+<P align=left>
+<TABLE border=0>
+<tr>
+<td nowrap valign=top rowspan=11 width=180 style="white-space:nowrap; text-align:left;";>	
+<div id ="leftmenu">
+<details>
+<summary><b><font class=grnorm>TABS</font><font class=bknorm> DATA PRODUCTS</b></font><BR> </summary>
+<font size="2">
+<A href="/Tglo" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TABS Home</a> <BR>
+<a href="/tglo/testpages/Index-frame/frame.php" style ="text-decoration:none"><font class=bknorm>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check out our new Beta site </font></a><br>
+<a href=http://tabs2.gerg.tamu.edu/tglo/RTA/RTA_index.html style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Real Time Data Analysis</A><br>
+<A href="/Tglo/sumpage.php" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Current Summary</a> <BR>
+<A href="/Tglo/buoystatus.php" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Buoy Status</a> <BR>
+<A href="http://seawater.tamu.edu/tglo/index.html" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TABS Model Results</a> <BR>
+<A href=http://polar.ncep.noaa.gov/waves/viewer.shtml?-multi_1-latest-hs-gmex- style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOAA Wave Model</a><BR>
+<a href="/tglo/vector_addition_trajectory_pub_final.xls" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vector Addition Trajectory Tool</a><img align=top src=C:/Users/AZ/Desktop/TABS/icon_sm.png>
+</font>
+</details>
+<details> <summary>
+<font class=bknorm>
+<b>WEATHER</b>
+</font> </summary>
+<font class=bksm size="2">
+<A href=/~woody/hurricane.php style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hurricane Tracks</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marine Forecasts<br>
+&nbsp;<A href="/tglo/weather.php" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TX</a>&nbsp;&nbsp;&nbsp;
+&nbsp;<A href="/tglo/weather.php?reg=la" style ="text-decoration:none">LA</a>&nbsp;&nbsp;&nbsp;
+&nbsp;<A href="/tglo/weather.php?reg=off" style ="text-decoration:none">Offshore</a>&nbsp;&nbsp;&nbsp;
+<br>
+<a href=http://weather.unisys.com/gfsx/gfsx.php?inv=0&plot=hght&region=us&t=9p&expanddiv=hide_bar style ="text-decoration:none">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MRF 10 day forecast</a>
+(UNiSYS)
+</font>
+</details>
+
+<details>
+<summary><b><font class=grnorm>TABS</font><font class=bknorm> INFORMATION</b></font><BR> </summary>
+<font class=rdsm size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTANT:</font><font class=bksm size="2"><a href=/tglo/notice_to_mariners_111810.pdf style ="text-decoration:none"> Notice to Mariners</a></b>
+<br>
+<font class=grsm size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TABS</font> <A href=/tglo/news.php style ="text-decoration:none">News</a>
+<br>
+<font class=grsm size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TABS</font> Web Site<a href=/usage/usage_201311.html#HOURSTATS style ="text-decoration:none">
+ Stats</a><br>
+<a href=/Tglo/feedback.php style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comments</a><br>
+</font>
+</details>
+
+<details>
+<summary>
+<font class=bknorm>
+<b>ARTICLES & PUBLICATIONS</b></font><BR> </summary>
+<font class=bksm size="2">
+<a href="/tglo/TABS_Descriptive_Paper.pdf" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Development of TABS paper(pdf)</a><br>
+<a href="/tglo/tabs10year.pdf" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ten Years of TABS paper(pdf)</a><br>
+<a href="/tglo/oceans2001.pdf" style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oceans 2001 TABS paper(pdf)</a><br>
+</font>
+</details>
+
+<details>
+<summary>
+<font class=bknorm>
+<b>LINKS</b><BR></font> </summary>
+<font class=bksm size="2">
+<a href=http://ocean.tamu.edu/GCOOS style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GCOOS</a> (Member)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TGLO <a href="http://www.glo.texas.gov/what-we-do/caring-for-the-coast/oil-spills/index.html" style ="text-decoration:none" >Oilspill Division</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NDBC &nbsp; &nbsp;<a href=http://www.ndbc.noaa.gov style ="text-decoration:none">Home</a>&nbsp; &nbsp;
+<a href=http://www.ndbc.noaa.gov/maps/WestGulf.shtml style ="text-decoration:none">West Gulf</a>&nbsp; &nbsp;
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TWBD <a href=http://midgewater.twdb.state.tx.us/bays_estuaries/tides.html style ="text-decoration:none"> Tide Forecasts</a><br>
+<a href=http://www.nhc.noaa.gov/ style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;National Hurricane Center</a><br>
+<a href=http://140.90.121.76/hgports/hgports.html style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Houston/Galveston PORTS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Texas Parks <a href=http://www.tpwd.state.tx.us/landwater/water/environconcerns/hab/ style ="text-decoration:none">Harmful Algal Blooms</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AVHRR <a href=http://fermi.jhuapl.edu/avhrr/gm/ style ="text-decoration:none"	>Images</a> (Johns Hopkins)<br>
+<a href=http://lighthouse.tamucc.edu/TCOON/HomePage style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TCOON</a> (TAMUCC)<br>
+<a href=http://wavcis.csi.lsu.edu/ style ="text-decoration:none">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WAVCIS</a> (LSU)<br>
+</font>
+</details>
+<BR>
+</div>
+
+</font>
+</td><td colspan=2>
+<font class=bkvsm style=font-size:7pt;>
+<i>In the map below, click on each of the TABS buoys to access 
+their half-hourly data for the last 5 days or to perform database searches.</i>
+</font>
+<br>
+<TR>
+<TD valign=top width=440 rowspan=11>
+<div id="map" >
+							
+							<!--iframe width="460" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://public.enthought.com/~kjordahl/tracker/animate.html" onload="initmap()"></iframe-->
+  <iframe width="690" height="450" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://public.enthought.com/~kjordahl/tracker/animate.html" onload="initmap()"></iframe>
+
+
+</div>
+<br>
+
+<i><font class=bkvsm style=font-size:6pt;>
+Bathymetric contours shown for these depths(meters): 20, 50, 200, 2000, 3500
+<BR>
+The vectors on the map point toward the direction that the currents or winds are flowing<br> and represent the average for the
+last three hours of the available data.<br>  The date and time at each station indicates the end of the three-hour average.
+</i></font>
+ </td>
+</center>
+<div id="data">
+<TH colspan=2 align=left><font class==bknorm>Last Data Reported</font>
+<TR>
+<TD valign=top>
+<TABLE border=0><TR><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=B>B</a></font></TD>
+<td nowrap valign=top><font class=bksm>Out of Service</font>
+<TR><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=D>D</a></font></TD>
+<td nowrap valign=top><font class=bksm>Out of Service</font>
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=F>F</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=J>J</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=K>K</a></font></TD>
+<td nowrap valign=top><font class=bksm>Out of Service</font>
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=N>N</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=R>R</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=V>V</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=W>W</a></font></TD>
+<td nowrap valign=top><font class=bksm>11/14/2013 11:30Z (05:30 CST)
+</font>
+<tr>
+<TR><TD>
+&nbsp;<BR>
+&nbsp;<BR>
+&nbsp;<BR>
+</td></tr>
+</TABLE>
+</TD>
+</TR>
+
+</TABLE>
+</div>
+<BR>
+</CENTER>
+
+
+
+<map name="tabs-imagemap-20101202">
+<!-- #$-:Image Map file created by GIMP Imagemap Plugin -->
+<!-- #$-:GIMP Imagemap Plugin by Maurits Rijk -->
+<!-- #$-:Please do not edit lines starting with "#$" -->
+<!-- #$VERSION:1.3 -->
+<!-- #$AUTHOR:Woody Lee -->
+<AREA SHAPE="RECT" COORDS="329,110,371,140" TITLE="TABS Buoy B&#10;test"  HREF="/Tglo/ven.php?buoy=B">
+<AREA SHAPE="RECT" COORDS="119,241,145,289" TITLE="TABS Buoy D"  HREF="/Tglo/ven.php?buoy=D">
+<AREA SHAPE="RECT" COORDS="393,139,424,187" TITLE="TABS Buoy F"  HREF="/Tglo/ven.php?buoy=F">
+<AREA SHAPE="RECT" COORDS="161,263,189,286" TITLE="TABS Buoy H"  HREF="/tglo/ven.php?buoy=H">
+<AREA SHAPE="RECT" COORDS="93,453,123,505" TITLE="TABS Buoy J"   HREF="/Tglo/ven.php?buoy=J">
+<AREA SHAPE="RECT" COORDS="148,449,185,508" TITLE="TABS Buoy K"  HREF="/Tglo/ven.php?buoy=K">
+<AREA SHAPE="RECT" COORDS="413,243,448,261" TITLE="TABS Buoy L (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=L">
+<AREA SHAPE="RECT" COORDS="404,222,447,238" TITLE="TABS Buoy M (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=M">
+<AREA SHAPE="RECT" COORDS="418,266,445,304" TITLE="TABS Buoy N (Flower Gardens)"  HREF="/Tglo/ven.php?buoy=N">
+<AREA SHAPE="RECT" COORDS="462,254,497,314" TITLE="TABS Buoy V (Flower Gardens)"  HREF="/tglo/ven.php?buoy=V">
+<AREA SHAPE="RECT" COORDS="458,41,493,91" TITLE="TABS Buoy R"  HREF="/tglo/ven.php?buoy=R">
+<AREA SHAPE="RECT" COORDS="410,32,442,80" TITLE="NDBC CMAN SRST2" HREF="/Tglo/ndbc.php?buoy=SRST2">
+<AREA SHAPE="RECT" COORDS="373,84,421,128" TITLE="NDBC Buoy 42035" HREF="/Tglo/ndbc.php?buoy=42035">
+<AREA SHAPE="RECT" COORDS="247,249,333,292" TITLE="NDBC Buoy 42019" HREF="/Tglo/ndbc.php?buoy=42019">
+<AREA SHAPE="RECT" COORDS="109,364,191,410" TITLE="NDBC Buoy 42020" HREF="/Tglo/ndbc.php?buoy=42020">
+<AREA SHAPE="RECT" COORDS="73,255,117,304" TITLE="NDBC CMAN PTAT2"  HREF="/Tglo/ndbc.php?buoy=PTAT2">
+<AREA SHAPE="RECT" COORDS="192,193,237,246" TITLE="TABS Buoy W"  HREF="/tglo/ven.php?buoy=W">
+<AREA SHAPE="RECT" COORDS="243,185,267,219" TITLE="TABS Buoy S"  HREF="/tglo/tabsqueryform.php?buoy=S">
+<AREA SHAPE="RECT" COORDS="328,146,368,173" TITLE="TABS Buoy C"  HREF="/tglo/tabsqueryform.php?buoy=C">
+<AREA SHAPE="RECT" COORDS="457,202,551,241" TITLE="Forest Oil FGBL1" HREF="Tglo/ndbc.php?buoy=FGBL1">
+<AREA SHAPE="RECT" COORDS="565,98,592,127" TITLE="TABS Buoy P (CMI)"  HREF="/tglo/tabsqueryform.php?buoy=P">
+<AREA SHAPE="RECT" COORDS="24,8,177,32" TITLE="TABS Description"  HREF="/Tglo/tabs_description.html">
+<AREA SHAPE="RECT" COORDS="23,49,236,77" TITLE="NOAA Buoy Description"  HREF="/Tglo/buoy_description.html">
+<AREA SHAPE="RECT" COORDS="25,79,230,105" TITLE="Data Archive" HREF="/Tglo/dataarchive.html">
+</MAP>
+<CENTER>
+<p>
+<p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
+<BR>
+</body>
+
+
+<table><TR><TD>
+<a href="http://www.tamu.edu/statements/trademark.html" class="bksm"> 2013 All Rights Reserved, </A>
+<a href="http://www.tamu.edu/" class="bksm"> Texas A&M University &#9642; </a> 
+<a href="mailto:woody@gerg.tamu.edu" class="bksm"> Webmaster &#9642; </a> 
+<a href="http://gerg.tamu.edu/contact-us" class="bksm"> Contact Us &#9642; </a>  
+<a href="http://geosciences.tamu.edu/about-us/geonet-information-hub/web-site-policies" class="bksm"> Site Policies &#9642; </a> 
+<a href="http://geosciences.tamu.edu/media/pdfs/emergency.pdf" class="bksm"> TAMU Emergency Protocol &#9642; </a>
+<a href="http://itaccessibility.tamu.edu" class="bksm"> Accessibility &#9642; </a>
+<a href="http://geosciences.tamu.edu/about-us/geonet-information-hub/web-site-policies/677-site-privacy-and-security-policy" class="bksm">Privacy & Security</a>
+</TD></TR></table>

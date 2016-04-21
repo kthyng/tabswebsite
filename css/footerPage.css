@@ -1,0 +1,73 @@
+#footerTextPage {
+margin:0;
+padding: 0;
+display: block;
+float: center;
+margin-left: 10em;
+font-size:12px;
+font-weight: bold;
+}
+
+#footerTextPage ul {
+margin:0;
+padding: 0;
+line-height: 2em;
+}
+
+#footerTextPage li {
+margin:0;
+padding: 0;
+list-style: none;
+float: left;
+position: relative;
+--background:#efefef;
+}
+
+#footerTextPage ul li a {
+text-align: left;
+text-decoration: none;	
+font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+padding-left: 1em;
+height: 18px;
+width: 154px;
+display: flex;
+color: #000000;
+}
+
+#footerTextPage ul ul{
+	position: absolute;
+	visibility: hidden;
+	top: 30	px;
+}
+
+/* #footerText ul li:hover ul {
+visibility: visible;
+} */
+
+/*********************************************************************************/
+
+/* #footerText li:hover{
+--background: #09F;
+background:#eee;
+} */
+
+/* #footerText ul li:hover ul li a:hover{
+	background: #CCC;
+	color: #000; 
+} */
+
+#footerTextPage a:hover{
+	color: #998031;
+	}
+	
+/* #footerText-final a{
+   text-align: left;
+text-decoration: none;	
+font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+padding-left: 1em;
+height: 18px;
+width: 152px;
+display: flex;
+color: #5856D6;
+} */
+
