@@ -74,13 +74,13 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
    function initmap() {
 	var userLocation = new L.LatLng(30.623944, -96.354405);
 
-var map = L.map('map').setView(userLocation, 13)
-
-	L.tileLayer('http://{s}.tile.cloudmade.com/f6a65c832e93471b9c3f55e6a1cc1f83/997/256/{z}/{x}/{y}.png', {
-	    maxZoom: 18,
-	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="http://cloudmade.com">CloudMade</a>'
-	}).addTo(map);
-}
+// var map = L.map('map').setView(userLocation, 13)
+//
+// 	L.tileLayer('http://{s}.tile.cloudmade.com/f6a65c832e93471b9c3f55e6a1cc1f83/997/256/{z}/{x}/{y}.png', {
+// 	    maxZoom: 18,
+// 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="http://cloudmade.com">CloudMade</a>'
+// 	}).addTo(map);
+// }
 
 	var marker = new L.Marker(userLocation);
 	map.addLayer(marker);
