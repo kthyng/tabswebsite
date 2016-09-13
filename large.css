@@ -10,12 +10,16 @@ div#gloseal
 {
 	margin-left : 4em;
 	margin-top: -.25em;
+    transform: scale(0.8, 0.8);
 }
 div#tglo{
-	 --font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+     --font-family: 'Open Sans Condensed', sans-serif;
+     /*--font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;*/
 	 font-family: Frutiger 65, Bold;
-	 font-size: .9em;
-	 	margin-top: -.25em;
+	 font-size: 0.9em;
+     	margin-top: -1.2em;
+        margin-left: -0.1em;
+    color: #8B7844;
 	 }
 
 div#title{
@@ -31,7 +35,7 @@ display:none;
 
 div#gerg{
 	margin-left: 2em;
-	
+
 	}
 
 div#text{
@@ -42,21 +46,21 @@ margin-left: -0.75em;
 font-size: 1em;
 }
 
-div#data 
+div#data
 {
  position: absolute;
  margin-top: 1em;
  margin-left: 3em;
 }
 
-div#custom{ 	
+div#custom{
 	color: #007AFF;
 }
 
 div#navmobile
-{ 
+{
 display: none;
-}  
+}
 
 
 div#map{
@@ -64,7 +68,7 @@ margin-left: 0em;
 margin-top : 0em;
 }
 
-div#Buoy { 
+div#Buoy {
 display: none;
 }
 
@@ -77,5 +81,3 @@ div#footerPageText{
 margin-left: 8em;
 margin-bottom: -5em;
 }
-
-
