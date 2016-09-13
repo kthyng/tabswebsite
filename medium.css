@@ -39,7 +39,7 @@ width : auto;
 position: inherit;
 left: 10px;
 float:none;
-bottom:0; 
+bottom:0;
 margin-bottom:460px;
 font-size: 10px;
 margin: 0px auto;
@@ -69,7 +69,7 @@ display:flex;
 
 /* #navmobile ul li a {
 text-align: left;
-text-decoration: none;	
+text-decoration: none;
 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 padding-left: 1em;
 height: 25px;
@@ -81,12 +81,12 @@ border: 1px solid #fff;
  */
 
 div#navmobile
-{ 
+{
 display: none;
-}  
+}
 
 
-div#footer { 
+div#footer {
 display: none
 }
 
@@ -94,7 +94,7 @@ div#gloseal
 {
 	margin-left : 0.5em;
 	--margin-top: -.25em;
-	
+
 }
 div#tglo{
 	 --font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -103,7 +103,7 @@ div#tglo{
 	 margin-top: -.25em;
 	 display: none;
 	 }
-	 
+
 div#title{
 	margin-top: -.1em;
 	margin-left: -17em;
@@ -131,11 +131,11 @@ div#text{
 display: none;
 }
 
-div#data 
-{display:none;	
+div#data
+{display:none;
 }
 
-div#custom{ 
+div#custom{
 	color: #007AFF;
 }
 
