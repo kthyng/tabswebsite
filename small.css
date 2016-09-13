@@ -35,7 +35,7 @@ width : auto;
 position: inherit;
 left: 10px;
 float:none;
-bottom:0; 
+bottom:0;
 margin-bottom:460px;
 font-size: 10px;
 margin: 0px auto;
@@ -91,7 +91,7 @@ display: block;
 
 div#navmobile ul li a:hover::after { border-color: #cad0e6; } */
 
-div#footer { 
+div#footer {
 display:none
 }
 
@@ -106,20 +106,20 @@ div#tglo{
 	 font-size: .9em;
 	 margin-top: -.25em;
 	 }
-	 
+
 div#title{
 	margin-top: -1.5em;
 	margin-left: -1em;
 	font-family: Frutiger 65, Bold;
 	}
-	
+
 div#mobtitle{
 	margin-left: -12em;
 	margin-top: -1.5em;
 	font-family: Frutiger 65, Bold;
 	text-align: left;
 }
-	
+
 div#gerg{
 	margin-left: 2em;
 	display:none;
@@ -133,11 +133,11 @@ margin-left: -.75em;
 font-size: 1em;
 }
 
-div#data 
-{display:none;	
+div#data
+{display:none;
 }
 
-div#custom{ 
+div#custom{
 	color: #007AFF;
 }
 
@@ -147,10 +147,9 @@ div#map{
 margin-left: 0em;
 margin-top : -5em;
 
-} 
+}
 
 div#footerText{
 margin-bottom: -1em;
 display: none;
 }
-
