@@ -1,0 +1,741 @@
+/*from http://www.glo.texas.gov/*/
+body {
+    background-color: #333;
+    font-family: 'Raleway', sans-serif;
+}
+h1,
+h2,
+h3,
+h3,
+.lead {
+    font-family: 'Open Sans Condensed', sans-serif;
+    color: #777;
+    font-weight: 300;
+}
+.honey {
+    display: none;
+}
+h2 {
+    font-size: 22px;
+    font-weight: 700;
+    background-image: url(../images/bg-h2.png);
+    margin-top: 40px;
+}
+h2:first-child {
+    margin-top: 0px;
+}
+h2 span {
+    background-color: #FFF;
+    padding-right: 10px;
+}
+h2.home {
+    font-size: 40px;
+    font-weight: 300;
+    background-image: none;
+    color: #fff;
+}
+h2.home span {
+    background-color: transparent;
+    padding-right: 0px;
+}
+.lead {
+    font-size: 28px;
+    line-height: 32px;
+    margin-bottom: 30px;
+}
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+:focus,
+:active {
+    outline: 0;
+}
+a:hover {
+    color: #286090;
+}
+hr {
+    border-top: 1px dotted #777;
+}
+.nav ul.fa-ul {
+    margin-left: 0;
+}
+.nav ul.fa-ul li {
+    margin-bottom: 0px;
+}
+.nav ul.fa-ul .fa-li {
+    position: relative;
+    left: 0;
+    top: 0;
+    width: auto;
+    text-align: center;
+}
+ul.fa-ul li {
+    margin-bottom: 10px;
+}
+ul.fa-ul li a {
+    font-weight: 700;
+}
+
+a#scroll-top {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    bottom: 10px;
+    right: 10px;
+    z-index: 10000;
+}
+a#scroll-top:hover {
+    color: #333;
+}
+
+a.sr-only {
+  color: #FFF;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.hero-static {
+    padding-top: 50px;
+    height: 500px;
+    width: 100%;
+    background: url(../images/bg-leasesale.jpg) bottom center #253646;
+    background-size: cover;
+    text-align: center;
+}
+
+.notfound {
+    padding-top: 80px;
+    text-align: center;
+    font-weight: 700;
+    color: #9e8b56;
+    background: url(../images/bg-404.png);
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+}
+.notfound span.notfound-text {
+    font-size: 120px;
+}
+.notfound span.notfound-text-small {
+    font-size: 20px;
+}
+.thumbnail.with-caption {
+  display: inline-block;
+  background: #f5f5f5;
+}
+.thumbnail.with-caption p {
+  margin: 0;
+  padding-top: 10px;
+  text-align: center;
+  font-size:12px;
+  font-weight:700;
+}
+
+.page-intro {
+    font-family: 'Open Sans Condensed', sans-serif;
+    color: #777;
+    font-weight: 300;
+    font-size: 28px;
+    line-height: 32px;
+    margin-bottom: 30px;
+}
+.header {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(226, 226, 226, 1) 100%);
+    background-image:url(../images/bg-hdr.jpg);
+    background-repeat:repeat-x;
+    background-position: top;
+    z-index: 1000;
+}
+.header img {
+    max-width: 100%
+}
+.header h1 {
+    margin: 15px 0 10px 0;
+    color: #8b7844;
+    line-height: 20px;
+}
+.header h1 span {
+    font-size: 18px;
+    margin: 0;
+}
+.header .social {
+    padding: 0;
+    margin: 0;
+}
+a.icon-social {
+    color: #8b7844;
+    font-size: 18px;
+}
+a.icon-social:hover {
+    color: #999;
+}
+.header .search {
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-size: 26px;
+    color: #8b7844;
+    padding: 10px 15px 0 0;
+}
+.header .input-group {
+    max-width: 300px;
+    float: right;
+}
+.callout {
+    display: block;
+    z-index:100;
+    position: absolute;
+    width:100%;
+    padding:30px 0;
+    top:400px;
+    background-color:rgba(0, 0, 0, .5);
+    z-index: 1;
+}
+
+.callout h1 {
+    color:#FFF;
+    margin:0;
+    font-weight: 700;
+    font-size: 64px;
+}
+
+.callout h2 {
+    color:#FFF;
+    margin:0 0 40px 0;
+    font-weight: 400;
+    font-size: 24px;
+}
+.callout .btn-hm {
+    font-family: "Roboto Condensed", "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #fff;
+    border: 2px solid #9e8b56;
+    padding: 10px 20px;
+    min-width: 150px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 0;
+    color: #9e8b56;
+    text-align: center;
+    transition: all 0.3s ease;
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    margin:30px 0 0 0;
+}
+.callout .btn-hm:hover {
+    color:#000;
+    border: 2px solid #000;
+    text-decoration: none;
+}
+.form-control {
+    max-width: 650px;
+}
+.hm-callouts img {
+    border: solid 1px #111;
+}
+.folder-context {
+    background: #dfd7c1;
+    padding-top: 5px;
+    min-height: 12px;
+}
+.folder-context .row {
+    margin-bottom: -15px;
+}
+.folder-context ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.folder-context ul li {
+    display: block;
+    float: left;
+    color: #9e8b56;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+.folder-context ul li .fa {
+    margin: 0 3px 0 7px;
+}
+.page-title {
+    background-color: #dfd7c1;
+    margin-top: -5px;
+    clear: both;
+}
+.page-title h1 {
+    font-size: 28px;
+    font-weight: 300;
+    text-transform: uppercase;
+    color: #9e8b56;
+    text-align: left;
+    margin: 0 0 8px 0;
+}
+.content-wrapper {
+    background-color: #fff;
+    box-shadow: inset 0 10px 10px -10px rgba(0, 0, 0, 0.5), inset 0 -10px 10px -10px rgba(0, 0, 0, 0.5);
+}
+.content-wrapper.home {
+    background-color: #9c8b5d;
+    color: #fff;
+    padding: 60px 0;
+}
+.main-content {
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+.main-content h2 {
+    text-transform: uppercase;
+}
+
+.announcement {
+    background-color: #fff;
+    color: #777;
+    padding: 40px 0;
+}
+.announcement h2 {
+    text-transform: uppercase;
+    color: #777;
+}
+
+.gray1 {
+    background-color: #fff;
+    color: #777;
+    padding: 60px 0;
+}
+.gray1 h2 {
+    text-transform: uppercase;
+    color: #777;
+}
+
+.gray2 {
+    background-color: #fff;
+    color: #777;
+    padding: 0px 0px 60px 0;
+}
+.gray2 h2 {
+    text-transform: uppercase;
+    color: #777;
+}
+
+
+.footer {
+    background-color: #333;
+    font-family: 'Lato', sans-serif;
+    color: #999;
+    padding: 20px 0;
+}
+.footerlinks ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 12px 0 0 0;
+    width: auto;
+}
+.webcast-wrapper {
+    border-top: dotted 1px #333;
+    border-bottom: solid 2px #999;
+    padding: 10px 0;
+    text-align: center;
+    margin: 10px 0;
+}
+.footerlinks ul li {
+    float: left;
+}
+.footerlinks ul li a {
+    display: block;
+    padding: 3px 15px 3px 0;
+    font-size: 12px;
+    color: #999;
+    text-decoration: none;
+    font-weight: 700;
+}
+.footerlinks ul li:last-child a {
+    padding: 3px 0;
+}
+.footerlinks ul li a:hover {
+    color: #FFF;
+    text-decoration: none;
+}
+.copyright {
+    clear: both;
+    font-size: 12px;
+    margin-top: 30px;
+    border-top: solid 1px #999;
+}
+/*  Button styles  */
+
+a.btn.right {
+    margin-top: 20px;
+    float: right;
+}
+a.btn span, .btn span.fa {
+    margin: 3px 0 0 10px;
+    float: right;
+}
+a.icon-social span.fa {
+    float: left;
+    margin: 0 8px 0 0;
+}
+a.btn.webcast {
+    margin-top: 0px;
+    float: none;
+}
+/*  span.fa {
+float: right;
+margin: 3px 0 0 20px;
+} */
+/* Area Specific Styles */
+
+.gpb-circle {
+    width: 234px;
+    float: left;
+    margin: 0 20px 0 0;
+}
+span.file-description {
+    font-size: 12px;
+}
+.open-jobs hr:last-child {
+    display: none;
+}
+/* SEARCH */
+
+.search-box {
+    float: right;
+    margin-left: 21px;
+    margin-top: 4px;
+    font-size: 14px;
+}
+.search-box {
+    margin-left: 0px;
+    width: auto;
+    border: solid 1px #9e8b56;
+    border-radius: 270px;
+}
+.search-box input {
+    position: relative;
+    -webkit-appearance: none;
+}
+.search-box input:focus {
+    outline: 0;
+}
+.search-box .toggle {
+    background-repeat: no-repeat;
+    -webkit-border-radius: 999px;
+    -moz-border-radius: 999px;
+    -ms-border-radius: 999px;
+    border-radius: 999px;
+    cursor: pointer;
+    height: 34px;
+    width: 34px;
+}
+.search-box .toggle {
+    background-color: #fff;
+    background-position: center -1px;
+    background-size: 36px 72px;
+}
+.search-box .toggle:hover {
+    background-position: center -38px;
+}
+.search-box .toggle {
+    -webkit-transition: -webkit-transform .5s;
+    -moz-transition: -moz-transform .5s;
+    -ms-transition: -ms-transform .5s;
+    transition: transform .5s;
+    background-image: url("../images/search-sprite.png");
+    background-position: 2px -2px;
+    background-size: 36px 72px;
+    border: none;
+    text-indent: -999px;
+    z-index: 2;
+}
+.search-box .toggle:hover {
+    background-position: 2px -39px;
+}
+.search-box .toggle.open {
+    -webkit-transform: rotate(-270deg);
+    -moz-transform: rotate(-270deg);
+    -ms-transform: rotate(-270deg);
+    transform: rotate(-270deg);
+    background-position: 0px -1px;
+}
+.search-box input[type="search"],
+.search-box input[type="text"] {
+    -webkit-transition: width 0.5s ease-in-out;
+    -moz-transition: width 0.5s ease-in-out;
+    -ms-transition: width 0.5s ease-in-out;
+    -o-transition: width 0.5s ease-in-out;
+    transition: width 0.5s ease-in-out;
+    background-color: #fff;
+    border: none;
+    border-image-width: 0;
+    -webkit-border-radius: 999px;
+    -moz-border-radius: 999px;
+    -ms-border-radius: 999px;
+    border-radius: 999px;
+    height: 36px;
+    margin: 0 0 0 -36px;
+    padding: 0 0 0 36px;
+    width: 0;
+    z-index: 1;
+}
+.search-box input[type="search"].open,
+.search-box input[type="text"].open {
+    width: 215px;
+}
+.program-image {
+    float: left;
+    margin: 0 20px 0 0;
+}
+em.disclaimer {
+    font-size: 12px;
+}
+/* SECTION SPECIFIC */
+/* Land Sales */
+
+.ls-detail {
+    border-right: dotted 1px #777;
+}
+/* Home Page */
+
+.homevid {
+    width: 100%;
+    height: 500px;
+    box-shadow: inset 0 10px 10px -10px rgba(0, 0, 0, 0.5);
+    display: block;
+    z-index: 1;
+}
+.vidloading {
+    color: #fff;
+    text-align: center;
+    position: absolute;
+    top: 200px;
+    width: 100%;
+    display: block;
+    z-index: 0;
+}
+#fader {
+    display: none;
+}
+/* BOOTSTRAP OVERRIDES */
+
+legend {
+    font-size: 16px;
+}
+.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .btn-group {
+    height: 34px;
+    width: 45px;
+    padding-top: 2px;
+    color: #999;
+}
+.col-xs-5 {
+    float: left;
+    width: 20%;
+}
+@media (max-width: 1199px) {} @media (max-width: 992px) {
+    .header h1 {
+        margin: 15px 0 10px 0;
+        line-height: 20px;
+        font-size: 28px;
+    }
+    .header h1 span {
+        font-size: 18px;
+        margin: 0;
+    }
+    /* SECTION SPECIFIC @ 992 */
+    /* Land Sales */
+
+    .ls-detail {
+        border-right: none;
+    }
+}
+@media (max-width: 1199px) {
+    .header .social {
+        margin: 0 0 0 -30px;
+        padding: 0;
+    }
+}
+@media (max-width: 992px) {
+    .header h1 {
+        margin: 15px 0 10px 0;
+        line-height: 20px;
+        font-size: 28px;
+    }
+    .header h1 span {
+        font-size: 18px;
+        margin: 0;
+    }
+    .header .social {
+        margin: 0;
+    }
+}
+@media (max-width: 1024px) {
+    .homevid {
+        display: none;
+    }
+    .vidloading {
+        display: none;
+    }
+
+    .callout {
+        top:200px;
+    }
+
+    #fader {
+        display: block;
+    }
+    #fader img {
+        max-width: 100%
+    }
+}
+@media (max-width: 767px) {
+    .gpb-circle {
+        width: 100%;
+        text-align: center;
+        float: none;
+        margin: 0 20 0 0;
+    }
+    .homevid {
+        height: 400px;
+    }
+    .header {
+        height: 80px;
+    }
+    .header h1 {
+        margin: 5px 0 0 0;
+        line-height: 20px;
+        font-size: 24px;
+    }
+    .header h1 span {
+        font-size: 14px;
+        margin: 0;
+    }
+    .header .logo {
+        width: 100px;
+    }
+    .header .search {
+        padding: 0;
+    }
+}
+@media (max-width: 680px) {
+    .col-xs-5 {
+        float: none;
+        width: 100%;
+    }
+
+   .callout {
+        top:160px;
+    }
+}
+@media only screen and (max-width: 650px) {
+    .search-box {
+        width: 40px;
+    }
+}
+@media (max-width: 620px) {
+    .header .social {
+        width: 240px;
+    }
+    .header .search {
+        font-size: 20px;
+    }
+}
+@media (max-width: 550px) {
+    .header h1 {
+        font-size: 20px;
+    }
+    .header h1 span {
+        font-size: 14px;
+    }
+    .header .social {
+        width: 200px;
+    }
+
+.callout h1 {
+    font-size: 36px;
+}
+
+.callout h2 {
+    margin:0 0 20px 0;
+    font-size: 16px;
+}
+.callout .btn-hm {
+    padding: 7px 20px;
+}
+}
+@media (max-width: 480px) {
+    h2 {
+        font-size: 22px;
+        background-image: none;
+    }
+    .homevid {
+        height: 200px;
+    }
+
+
+   .callout {
+        top:180px;
+    }
+
+.callout h1 {
+    font-size: 30px;
+}
+
+.callout h2 {
+    margin:0 0 10px 0;
+    font-size: 14px;
+}
+.callout .btn-hm {
+    padding: 5px 20px;
+}
+
+
+    .notfound {
+        padding-top: 20px;
+        text-align: center;
+        font-weight: 700;
+        color: #9e8b56;
+        background: url(../images/bg-404-sm.png);
+        width: 220px;
+        height: 220px;
+        margin: 0 auto;
+    }
+    .notfound span.notfound-text {
+        font-size: 80px;
+    }
+    .notfound span.notfound-text-small {
+        font-size: 16px;
+    }
+    .header {
+        height: auto;
+    }
+    .header .branding {
+        width: 290px;
+        float: none;
+        margin: 0 auto;
+    }
+    .header h1 {
+        margin-top: 10px;
+    }
+    .header .logo {
+        width: 80px;
+        padding: 0;
+    }
+    .header .social {
+        padding: 0 0 0 10px;
+        width: 208px;
+    }
+    .header .search {
+        width: 100%;
+        float: none;
+        text-align: center;
+        border-top: dotted 1px #ddd;
+    }
+    .header .input-group {
+        width: 200px;
+        float: none;
+        margin: 0 auto 20px auto;
+    }
+}
+@media (max-width: 380px) {}

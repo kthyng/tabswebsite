@@ -8,28 +8,39 @@ font-size: 27px;
 
 div#gloseal
 {
-	margin-left : 4em;
+	margin-left : 3.5em;
 	margin-top: -.25em;
     transform: scale(0.8, 0.8);
 }
 div#tglo{
      --font-family: 'Open Sans Condensed', sans-serif;
-     /*--font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;*/
 	 font-family: Frutiger 65, Bold;
-	 font-size: 0.9em;
-     	margin-top: -1.2em;
-        margin-left: -0.1em;
+	 font-size: 0.8em;
+     	margin-top: -0.5em;
+        margin-bottom: 0.3em;
+        margin-left: -0.2em;
     color: #8B7844;
 	 }
 
 div#title{
+    --font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: bold;
 	margin-top: -1.5em;
 	margin-left: -1em;
 	font-family: Frutiger 65, Bold;
-
+    font-size: 1.3em;
+    color: #000000;
 	}
+
 div#mobtitle{
-display:none;
+    --font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: light;
+    font-style: italic;
+    font-size: 0.8em;
+	margin-top: -1.5em;
+	margin-left: -0.5em;
+	font-family: Frutiger 65, Bold;
+    color: #000000;
 }
 
 
