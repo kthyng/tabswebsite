@@ -1,0 +1,373 @@
+
+
+<HEAD>
+<!-- <link href="/tglo/newtabs.css" rel="stylesheet" type="text/css"> -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<TITLE>TABS, Texas Automated Buoy System, Gulf of Mexico Ocean Observatory, Texas Coastal Ocean Observation, Real Time
+Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
+
+
+
+
+
+<meta HTTP-EQUIV="REFRESH" CONTENT="300">
+<meta HTTP-EQUIV="Expires" CONTENT="1800">
+<meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="HandheldFriendly" content="true">
+<meta name="viewport" content="width=device-width,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+
+<link href="css/leaflet.css"  rel="stylesheet" type="text/css">
+<link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css">
+<link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css">
+<link rel="stylesheet" media="screen and (max-width: 570px) " href="small.css">
+<link rel="stylesheet" media="screen and (max-width: 1030px)" href="medium.css">
+<link rel="stylesheet" media="screen and (min-width: 1030px)" href="large.css">
+
+
+<link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css">
+<!-- <link href="css/default.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/style.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css"> -->
+<link rel ="stylesheet" type="text/css" href="css/dropdown.css">
+ <link rel="stylesheet" href="css/zentools.css" type="text/css" />
+  <link rel="stylesheet" href="css/footer.css" type="text/css" />
+    <link rel="stylesheet" href="css/footerPage.css" type="text/css" />
+  <link href="images/favicon.ico" rel="icon" type="image/x-icon" />
+<link href="css/styles.css" rel="stylesheet"/>
+<link href="css/font-awesome.css" rel="stylesheet">
+
+
+
+<script type="text/javascript" src="js/jquery.min.js?v=1.8.2"></script>
+<script type="text/javascript" src="js/jquery.once.js?v=1.2"></script>
+<script type="text/javascript" src="js/tamustyle.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+ <script type="text/javascript" src="js/leaflet.js"></script>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<!--[if lte IE 8]>
+     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
+ <![endif]-->
+  <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-21828695-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })
+  //example user location
+//var userLocation = new L.LatLng();
+   function initmap() {
+	var userLocation = new L.LatLng(30.623944, -96.354405);
+
+// var map = L.map('map').setView(userLocation, 13)
+//
+// 	L.tileLayer('http://{s}.tile.cloudmade.com/f6a65c832e93471b9c3f55e6a1cc1f83/997/256/{z}/{x}/{y}.png', {
+// 	    maxZoom: 18,
+// 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="http://cloudmade.com">CloudMade</a>'
+// 	}).addTo(map);
+// }
+
+	var marker = new L.Marker(userLocation);
+	map.addLayer(marker);
+
+</script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
+
+<script type="text/javascript" src="js/ddimgtooltip.js">
+
+/***********************************************
+* Image w/ description tooltip v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+* This notice MUST stay intact for legal use
+* Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
+***********************************************/
+
+
+
+tooltips[0]=["images/tabs_B_ven.png", {width:"200px", height: "100px";}]
+
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var pagebody = $("#head");
+	var themenu = $("#navmenu");
+	var topbar  = $("#toolbarnav");
+	var content = $("#content");
+	var viewport = {
+  	width : $(window).width(),
+  	height : $(window).height()
+	};
+	// retrieve variables as
+	// viewport.width / viewport.height
+
+	function openme() {
+	$(function () {
+	  topbar.animate({
+	    left: "290px"
+	  }, { duration: 300, queue: false });
+	  pagebody.animate({
+	    left: "290px"
+	  }, { duration: 300, queue: false });
+	});
+}
+
+function closeme() {
+	var closeme = $(function() {
+  	topbar.animate({
+      left: "0px"
+  	}, { duration: 180, queue: false });
+  	pagebody.animate({
+      left: "0px"
+  	}, { duration: 180, queue: false });
+	});
+}
+</script>
+
+</HEAD>
+
+
+<!--
+<body bgcolor="#FFFFFF">
+
+<p align=left>
+<div id="head">
+<header id="toolbarnav">
+		<a rel="external" href="#navmenu" id="menu-btn"></a>
+</header>
+-->
+
+<!-- include header from separate file -->
+<?php include("includes/header.html");?>
+
+<!-- include navigation from separate file -->
+<?php include("includes/navigation.html");?>
+
+
+<TR>
+<TD valign=top width=440 rowspan=11>
+<div id="map" >
+
+  <iframe width="815" height="520" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/index.html"></iframe>
+
+</div>
+<br>
+<center>
+<i><font class=bkvsm style=font-size:6pt;>
+The vectors on the map point toward the direction that the currents or winds are flowing<br> and represent the average for the
+last three hours of the available data.<br>
+The date and time at each station indicates the end of the three-hour average.<br>
+</i></font>
+<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 15px; color:#009933; text-decoration: none">&nbsp &nbsp Click here for full-screen map </a>
+ </td>
+</center>
+
+<TR>
+<TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
+<TD valign=top>
+<div id="Report">
+<TABLE border=0>
+<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W </a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
+</font>
+</font>
+<tr>
+<TR><TD>
+&nbsp;<BR>
+&nbsp;<BR>
+&nbsp;<BR>
+</td></tr>
+</TABLE>
+</TD>
+</TR>
+
+</TABLE>
+</div>
+
+<BR>
+</CENTER>
+<div id="Buoy">
+<TABLE border=0>
+<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
+</font>
+</font>
+<tr>
+
+<TR><TD>
+&nbsp;<BR>
+&nbsp;<BR>
+&nbsp;<BR>
+</td></tr>
+</TABLE>
+</TD>
+</TR>
+
+</TABLE>
+</div>
+
+
+
+<map name="tabs-imagemap-20101202">
+<!-- #$-:Image Map file created by GIMP Imagemap Plugin -->
+<!-- #$-:GIMP Imagemap Plugin by Maurits Rijk -->
+<!-- #$-:Please do not edit lines starting with "#$" -->
+<!-- #$VERSION:1.3 -->
+<!-- #$AUTHOR:Woody Lee -->
+<AREA SHAPE="RECT" COORDS="329,110,371,140" TITLE="TABS Buoy B&#10;test"  HREF="/Tglo/ven.php?buoy=B">
+<AREA SHAPE="RECT" COORDS="119,241,145,289" TITLE="TABS Buoy D"  HREF="/Tglo/ven.php?buoy=D">
+<AREA SHAPE="RECT" COORDS="393,139,424,187" TITLE="TABS Buoy F"  HREF="/Tglo/ven.php?buoy=F">
+<AREA SHAPE="RECT" COORDS="161,263,189,286" TITLE="TABS Buoy H"  HREF="/tglo/ven.php?buoy=H">
+<AREA SHAPE="RECT" COORDS="93,453,123,505" TITLE="TABS Buoy J"   HREF="/Tglo/ven.php?buoy=J">
+<AREA SHAPE="RECT" COORDS="148,449,185,508" TITLE="TABS Buoy K"  HREF="/Tglo/ven.php?buoy=K">
+<AREA SHAPE="RECT" COORDS="413,243,448,261" TITLE="TABS Buoy L (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=L">
+<AREA SHAPE="RECT" COORDS="404,222,447,238" TITLE="TABS Buoy M (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=M">
+<AREA SHAPE="RECT" COORDS="418,266,445,304" TITLE="TABS Buoy N (Flower Gardens)"  HREF="/Tglo/ven.php?buoy=N">
+<AREA SHAPE="RECT" COORDS="462,254,497,314" TITLE="TABS Buoy V (Flower Gardens)"  HREF="/tglo/ven.php?buoy=V">
+<AREA SHAPE="RECT" COORDS="458,41,493,91" TITLE="TABS Buoy R"  HREF="/tglo/ven.php?buoy=R">
+<AREA SHAPE="RECT" COORDS="410,32,442,80" TITLE="NDBC CMAN SRST2" HREF="/Tglo/ndbc.php?buoy=SRST2">
+<AREA SHAPE="RECT" COORDS="373,84,421,128" TITLE="NDBC Buoy 42035" HREF="/Tglo/ndbc.php?buoy=42035">
+<AREA SHAPE="RECT" COORDS="247,249,333,292" TITLE="NDBC Buoy 42019" HREF="/Tglo/ndbc.php?buoy=42019">
+<AREA SHAPE="RECT" COORDS="109,364,191,410" TITLE="NDBC Buoy 42020" HREF="/Tglo/ndbc.php?buoy=42020">
+<AREA SHAPE="RECT" COORDS="73,255,117,304" TITLE="NDBC CMAN PTAT2"  HREF="/Tglo/ndbc.php?buoy=PTAT2">
+<AREA SHAPE="RECT" COORDS="192,193,237,246" TITLE="TABS Buoy W"  HREF="/tglo/ven.php?buoy=W">
+<AREA SHAPE="RECT" COORDS="243,185,267,219" TITLE="TABS Buoy S"  HREF="/tglo/tabsqueryform.php?buoy=S">
+<AREA SHAPE="RECT" COORDS="328,146,368,173" TITLE="TABS Buoy C"  HREF="/tglo/tabsqueryform.php?buoy=C">
+<AREA SHAPE="RECT" COORDS="457,202,551,241" TITLE="Forest Oil FGBL1" HREF="Tglo/ndbc.php?buoy=FGBL1">
+<AREA SHAPE="RECT" COORDS="565,98,592,127" TITLE="TABS Buoy P (CMI)"  HREF="/tglo/tabsqueryform.php?buoy=P">
+<AREA SHAPE="RECT" COORDS="24,8,177,32" TITLE="TABS Description"  HREF="/Tglo/tabs_description.html">
+<AREA SHAPE="RECT" COORDS="23,49,236,77" TITLE="NOAA Buoy Description"  HREF="/Tglo/buoy_description.html">
+<AREA SHAPE="RECT" COORDS="25,79,230,105" TITLE="Data Archive" HREF="/Tglo/dataarchive.html">
+</MAP>
+<div id="navmobile">
+
+<ul data-role="listview">
+<li> <a href="#" <font class=bknorm>DATA PRODUCTS</font> </a>
+<ul>
+<li> <A href="/Tglo" style ="text-decoration:none">TABS Home</a>  </li>
+<li> <a href="/tglo/testpages/Index-frame/frame.php" style ="text-decoration:none"><font class=bknorm>Check out our new Beta site </font></a> </li>
+<li><a href=http://tabs2.gerg.tamu.edu/tglo/RTA/RTA_index.html style ="text-decoration:none">Real Time Data Analysis</A> </li>
+<li><A href="/Tglo/sumpage.php" style ="text-decoration:none">Current Summary</a>  </li>
+<li> <A href="/Tglo/buoystatus.php" style ="text-decoration:none">Buoy Status</a>  </li>
+
+
+
+</ul> <!-- end of inner ul-->
+</li> <!-- end of main li-->
+</ul> <!-- end of main ul-->
+<ul data-role="listview">
+<li> <a href="#" <font class=bknorm>
+MODEL PRODUCTS
+</font><BR> </a>
+<ul>
+<li><A href="http://seawater.tamu.edu/tglo/index.html" style ="text-decoration:none">TABS Model Results</a>  </li>
+<li> <A href=http://polar.ncep.noaa.gov/waves/viewer.shtml?-multi_1-latest-hs-gmex- style ="text-decoration:none">NOAA Wave Model</a></li>
+<li><a href="/tglo/vector_addition_trajectory_pub_final.xls" style ="text-decoration:none">Vector Addition Trajectory Tool</a><!-- <img align=top src="images/icon_sm.png"> -->  </li>
+</ul> <!-- end of inner ul-->
+</li> <!-- end of main li-->
+</ul> <!-- end of main ul-->
+<ul data-role="listview">
+<li> <a href="#" <font class=bknorm>
+NOAA WEATHER
+</font><BR> </a>
+<ul>
+<li> <A href=/~woody/hurricane.php style ="text-decoration:none">Hurricane Tracks</a><!--<br>
+Marine Forecasts<br> --></li>
+<li><A href="/tglo/weather.php" style ="text-decoration:none">TX</a> </li>
+<li><A href="/tglo/weather.php?reg=la" style ="text-decoration:none">LA</a> </li>
+<li><A href="/tglo/weather.php?reg=off" style ="text-decoration:none">Offshore</a> </li>
+<li> <a href=http://weather.unisys.com/gfsx/gfsx.php?inv=0&plot=hght&region=us&t=9p&expanddiv=hide_bar style ="text-decoration:none">
+MRF 10 day forecast</a>
+</li>
+
+</ul> <!-- end of inner ul-->
+</li> <!-- end of main li-->
+</ul> <!-- end of main ul-->
+
+<ul data-role="listview">
+<li> <a href="#" <b><font class=grnorm>NOTICES</b></font> </a>
+<ul>
+<li><a href=/tglo/notice_to_mariners_111810.pdf style ="text-decoration:none"> Notice to Mariners</a></b>
+</li>
+<li><A href=/tglo/news.php style ="text-decoration:none">TABS News</a>
+</li>
+<li><a href=/usage/usage_201311.html#HOURSTATS style ="text-decoration:none">
+ TABS Web Site Stats</a> </li>
+<li><a href=/Tglo/feedback.php style ="text-decoration:none">Comments</a> </li>
+
+</ul> <!-- end of inner ul-->
+</li> <!-- end of main li-->
+</ul> <!-- end of main ul-->
+
+
+</div>   <!-- end of nav-menu-->
+<p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
+
+<section id="bottomrow">
+	<div class="zen-container">
+  			<!-- bottom -->
+	<div class="row-fluid">
+							<div class="span12 item-first" data-default="span12">
+										<div id="bottom1">
+
+		<div class="moduletable ">
+
+
+						<div class="zen-module-body">
+
+
+<!-- include footer from separate file -->
+<?php include("includes/footer.html");?>
+
+</body>
