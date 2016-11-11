@@ -143,17 +143,6 @@ function closeme() {
 
 </HEAD>
 
-
-<!--
-<body bgcolor="#FFFFFF">
-
-<p align=left>
-<div id="head">
-<header id="toolbarnav">
-		<a rel="external" href="#navmenu" id="menu-btn"></a>
-</header>
--->
-
 <!-- include header from separate file -->
 <?php include("includes/header.html");?>
 
@@ -178,6 +167,8 @@ The date and time at each station indicates the end of the three-hour average.<b
 <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 15px; color:#009933; text-decoration: none">&nbsp &nbsp Click here for full-screen map </a>
  </td>
 </center>
+
+
 
 <TR>
 <TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
@@ -219,20 +210,8 @@ The date and time at each station indicates the end of the three-hour average.<b
 
 <BR>
 
-<p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
-
-<section id="bottomrow">
-	<div class="zen-container">
-  			<!-- bottom -->
-	<div class="row-fluid">
-							<div class="span12 item-first" data-default="span12">
-										<div id="bottom1">
-
-		<div class="moduletable ">
-
-
-						<div class="zen-module-body">
-
+<!-- separate text below map from footer -->
+<BR><BR>
 
 <!-- include footer from separate file -->
 <?php include("includes/footer.html");?>
