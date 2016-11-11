@@ -1,11 +1,10 @@
 #footerTextPage {
 margin:0;
-padding: 0;
+padding: 20;
 display: block;
-float: center;
 margin-left: 10em;
 font-size:12px;
-font-weight: bold;
+font-weight: normal;
 }
 
 #footerTextPage ul {
@@ -29,7 +28,7 @@ text-decoration: none;
 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 padding-left: 1em;
 height: 18px;
-width: 154px;
+width: 300px;
 display: flex;
 color: #000000;
 }
