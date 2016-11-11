@@ -162,8 +162,7 @@ The vectors on the map point toward the direction that the currents or winds are
 last three hours of the available data.<br>
 The date and time at each station indicates the end of the three-hour average.<br>
 </i></font>
-<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 15px; color:#009933; text-decoration: none">&nbsp &nbsp Click here for full-screen map </a>
- </td>
+</td>
 </center>
 
 
@@ -201,6 +200,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 &nbsp;<BR>
 </td></tr>
 </TABLE>
+<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 15px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
 </TD>
 </TR>
 </TABLE>
