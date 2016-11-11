@@ -23,7 +23,7 @@ background:#efefef;
 
 #navmenu ul li a {
 text-align: left;
-text-decoration: none;	
+text-decoration: none;
 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 padding-left: 1em;
 height: 23px;
@@ -52,7 +52,7 @@ background:#eee;
 
 #navmenu ul li:hover ul li a:hover{
 	background: #CCC;
-	color: #000; 
+	color: #000;
 }
 
 #navmenu a:hover{
@@ -85,7 +85,7 @@ background:#efefef;
 
 #navmobile ul li a {
 text-align: left;
-text-decoration: none;	
+text-decoration: none;
 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 padding-left: 1em;
 height: 25px;
@@ -114,10 +114,9 @@ background:#eee;
 
 #navmobile ul li:hover ul li a:hover{
 	background: #CCC;
-	color: #000; 
+	color: #000;
 }
 
 #navmobile a:hover{
 	color: #007AFF;
 	}
-

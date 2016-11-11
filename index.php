@@ -153,13 +153,12 @@ function closeme() {
 <TR>
 <TD valign=top width=440 rowspan=11>
 <div id="map" >
-  <iframe width="815" height="520" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
+  <iframe width="800" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
 
-<br>
 <center>
 <i><font class=bkvsm style="font-size:6pt;">
-The vectors on the map point toward the direction that the currents or winds are flowing<br> and represent the average for the
+The vectors on the map point toward the direction that the currents or winds are flowing and represent the average for the
 last three hours of the available data.<br>
 The date and time at each station indicates the end of the three-hour average.<br>
 </i></font>
@@ -206,8 +205,6 @@ The date and time at each station indicates the end of the three-hour average.<b
 </TR>
 </TABLE>
 </div>
-
-<BR>
 
 <!-- separate text below map from footer -->
 <BR><BR>
