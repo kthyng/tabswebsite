@@ -27,9 +27,9 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <link href="css/leaflet.css"  rel="stylesheet" type="text/css">
 <link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css">
 <link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css">
-<link rel="stylesheet" media="screen and (max-width: 570px) " href="small.css">
-<link rel="stylesheet" media="screen and (max-width: 1030px)" href="medium.css">
-<link rel="stylesheet" media="screen and (min-width: 1030px)" href="large.css">
+<link rel="stylesheet" media="screen and (max-width: 570px) " href="css/small.css">
+<link rel="stylesheet" media="screen and (max-width: 1030px)" href="css/medium.css">
+<link rel="stylesheet" media="screen and (min-width: 1030px)" href="css/large.css">
 
 
 <link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css">
