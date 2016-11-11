@@ -214,51 +214,10 @@ The date and time at each station indicates the end of the three-hour average.<b
 </TABLE>
 </TD>
 </TR>
-
 </TABLE>
 </div>
 
 <BR>
-</CENTER>
-<div id="Buoy">
-<TABLE border=0>
-<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
-</font>
-</font>
-<tr>
-
-<TR><TD>
-&nbsp;<BR>
-&nbsp;<BR>
-&nbsp;<BR>
-</td></tr>
-</TABLE>
-</TD>
-</TR>
-
-</TABLE>
-</div>
-
-
-
 
 <p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
 
