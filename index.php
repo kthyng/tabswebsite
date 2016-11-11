@@ -153,7 +153,7 @@ function closeme() {
 <TR>
 <TD valign=top width=440 rowspan=11>
 <div id="map" >
-  <iframe width="815" height="520" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/index.html"></iframe>
+  <iframe width="815" height="520" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
 
 <br>
