@@ -290,68 +290,9 @@ The date and time at each station indicates the end of the three-hour average.<b
 <AREA SHAPE="RECT" COORDS="23,49,236,77" TITLE="NOAA Buoy Description"  HREF="/Tglo/buoy_description.html">
 <AREA SHAPE="RECT" COORDS="25,79,230,105" TITLE="Data Archive" HREF="/Tglo/dataarchive.html">
 </MAP>
-<div id="navmobile">
-
-<ul data-role="listview">
-<li> <a href="#" <font class=bknorm>DATA PRODUCTS</font> </a>
-<ul>
-<li> <A href="/Tglo" style ="text-decoration:none">TABS Home</a>  </li>
-<li> <a href="/tglo/testpages/Index-frame/frame.php" style ="text-decoration:none"><font class=bknorm>Check out our new Beta site </font></a> </li>
-<li><a href=http://tabs2.gerg.tamu.edu/tglo/RTA/RTA_index.html style ="text-decoration:none">Real Time Data Analysis</A> </li>
-<li><A href="/Tglo/sumpage.php" style ="text-decoration:none">Current Summary</a>  </li>
-<li> <A href="/Tglo/buoystatus.php" style ="text-decoration:none">Buoy Status</a>  </li>
 
 
 
-</ul> <!-- end of inner ul-->
-</li> <!-- end of main li-->
-</ul> <!-- end of main ul-->
-<ul data-role="listview">
-<li> <a href="#" <font class=bknorm>
-MODEL PRODUCTS
-</font><BR> </a>
-<ul>
-<li><A href="http://seawater.tamu.edu/tglo/index.html" style ="text-decoration:none">TABS Model Results</a>  </li>
-<li> <A href=http://polar.ncep.noaa.gov/waves/viewer.shtml?-multi_1-latest-hs-gmex- style ="text-decoration:none">NOAA Wave Model</a></li>
-<li><a href="/tglo/vector_addition_trajectory_pub_final.xls" style ="text-decoration:none">Vector Addition Trajectory Tool</a><!-- <img align=top src="images/icon_sm.png"> -->  </li>
-</ul> <!-- end of inner ul-->
-</li> <!-- end of main li-->
-</ul> <!-- end of main ul-->
-<ul data-role="listview">
-<li> <a href="#" <font class=bknorm>
-NOAA WEATHER
-</font><BR> </a>
-<ul>
-<li> <A href=/~woody/hurricane.php style ="text-decoration:none">Hurricane Tracks</a><!--<br>
-Marine Forecasts<br> --></li>
-<li><A href="/tglo/weather.php" style ="text-decoration:none">TX</a> </li>
-<li><A href="/tglo/weather.php?reg=la" style ="text-decoration:none">LA</a> </li>
-<li><A href="/tglo/weather.php?reg=off" style ="text-decoration:none">Offshore</a> </li>
-<li> <a href=http://weather.unisys.com/gfsx/gfsx.php?inv=0&plot=hght&region=us&t=9p&expanddiv=hide_bar style ="text-decoration:none">
-MRF 10 day forecast</a>
-</li>
-
-</ul> <!-- end of inner ul-->
-</li> <!-- end of main li-->
-</ul> <!-- end of main ul-->
-
-<ul data-role="listview">
-<li> <a href="#" <b><font class=grnorm>NOTICES</b></font> </a>
-<ul>
-<li><a href=/tglo/notice_to_mariners_111810.pdf style ="text-decoration:none"> Notice to Mariners</a></b>
-</li>
-<li><A href=/tglo/news.php style ="text-decoration:none">TABS News</a>
-</li>
-<li><a href=/usage/usage_201311.html#HOURSTATS style ="text-decoration:none">
- TABS Web Site Stats</a> </li>
-<li><a href=/Tglo/feedback.php style ="text-decoration:none">Comments</a> </li>
-
-</ul> <!-- end of inner ul-->
-</li> <!-- end of main li-->
-</ul> <!-- end of main ul-->
-
-
-</div>   <!-- end of nav-menu-->
 <p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
 
 <section id="bottomrow">
