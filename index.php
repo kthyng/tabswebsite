@@ -259,39 +259,6 @@ The date and time at each station indicates the end of the three-hour average.<b
 
 
 
-<map name="tabs-imagemap-20101202">
-<!-- #$-:Image Map file created by GIMP Imagemap Plugin -->
-<!-- #$-:GIMP Imagemap Plugin by Maurits Rijk -->
-<!-- #$-:Please do not edit lines starting with "#$" -->
-<!-- #$VERSION:1.3 -->
-<!-- #$AUTHOR:Woody Lee -->
-<AREA SHAPE="RECT" COORDS="329,110,371,140" TITLE="TABS Buoy B&#10;test"  HREF="/Tglo/ven.php?buoy=B">
-<AREA SHAPE="RECT" COORDS="119,241,145,289" TITLE="TABS Buoy D"  HREF="/Tglo/ven.php?buoy=D">
-<AREA SHAPE="RECT" COORDS="393,139,424,187" TITLE="TABS Buoy F"  HREF="/Tglo/ven.php?buoy=F">
-<AREA SHAPE="RECT" COORDS="161,263,189,286" TITLE="TABS Buoy H"  HREF="/tglo/ven.php?buoy=H">
-<AREA SHAPE="RECT" COORDS="93,453,123,505" TITLE="TABS Buoy J"   HREF="/Tglo/ven.php?buoy=J">
-<AREA SHAPE="RECT" COORDS="148,449,185,508" TITLE="TABS Buoy K"  HREF="/Tglo/ven.php?buoy=K">
-<AREA SHAPE="RECT" COORDS="413,243,448,261" TITLE="TABS Buoy L (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=L">
-<AREA SHAPE="RECT" COORDS="404,222,447,238" TITLE="TABS Buoy M (NOPP) "  HREF="/tglo/tabsqueryform.php?buoy=M">
-<AREA SHAPE="RECT" COORDS="418,266,445,304" TITLE="TABS Buoy N (Flower Gardens)"  HREF="/Tglo/ven.php?buoy=N">
-<AREA SHAPE="RECT" COORDS="462,254,497,314" TITLE="TABS Buoy V (Flower Gardens)"  HREF="/tglo/ven.php?buoy=V">
-<AREA SHAPE="RECT" COORDS="458,41,493,91" TITLE="TABS Buoy R"  HREF="/tglo/ven.php?buoy=R">
-<AREA SHAPE="RECT" COORDS="410,32,442,80" TITLE="NDBC CMAN SRST2" HREF="/Tglo/ndbc.php?buoy=SRST2">
-<AREA SHAPE="RECT" COORDS="373,84,421,128" TITLE="NDBC Buoy 42035" HREF="/Tglo/ndbc.php?buoy=42035">
-<AREA SHAPE="RECT" COORDS="247,249,333,292" TITLE="NDBC Buoy 42019" HREF="/Tglo/ndbc.php?buoy=42019">
-<AREA SHAPE="RECT" COORDS="109,364,191,410" TITLE="NDBC Buoy 42020" HREF="/Tglo/ndbc.php?buoy=42020">
-<AREA SHAPE="RECT" COORDS="73,255,117,304" TITLE="NDBC CMAN PTAT2"  HREF="/Tglo/ndbc.php?buoy=PTAT2">
-<AREA SHAPE="RECT" COORDS="192,193,237,246" TITLE="TABS Buoy W"  HREF="/tglo/ven.php?buoy=W">
-<AREA SHAPE="RECT" COORDS="243,185,267,219" TITLE="TABS Buoy S"  HREF="/tglo/tabsqueryform.php?buoy=S">
-<AREA SHAPE="RECT" COORDS="328,146,368,173" TITLE="TABS Buoy C"  HREF="/tglo/tabsqueryform.php?buoy=C">
-<AREA SHAPE="RECT" COORDS="457,202,551,241" TITLE="Forest Oil FGBL1" HREF="Tglo/ndbc.php?buoy=FGBL1">
-<AREA SHAPE="RECT" COORDS="565,98,592,127" TITLE="TABS Buoy P (CMI)"  HREF="/tglo/tabsqueryform.php?buoy=P">
-<AREA SHAPE="RECT" COORDS="24,8,177,32" TITLE="TABS Description"  HREF="/Tglo/tabs_description.html">
-<AREA SHAPE="RECT" COORDS="23,49,236,77" TITLE="NOAA Buoy Description"  HREF="/Tglo/buoy_description.html">
-<AREA SHAPE="RECT" COORDS="25,79,230,105" TITLE="Data Archive" HREF="/Tglo/dataarchive.html">
-</MAP>
-
-
 
 <p align="center"> <IMG ALIGN="TOP" height="2" width="540" SRC="/Tglo/Images/GRAD_BLUE_LINE.gif">
 
