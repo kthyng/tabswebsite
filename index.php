@@ -143,19 +143,22 @@ function closeme() {
 
 </HEAD>
 
+
 <!-- include header from separate file -->
 <?php include("includes/header.html");?>
+
 
 <!-- include navigation from separate file -->
 <?php include("includes/navigation.html");?>
 
 
+<!-- Map from server-->
 <TR>
 <TD valign=top width=440 rowspan=11>
 <div id="map" >
   <iframe width="800" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
-
+<!-- text below map -->
 <center>
 <i><font class=bkvsm style="font-size:6pt;">
 The vectors on the map point toward the direction that the currents or winds are flowing and represent the average for the
@@ -164,11 +167,15 @@ The date and time at each station indicates the end of the three-hour average.<b
 </i></font>
 </td>
 </center>
+<!-- end map -->
 
+
+<!-- buoy list on right hand side -->
 <TR>
 <TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
 <TD valign=top>
 <div id="Report">
+<b>Most Recent Report</b>
 
 <?php
 echo "<table border=0 bgcolor=\"#f8f8f8\">";
@@ -223,85 +230,6 @@ echo "</table>";
 </TABLE>
 </div>
 
-<BR>
-</CENTER>
-<div id="Buoy">
-<TABLE border=0>
-<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
-</font>
-</font>
-<tr>
-
-<TR><TD>
-&nbsp;<BR>
-&nbsp;<BR>
-&nbsp;<BR>
-</td></tr>
-</TABLE>
-</TD>
-</TR>
-
-</TABLE>
-</div>
-
-<!--
-<TR>
-<TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
-<TD valign=top>
-<div id="Report">
-<TABLE border=0>
-<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
-<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W </a></font></TD>
-<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
-</font>
-</font>
-<tr>
-<TR><TD>
-&nbsp;<BR>
-&nbsp;<BR>
-&nbsp;<BR>
-</td></tr>
-</TABLE>
-<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 15px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
-</TD>
-</TR>
-</TABLE>
-</div>
--->
 
 <!-- separate text below map from footer -->
 <BR><BR>
