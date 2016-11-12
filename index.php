@@ -186,7 +186,8 @@ foreach ($blet as $f) {
 	if (preg_match("/Z/",$f)) {
 		print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=$f>$f</a></font></TD>\n";
 		print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
-		} else {
+		}
+    else {
 	$venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
 	$lines=file($venfile);
 	$l=array_pop($lines);
@@ -219,7 +220,7 @@ foreach ($blet as $f) {
 		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
 		}
 
-}
+    }
 	$bidx++;
 }
 echo "</table>";
