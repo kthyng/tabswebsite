@@ -165,8 +165,104 @@ The date and time at each station indicates the end of the three-hour average.<b
 </td>
 </center>
 
+<TR>
+<TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
+<TD valign=top>
+<div id="Report">
 
+<?php
+echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
+$blet=array("B","D","F","J","K","N","R","V","W","X");
+	$bidx=0;
+foreach ($blet as $f) {
+	if (preg_match("/Z/",$f)) {
+		print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=$f>$f</a></font></TD>\n";
+		print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
+		} else {
+	$venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
+	$lines=file($venfile);
+	$l=array_pop($lines);
+	if (trim($l)) {
+		$line=trim($l);
+		$data=explode(' ',$line);$datestr=$data[0];
+		$timestr=substr($data[1],0,5);
+
+        // tabs datetime in UTC and Texas time (CST/CDT)
+        // set up date and time together with UTC timezone (which is what the data is in)
+        $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
+        // echo $dtUTC->format('Y-m-d H:i');
+        // save formatted string
+        // http://php.net/manual/en/datetime.formats.date.php
+        // $dtUTCstr = $dtUTC->format('Y-m-d H:i');
+        $dtUTCstr = $dtUTC->format('M d, Y H:i');
+        // find time zone abbreviation
+        // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
+        $dtUTCtz = $dtUTC->format('T');
+
+        // start from UTC datetime
+        $dtTX = $dtUTC;
+        // convert to TX
+        // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
+        $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
+        $dtTXstr = $dtTX->format('H:i');
+        $dtTXtz = $dtTX->format('T');
+
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
+		}
+
+}
+	$bidx++;
+}
+echo "</table>";
+?>
+</TD>
+</TR>
+
+</TABLE>
+</div>
+
+<BR>
+</CENTER>
+<div id="Buoy">
+<TABLE border=0>
+<TH colspan=2 align=left><font class==bknorm size=2em><br>Most Recent Report</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=B rel="imgtip[0]" >B</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=D rel="imgtip[1]" >D</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=F rel="imgtip[2]" >F</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=J rel="imgtip[3]" >J</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><A href=/tglo/ven.php?buoy=K rel="imgtip[4]" >K</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>Out of Service</font>
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=N rel="imgtip[5]" >N</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=R rel="imgtip[6]" >R</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 20:00Z (14:00 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=V rel="imgtip[7]" >V</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 17:30Z (11:30 CST)
+<TR><td valign=top><font class=bksm size = 2em><a href=/tglo/ven.php?buoy=W rel="imgtip[8]" >W</a></font></TD>
+<td nowrap valign=top><font class=bksm size = 2em>11/14/2013 11:30Z (05:30 CST)
+</font>
+</font>
+<tr>
+
+<TR><TD>
+&nbsp;<BR>
+&nbsp;<BR>
+&nbsp;<BR>
+</td></tr>
+</TABLE>
+</TD>
+</TR>
+
+</TABLE>
+</div>
+
+<!--
 <TR>
 <TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
 <TD valign=top>
@@ -205,6 +301,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 </TR>
 </TABLE>
 </div>
+-->
 
 <!-- separate text below map from footer -->
 <BR><BR>
