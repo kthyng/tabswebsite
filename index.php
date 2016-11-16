@@ -9,10 +9,6 @@
 <TITLE>TABS, Texas Automated Buoy System, Gulf of Mexico Ocean Observatory, Texas Coastal Ocean Observation, Real Time
 Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
-
-
-
-
 <meta HTTP-EQUIV="REFRESH" CONTENT="300">
 <meta HTTP-EQUIV="Expires" CONTENT="1800">
 <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
@@ -27,9 +23,6 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <link href="css/leaflet.css"  rel="stylesheet" type="text/css">
 <link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css">
 <link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css">
-<link rel="stylesheet" media="screen and (max-width: 570px) " href="css/small.css">
-<link rel="stylesheet" media="screen and (max-width: 1030px)" href="css/medium.css">
-<link rel="stylesheet" media="screen and (min-width: 1030px)" href="css/large.css">
 
 
 <link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css">
@@ -37,13 +30,9 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <!-- <link href="css/style.css" media="all" rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css"> -->
-<link rel ="stylesheet" type="text/css" href="css/dropdown.css">
- <link rel="stylesheet" href="css/zentools.css" type="text/css" />
-  <link rel="stylesheet" href="css/footer.css" type="text/css" />
-    <link rel="stylesheet" href="css/footerPage.css" type="text/css" />
-  <link href="images/favicon.ico" rel="icon" type="image/x-icon" />
-<link href="css/styles.css" rel="stylesheet"/>
-<link href="css/font-awesome.css" rel="stylesheet">
+
+<link rel="stylesheet" href="css/zentools.css" type="text/css" />
+<link href="images/favicon.ico" rel="icon" type="image/x-icon" />
 
 
 
@@ -216,7 +205,8 @@ foreach ($blet as $f) {
         $dtTXstr = $dtTX->format('H:i');
         $dtTXtz = $dtTX->format('T');
 
-        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png rel=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png>$f</a></font></TD>\n";
 		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
 		}
 
@@ -225,12 +215,13 @@ foreach ($blet as $f) {
 }
 echo "</table>";
 ?>
+<BR>
+<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
 </TD>
 </TR>
 
 </TABLE>
 </div>
-
 
 <!-- separate text below map from footer -->
 <BR><BR>
