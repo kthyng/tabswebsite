@@ -217,7 +217,7 @@ if ($table == 'ven' ) {
 if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
 	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
 
-$header=$table."tableheader.php";
+$header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
@@ -237,8 +237,8 @@ foreach ($venlines1 as $elem) {
 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
                 }
         $datestr = $ts_utc->format('Y/m/d');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
         $timestr = $ts_utc->format('H:i');
+        // $datestr=strftime("%m/%d/%Y",$ts_utc);
         // $timestr=strftime("%T",$ts_utc);
         $east=$data[2] * $convfac;
         $north=$data[3]* $convfac;
@@ -257,10 +257,10 @@ if ($units=="M") {$convfac=1;$ut=" (m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
 
 if ($table=='met') {
-	print "<br>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from\n";
+	print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from</i>\n<br>";
 
 }
-$header=$table."tableheader.php";
+$header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 
 include($header);
@@ -270,13 +270,17 @@ foreach ($metlines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
         if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
-                $ts_utc=strtotime($data[0]." ".$data[1]);
+            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+                // $ts_utc=strtotime($data[0]." ".$data[1]);
                 } else {
-                $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		$timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
                 }
-        $datestr=strftime("%m/%d/%Y",$ts_utc);
-        $timestr=strftime("%T",$ts_utc);
+        $datestr = $ts_utc->format('Y/m/d');
+        $timestr = $ts_utc->format('H:i');
+        // $datestr=strftime("%m/%d/%Y",$ts_utc);
+        // $timestr=strftime("%T",$ts_utc);
         $veast_c=$data[2] * $convfac;
         $vnorth_c=$data[3]* $convfac;
         $veast=$data[2];
@@ -304,7 +308,7 @@ foreach ($metlines1 as $elem) {
 
 if ($table == 'eng' ) {
 
-$header=$table."tableheader.php";
+$header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
@@ -313,13 +317,17 @@ foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
         if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
-                $ts_utc=strtotime($data[0]." ".$data[1]);
+                // $ts_utc=strtotime($data[0]." ".$data[1]);
+            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
                 } else {
-                $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		$timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+                // $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
                 }
-        $datestr=strftime("%m/%d/%Y",$ts_utc);
-        $timestr=strftime("%T",$ts_utc);
+        $datestr = $ts_utc->format('Y/m/d');
+        $timestr = $ts_utc->format('H:i');
+        // $datestr=strftime("%m/%d/%Y",$ts_utc);
+        // $timestr=strftime("%T",$ts_utc);
         $vbatt=$data[2];
         $sigstr=$data[3];
 	$comp=$data[4];
@@ -340,7 +348,7 @@ if ($table == 'salt' ) {
 if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
 
-$header=$table."tableheader.php";
+$header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
@@ -349,13 +357,17 @@ foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
         if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
-                $ts_utc=strtotime($data[0]." ".$data[1]);
+            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+                // $ts_utc=strtotime($data[0]." ".$data[1]);
                 } else {
-                $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		$timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
                 }
-        $datestr=strftime("%m/%d/%Y",$ts_utc);
-        $timestr=strftime("%T",$ts_utc);
+        $datestr = $ts_utc->format('Y/m/d');
+        $timestr = $ts_utc->format('H:i');
+        // $datestr=strftime("%m/%d/%Y",$ts_utc);
+        // $timestr=strftime("%T",$ts_utc);
         $watertemp=$data[2];
         $conduct=$data[3];
 	$salinity=$data[4];
