@@ -20,19 +20,19 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 
-<link href="css/leaflet.css"  rel="stylesheet" type="text/css">
-<link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css">
-<link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css">
+<!-- <link href="css/leaflet.css"  rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css"> -->
 
 
-<link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css">
+<!-- <link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/default.css" media="all" rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/style.css" media="all" rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css"> -->
 <!-- <link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css"> -->
 
-<link rel="stylesheet" href="css/zentools.css" type="text/css" />
-<link href="images/favicon.ico" rel="icon" type="image/x-icon" />
+<!-- <link rel="stylesheet" href="css/zentools.css" type="text/css" /> -->
+<!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
 
 
@@ -41,7 +41,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <script type="text/javascript" src="js/tamustyle.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
  <script type="text/javascript" src="js/leaflet.js"></script> -->
-<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
+<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" /> -->
 <!--[if lte IE 8]>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
  <![endif]-->
@@ -78,7 +78,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 <!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> -->
 
-<link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
+<!-- <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" /> -->
 
 <!-- <script type="text/javascript" src="js/ddimgtooltip.js">
 
