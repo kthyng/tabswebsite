@@ -1,5 +1,8 @@
 '''
 Make plot of recent buoy data.
+
+python plot_buoy.py -h for help
+python plot_buoy.py 'ven' 'tempfile' 'tempout'
 '''
 
 import matplotlib.pyplot as plt
@@ -9,6 +12,7 @@ import netCDF4 as netCDF
 import numpy as np
 import time
 from datetime import datetime
+import argparse
 
 mpl.rcParams.update({'font.size': 14})
 mpl.rcParams['font.sans-serif'] = 'Arev Sans, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Helvetica, Avant Garde, sans-serif'
@@ -32,9 +36,165 @@ locs = {'B': ['94 53.943W', '28 58.938N'], 'K': ['96 29.988W', '26 13.008N'],
         'R': ['93 38.502W', '29 38.100N'], 'V': ['93 35.838W', '27 53.796N'],
         'W': ['96 00.348W', '28 21.042N'], 'X': ['96 20.298W', '27 03.960N']}
 
+# parse the input arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
+parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
+parser.add_argument('figname', type=str, help='figure filename, to be saved in /tmp')
+args = parser.parse_args()
 
-def plot(loc):
-    '''Make plot.'''
+
+def ven(dataname, figname):
+    '''Plot ven data.
+
+    Find data in dataname and save fig to figname, both in /tmp.
+    '''
+
+    ## Load in data already saved into /tmp file by tabsquery.php ##
+    # time in UTC, velocities in cm/s, direction in deg T, temp in deg C
+    names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
+    df = pd.read_table('/tmp/' + dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+    # Calculate along- and across-shelf
+    # along-shelf rotation angle in math angle convention
+    theta = np.deg2rad(-(angle['B']-90))  # convert from compass to math angle
+    df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
+    df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
+
+    # max current value
+    cmax = 60  # cm/s
+    kmax = cmax/51.4444444444  # knots
+    lw = 1.5
+
+    # plot
+    fig, axes = plt.subplots(4, 1, figsize=(8.5,11), sharex=True)
+    # bottom controlled later
+    fig.subplots_adjust(top=0.96, right=0.90, left=0.22, hspace=0.1)
+    # fig.suptitle('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
+
+    # current arrows
+    ax = axes[0]
+    # can't use datetime index directly unfortunately here, so can't use pandas later either
+    idx = mpl.dates.date2num(df.index.to_pydatetime())
+
+    # arrows with no heads for lines
+    # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
+    ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
+              headaxislength=0, headlength=0, width=0.001)
+    ax.set_ylim(-cmax, cmax)
+    ax.set_ylabel('Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    ax.set_title('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
+
+    # compass arrow
+    ax.annotate("", xy=(0.97, 0.95), xytext=(0.97, 0.83),
+            arrowprops=dict(arrowstyle="->"), xycoords='axes fraction')
+    ax.text(0.97, 0.77, 'N', transform=ax.transAxes,
+            horizontalalignment='center', fontsize=10)
+    # convert to knots
+    axknots = ax.twinx()
+    axknots.set_ylim(-kmax, kmax)
+    axknots.set_ylabel(r'[knots]')
+
+    ## cross-shelf wind ##
+    ax = axes[1]
+    idx = mpl.dates.date2num(df.index.to_pydatetime())
+    ax.plot(idx, df.Across, 'k', lw=lw)
+    ax.plot(idx, np.zeros(idx.size), 'k:')
+    ax.set_ylim(-cmax-15, cmax+15)
+    ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    # convert to knots
+    axknots = ax.twinx()
+    axknots.set_ylim(-kmax, kmax)
+    axknots.set_ylabel('[knots]')
+    ax.text(0.02, 0.91, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
+    ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(angle['B']) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ####
+
+    # along-shelf wind
+    ax = axes[2]
+    ax.plot(idx, df.Along, 'k', lw=lw)
+    ax.plot(idx, np.zeros(idx.size), 'k:')
+    ax.set_ylim(-cmax-15, cmax+15)
+    ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    # ax.grid(which='major', color='k', linestyle='-', linewidth=0.05, alpha=0.5)
+    # convert to knots
+    axknots = ax.twinx()
+    axknots.set_ylim(-kmax, kmax)
+    axknots.set_ylabel('[knots]')
+    ax.text(0.02, 0.91, 'UPCOAST', fontsize=10, transform=ax.transAxes)
+    ax.text(0.02, 0.04, 'DOWNCOAST', fontsize=10, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(angle['B']-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+
+    # T/S
+    cmicro = '0.6'
+    cDCS = '0.0'
+    csalt = 'm'
+    ax = axes[3]
+    idx = mpl.dates.date2num(df.index.to_pydatetime())
+    ax.plot(idx, df.WaterT, lw=lw, color=cDCS, linestyle='-')
+    idx = mpl.dates.date2num(dfsalt.index.to_pydatetime())
+    ax.plot(idx, dfsalt.Temp, lw=lw, color=cmicro, linestyle='-')
+    ax.set_ylabel(r'Temperature $\left[^\circ\mathrm{C}\right]$')
+    # set bottom ylim a little large to make room for text
+    ylim = ax.get_ylim()
+    ax.set_ylim(ylim[0]*0.98, ylim[1])
+    # Fahrenheit
+    axF = ax.twinx()
+    axF.spines["left"].set_position(("axes", -0.16))
+    # make spine visible
+    # http://matplotlib.org/examples/pylab_examples/multiple_yaxis_with_spines.html
+    def make_patch_spines_invisible(ax):
+        ax.set_frame_on(True)
+        ax.patch.set_visible(False)
+        for sp in ax.spines.values():
+            sp.set_visible(False)
+    make_patch_spines_invisible(axF)
+    # put spine on left, and shift farther to the left too
+    # http://stackoverflow.com/questions/20146652/two-y-axis-on-the-left-side-of-the-figure
+    axF.spines["left"].set_visible(True)
+    axF.yaxis.set_label_position('left')
+    axF.yaxis.set_ticks_position('left')
+    axF.set_ylabel(r'$\left[^\circ\mathrm{F}\right]$')
+    ylim = ax.get_ylim()
+    # convert to fahrenheit
+    axF.set_ylim(ylim[0]*(9/5.)+32, ylim[1]*(9/5.)+32)
+
+    # hourly minor ticks
+    hours = mpl.dates.HourLocator()
+    ax.xaxis.set_minor_locator(hours)
+    halfdays = mpl.dates.HourLocator(byhour=[0,12])
+    ax.xaxis.set_major_locator(halfdays)
+    ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+
+    # Year for first entry
+    ax.text(0.98, -0.25, datetime.strftime(df.index[0], '%Y'),
+            transform=ax.transAxes, rotation=30)
+
+
+    # rotates and right aligns the x labels, and moves the bottom of the
+    # axes up to make room for them
+    fig.autofmt_xdate(bottom=0.125)
+
+    # text at bottom
+    # right hand side
+    text = 'Oceanography and GERG at Texas A&M University\n' \
+           + time.strftime('%a %b %d, %Y %H:%M GMT%z')
+    fig.text(0.95, 0.035, text, fontsize=8, transform=fig.transFigure,
+             horizontalalignment='right', verticalalignment='top')
+    # left hand side
+    text = 'TGLO, GERG, Oceanography, and Texas A&M make no representations\n' \
+           + 'or any other warranty with regard to this data.\n' \
+           + 'These data are not suitable for navigation purposes.'
+    fig.text(0.08, 0.035, text, fontsize=8, transform=fig.transFigure,
+             horizontalalignment='left', verticalalignment='top')
+
+    fig.savefig('/tmp/' + figname '.pdf')
+    fig.savefig('/tmp/' + figname '.png')
+
+
+
+def plot_buoy(loc):
+    '''Make plot of most relevant buoy data.'''
 
 
     ## Load in data, from txt page or php ##
@@ -212,3 +372,10 @@ def plot(loc):
              horizontalalignment='left', verticalalignment='top')
 
     fig.savefig('test.pdf')
+
+
+
+if __name__ == "__main__":
+
+    if args.which == 'ven':
+        ven(args.dataname, args.figname)
