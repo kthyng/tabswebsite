@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] != 'POST') {
 echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=http://tabs1.gerg.tamu.edu/tglo/tabsqueryform.php\">";
 echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 
-	print "<p><b>Database search form is here:</b> <a href=/tglo/tabsqueryform.php>http://tabs.gerg.tamu.edu/tglo/tabsqueryform.php</a>";
+	print "<p><b>Database search form is here:</b> <a href=tabsqueryform.php>http://tabs.gerg.tamu.edu/tglo/tabsqueryform.php</a>";
 } else {
 
 
@@ -144,8 +144,8 @@ if ($_POST['Datatype']=="pic") {
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=240><font face=helvetica><HR width=100%><BR>";
 print "<table>\n";
-print "<TR valign=top><TD>Return to <a href=/tglo/tabsqueryform.php>TABS Database query</a></TD></TR>\n";
-print "<TR><TD>Return to <a href=/tglo/>TABS page</a></TR></TD>\n";
+print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>TABS Database query</a></TD></TR>\n";
+print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><HR width=100%><br>";
         print "<font face=helvetica><b>Results of TABS Data query</b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
@@ -182,8 +182,8 @@ print "<input NAME=Datatype TYPE=hidden value=$Datatype>\n";
 print "<BR><input type=submit  value=Change>\n</form>\n";
 
 print "<br><table>\n";
-print "<TR><TD>Return to <a href=/tglo/tabsqueryform.php>TABS Database query</a></TD></TR>\n";
-print "<TR><TD>Return to <a href=/tglo/>TABS page</a></TR></TD>\n";
+print "<TR><TD>Return to <a href=tabsqueryform.php>TABS Database query</a></TD></TR>\n";
+print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
 print "</table>\n";
 print "</font>\n";
 print "</TD><TD style=\"text-align:left !important;\">";
@@ -216,7 +216,7 @@ if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
 
 $header=$table."tableheader.php";
 print "<b>Results of TABS Data query</b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
-include($header); //KMT COMMENTED
+include($header);
 
 $venlines1=file($tempfile);
 foreach ($venlines1 as $elem) {
