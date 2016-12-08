@@ -143,9 +143,9 @@ function closeme() {
 
 <!-- Map from server-->
 <TR>
-<TD valign=top width=440 rowspan=11>
+<TD valign=top width=44 rowspan=11>
 <div id="map" >
-  <iframe width="800" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
+  <iframe width="815" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
 <!-- text below map -->
 <center>
