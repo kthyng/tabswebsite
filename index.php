@@ -36,18 +36,18 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 
 
-<script type="text/javascript" src="js/jquery.min.js?v=1.8.2"></script>
+<!-- <script type="text/javascript" src="js/jquery.min.js?v=1.8.2"></script>
 <script type="text/javascript" src="js/jquery.once.js?v=1.2"></script>
 <script type="text/javascript" src="js/tamustyle.js"></script>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
- <script type="text/javascript" src="js/leaflet.js"></script>
+ <script type="text/javascript" src="js/leaflet.js"></script> -->
 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
 <!--[if lte IE 8]>
      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
  <![endif]-->
-  <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+  <!-- <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script> -->
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21828695-1']);
@@ -74,13 +74,13 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 	var marker = new L.Marker(userLocation);
 	map.addLayer(marker);
 
-</script>
+</script> -->
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> -->
 
 <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
 
-<script type="text/javascript" src="js/ddimgtooltip.js">
+<!-- <script type="text/javascript" src="js/ddimgtooltip.js">
 
 /***********************************************
 * Image w/ description tooltip v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
@@ -92,9 +92,9 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 tooltips[0]=["images/tabs_B_ven.png", {width:"200px", height: "100px";}]
 
-</script>
+</script> -->
 
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 $(document).ready(function(){
 	var pagebody = $("#head");
 	var themenu = $("#navmenu");
@@ -128,7 +128,7 @@ function closeme() {
   	}, { duration: 180, queue: false });
 	});
 }
-</script>
+</script> -->
 
 </HEAD>
 
