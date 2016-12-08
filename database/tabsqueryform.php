@@ -1,9 +1,9 @@
 <?php
 
-// $buoy = isset($_GET["buoy"]) ? $_GET["buoy"] : "";
-// $type = isset($_GET["type"]) ? $_GET["type"] : "";
-// $time = isset($_GET["time"]) ? $_GET["time"] : "";
-// $units = isset($_GET["units"]) ? $_GET["units"] : "";
+$buoy = isset($_GET["buoy"]) ? $_GET["buoy"] : "";
+$type = isset($_GET["type"]) ? $_GET["type"] : "";
+$time = isset($_GET["time"]) ? $_GET["time"] : "";
+$units = isset($_GET["units"]) ? $_GET["units"] : "";
 
 
 $PageTitle="TABS Buoy Database Query page";

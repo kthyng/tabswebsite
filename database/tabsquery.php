@@ -33,7 +33,8 @@ $Nextdays=$_POST["Nextdays"];
 $Prevdays=$_POST["Prevdays"];
 $table=$_POST["table"];
 
-$tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
+$tempfile=tempnam("/tmp",$Buoyname . $table);
+// $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
 $tempout=basename($tempfile);
 
 #echo "BUOY: $Buoyname  $table<br>TMP: $tempout  $tempfile<BR>";
@@ -86,7 +87,6 @@ list($datetime,$date,$time,$ve,$vn,$comp,$twater,$tx,$ty)=$data;
 // Notes in index.php
 $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
 $date = $UTC->format('Y/m/d');
-// $date=strftime("%m/%d/%Y",strtotime($data[1]));
 $speed=hypot($ve,$vn);
 
 
@@ -103,7 +103,8 @@ fclose($tmpfh) or die($php_errormsg);
 
 if ($table == 'met'){
 list($datetime,$date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh)=$data;
-$date=strftime("%m/%d/%Y",strtotime($data[1]));
+$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+$date = $UTC->format('Y/m/d');
 
 $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
 $outstr=sprintf("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %5.1f %4.0d %4.0d %7.1f %7.1f\n",
@@ -115,7 +116,8 @@ fclose($tmpfh) or die($php_errormsg);
 
 if ($table == 'eng'){
 list($datetime,$date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2)=$data;
-$date=strftime("%m/%d/%Y",strtotime($data[1]));
+$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+$date = $UTC->format('Y/m/d');
 $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
 $outstr=sprintf("%s %s %7.1f %7.2f %7.1f %7.0f %3.0d %3.0d %7.1f %7.1f %7.1f\n",
 $date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2);
@@ -127,7 +129,8 @@ fclose($tmpfh) or die($php_errormsg);
 
 if ($table == 'salt'){
 list($datetime,$date,$time,$watertemp,$conduct,$salinity,$density,$soundvel)=$data;
-$date=strftime("%m/%d/%Y",strtotime($data[1]));
+$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+$date = $UTC->format('Y/m/d');
 $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
 $outstr=sprintf("%s %s %7.2f %7.2f %7.2f %7.2f %7.2f\n",
 $date,$time,$watertemp,$conduct,$salinity,$density,$soundvel);
@@ -148,7 +151,7 @@ print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>TABS Database quer
 print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><HR width=100%><br>";
-        print "<font face=helvetica><b>Results of TABS Data query</b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
+        print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
 	print "<a href=/tglo/tmp/".$tempout.".pdf> <img src=/tglo/tmp/".$tempout.".png></A>\n";
 	print "</TD></TR></TABLE>\n";
 }
@@ -202,7 +205,7 @@ if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
 
 
         }
-// Use Station Local
+// Use Station Local, $_POST['tz'] == 'STN'
 else {
 // HOW TO UPDATE THIS???
 $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('America/Chicago'));
@@ -215,7 +218,7 @@ if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
 	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
 
 $header=$table."tableheader.php";
-print "<b>Results of TABS Data query</b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
 $venlines1=file($tempfile);
@@ -258,7 +261,7 @@ if ($table=='met') {
 
 }
 $header=$table."tableheader.php";
-print "<b>Results of TABS Data query</b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 
 include($header);
 
@@ -302,7 +305,7 @@ foreach ($metlines1 as $elem) {
 if ($table == 'eng' ) {
 
 $header=$table."tableheader.php";
-print "<b>Results of TABS Data query</b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
 $englines1=file($tempfile);
@@ -338,7 +341,7 @@ if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
 
 $header=$table."tableheader.php";
-print "<b>Results of TABS Data query</b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
 include($header);
 
 $englines1=file($tempfile);
