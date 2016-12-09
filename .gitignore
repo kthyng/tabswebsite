@@ -1,3 +1,4 @@
 .DS_Store
 unused
 phphelp.txt
+tmp/*

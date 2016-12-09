@@ -33,7 +33,7 @@ $Nextdays=$_POST["Nextdays"];
 $Prevdays=$_POST["Prevdays"];
 $table=$_POST["table"];
 
-$tempfile=tempnam("/tmp",$Buoyname . $table);
+$tempfile=tempnam("tmp",$Buoyname . $table);
 // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
 $tempout=basename($tempfile);
 
@@ -143,8 +143,8 @@ fclose($tmpfh) or die($php_errormsg);
 chmod($tempfile, 0644);
 
 if ($_POST['Datatype']=="pic") {
-    passthru("python figures/plot_buoy.py 'ven' $tempfile $tempout");
-	// system('/home/woody/htdocs/tglo/prog/queryplot.csh '.escapeshellarg($tempfile));
+    $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
+    system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=240><font face=helvetica><HR width=100%><BR>";
 print "<table>\n";
@@ -153,7 +153,7 @@ print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><HR width=100%><br>";
         print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
-	print "<a href=/tmp/".$tempout.".pdf> <img src=/tmp/".$tempout.".png></A>\n";
+	print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";
 	print "</TD></TR></TABLE>\n";
 }
 

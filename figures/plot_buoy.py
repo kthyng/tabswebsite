@@ -40,20 +40,19 @@ locs = {'B': ['94 53.943W', '28 58.938N'], 'K': ['96 29.988W', '26 13.008N'],
 parser = argparse.ArgumentParser()
 parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
 parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
-parser.add_argument('figname', type=str, help='figure filename, to be saved in /tmp')
 args = parser.parse_args()
 
 
-def ven(dataname, figname):
+def ven(dataname):
     '''Plot ven data.
 
-    Find data in dataname and save fig to figname, both in /tmp.
+    Find data in dataname and save fig, both in /tmp.
     '''
 
     ## Load in data already saved into /tmp file by tabsquery.php ##
     # time in UTC, velocities in cm/s, direction in deg T, temp in deg C
     names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
-    df = pd.read_table('/tmp/' + dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+    df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
     # Calculate along- and across-shelf
     # along-shelf rotation angle in math angle convention
     theta = np.deg2rad(-(angle['B']-90))  # convert from compass to math angle
@@ -128,12 +127,9 @@ def ven(dataname, figname):
     # T/S
     cmicro = '0.6'
     cDCS = '0.0'
-    csalt = 'm'
     ax = axes[3]
     idx = mpl.dates.date2num(df.index.to_pydatetime())
     ax.plot(idx, df.WaterT, lw=lw, color=cDCS, linestyle='-')
-    idx = mpl.dates.date2num(dfsalt.index.to_pydatetime())
-    ax.plot(idx, dfsalt.Temp, lw=lw, color=cmicro, linestyle='-')
     ax.set_ylabel(r'Temperature $\left[^\circ\mathrm{C}\right]$')
     # set bottom ylim a little large to make room for text
     ylim = ax.get_ylim()
@@ -188,8 +184,11 @@ def ven(dataname, figname):
     fig.text(0.08, 0.035, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='left', verticalalignment='top')
 
-    fig.savefig('/tmp/' + figname '.pdf')
-    fig.savefig('/tmp/' + figname '.png')
+    # x = np.linspace(0,10)
+    # plt.plot(x,x)
+    # fig = plt.gcf()
+    fig.savefig(dataname + '.pdf')
+    fig.savefig(dataname + '.png')
 
 
 
@@ -378,4 +377,4 @@ def plot_buoy(loc):
 if __name__ == "__main__":
 
     if args.which == 'ven':
-        ven(args.dataname, args.figname)
+        ven(args.dataname)
