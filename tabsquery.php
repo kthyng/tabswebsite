@@ -78,7 +78,10 @@ $rows[] = $row;
 
 mysql_close();
 
-
+$command = escapeshellcmd('/anaconda/bin/python tabsquery.py "'.$tablename.'" "'.$dstart.'" "'.$Prevdays.'" "'.$Nextdays.'"');
+passthru($command);
+// exec($command, $output);
+// echo $output;
 
 foreach ($rows as $data) {
 

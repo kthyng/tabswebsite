@@ -30,17 +30,19 @@ angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
          'V': 173, 'W': 173, 'X': 90}
 
 # locations for buoys
-locs = {'B': ['94 53.943W', '28 58.938N'], 'K': ['96 29.988W', '26 13.008N'],
-        'D': ['96 50.574W', '27 56.376N'], 'F': ['94 14.496W', '28 50.550N'],
-        'J': ['97 03.042W', '26 11.484N'], 'N': ['94 02.202W', '27 53.418N'],
-        'R': ['93 38.502W', '29 38.100N'], 'V': ['93 35.838W', '27 53.796N'],
-        'W': ['96 00.348W', '28 21.042N'], 'X': ['96 20.298W', '27 03.960N']}
+locs = {'B': {'lon': '94 53.943W', 'lat': '28 58.938N'}, 'K': {'lon': '96 29.988W', 'lat': '26 13.008N'},
+        'D': {'lon': '96 50.574W', 'lat': '27 56.376N'}, 'F': {'lon': '94 14.496W', 'lat': '28 50.550N'},
+        'J': {'lon': '97 03.042W', 'lat': '26 11.484N'}, 'N': {'lon': '94 02.202W', 'lat': '27 53.418N'},
+        'R': {'lon': '93 38.502W', 'lat': '29 38.100N'}, 'V': {'lon': '93 35.838W', 'lat': '27 53.796N'},
+        'W': {'lon': '96 00.348W', 'lat': '28 21.042N'}, 'X': {'lon': '96 20.298W', 'lat': '27 03.960N'}}
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
 parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
 args = parser.parse_args()
+
+buoy = args.dataname.split('/')[-1][0]
 
 
 def ven(dataname):
@@ -55,7 +57,7 @@ def ven(dataname):
     df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
     # Calculate along- and across-shelf
     # along-shelf rotation angle in math angle convention
-    theta = np.deg2rad(-(angle['B']-90))  # convert from compass to math angle
+    theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
     df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
     df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
 
@@ -78,10 +80,11 @@ def ven(dataname):
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
     ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
-              headaxislength=0, headlength=0, width=0.001)
+              headaxislength=0, headlength=0, width=0.1,
+              units='y', scale_units='y', scale=1)
     ax.set_ylim(-cmax, cmax)
     ax.set_ylabel('Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    ax.set_title('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
+    ax.set_title('TGLO TABS Buoy ' + buoy + ': ' + locs[buoy]['lat'] + ', ' + locs[buoy]['lon'], fontsize=18)
 
     # compass arrow
     ax.annotate("", xy=(0.97, 0.95), xytext=(0.97, 0.83),
@@ -93,12 +96,13 @@ def ven(dataname):
     axknots.set_ylim(-kmax, kmax)
     axknots.set_ylabel(r'[knots]')
 
-    ## cross-shelf wind ##
+    ## cross-shelf flow ##
     ax = axes[1]
-    idx = mpl.dates.date2num(df.index.to_pydatetime())
     ax.plot(idx, df.Across, 'k', lw=lw)
     ax.plot(idx, np.zeros(idx.size), 'k:')
-    ax.set_ylim(-cmax-15, cmax+15)
+    # ax.set_ylim(-cmax-15, cmax+15)
+    ylim = ax.get_ylim()
+    ax.set_ylim(ylim[0]*0.9, ylim[1]*1.1)
     ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     # convert to knots
     axknots = ax.twinx()
@@ -106,10 +110,10 @@ def ven(dataname):
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle['B']) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(angle[buoy]) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
     ####
 
-    # along-shelf wind
+    # along-shelf flow
     ax = axes[2]
     ax.plot(idx, df.Along, 'k', lw=lw)
     ax.plot(idx, np.zeros(idx.size), 'k:')
@@ -118,17 +122,17 @@ def ven(dataname):
     # ax.grid(which='major', color='k', linestyle='-', linewidth=0.05, alpha=0.5)
     # convert to knots
     axknots = ax.twinx()
-    axknots.set_ylim(-kmax, kmax)
+    ylim = ax.get_ylim()
+    axknots.set_ylim(ylim[0], ylim[1])
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'UPCOAST', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'DOWNCOAST', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle['B']-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(angle[buoy]-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
 
     # T/S
     cmicro = '0.6'
     cDCS = '0.0'
     ax = axes[3]
-    idx = mpl.dates.date2num(df.index.to_pydatetime())
     ax.plot(idx, df.WaterT, lw=lw, color=cDCS, linestyle='-')
     ax.set_ylabel(r'Temperature $\left[^\circ\mathrm{C}\right]$')
     # set bottom ylim a little large to make room for text
@@ -155,11 +159,11 @@ def ven(dataname):
     # convert to fahrenheit
     axF.set_ylim(ylim[0]*(9/5.)+32, ylim[1]*(9/5.)+32)
 
-    # hourly minor ticks
-    hours = mpl.dates.HourLocator()
-    ax.xaxis.set_minor_locator(hours)
-    halfdays = mpl.dates.HourLocator(byhour=[0,12])
-    ax.xaxis.set_major_locator(halfdays)
+    # # hourly minor ticks
+    # hours = mpl.dates.HourLocator()
+    # ax.xaxis.set_minor_locator(hours)
+    # halfdays = mpl.dates.HourLocator(byhour=[0,12])
+    # ax.xaxis.set_major_locator(halfdays)
     ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
 
     # Year for first entry
@@ -184,9 +188,6 @@ def ven(dataname):
     fig.text(0.08, 0.035, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='left', verticalalignment='top')
 
-    # x = np.linspace(0,10)
-    # plt.plot(x,x)
-    # fig = plt.gcf()
     fig.savefig(dataname + '.pdf')
     fig.savefig(dataname + '.png')
 
