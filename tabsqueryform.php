@@ -15,6 +15,29 @@ include("includes/navigation.html");
 print "<form action=\"tabsquery.php\" method=\"post\">\n";
 
 
+// buoys and their available variables
+// A: eng, ven
+// B: eng, met, salt, ven
+// C: eng, ven
+// D: eng, salt, ven
+// E: eng, ven
+// F: eng, salt, ven
+// G: eng, ven
+// H: eng, met, salt, ven
+// J: eng, met, salt, ven
+// K: adcp, eng, met, salt, ven, wave
+// L: eng, ven
+// M: eng, ven
+// N: eng, met, salt, ven, wave
+// P: eng, ven
+// R: eng, salt, ven
+// S: eng, ven
+// T: eng, ven
+// U: eng, ven
+// V: eng, met, salt, ven, wave
+// W: eng, salt, ven
+// X: eng, met, salt, ven, wave
+
 print <<<_HTML_
 <BR>
 <TABLE border=0>
