@@ -24,14 +24,24 @@ echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 	print "<p><b>Database search form is here:</b> <a href=tabsqueryform.php>http://tabs.gerg.tamu.edu/tglo/tabsqueryform.php</a>";
 } else {
 
-
+// bring in data from tabsqueryform.php
 $Buoyname=$_POST["Buoyname"];
-$Year=$_POST["Year"];
-$Month=$_POST["Month"];
-$Day=$_POST["Day"];
-$Nextdays=$_POST["Nextdays"];
-$Prevdays=$_POST["Prevdays"];
 $table=$_POST["table"];
+$datepicker=$_POST["datepicker"];
+
+// change format of date from yyyy/m/d to yyyy-m-d
+$datepicker = str_replace ("/", "-", $datepicker);
+// split date range into two dates. if it is just one date, still becomes an array but of length 1
+$dates = explode(" - ", $datepicker);
+// start date is the first date
+$dstart = $dates[0];
+if (count($dates)==2) {
+    // if there is an end date, use it
+    $dend = $dates[1];
+} else {
+    // if there is not an end date, use start date
+    $dend = $dstart;
+}
 
 $tempfile=tempnam("tmp",$Buoyname . $table);
 // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
@@ -44,9 +54,6 @@ die( "<h2>No Met Data Available for selected station</h2>\n" ); }
 
 #if ($table == salt && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 #die( "<h2>No Water Property Data Available for selected station</h2>\n" ); }
-
-
-$dstart=$Year."-".$Month."-".$Day;
 
 if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
 	die("Can't connect: ".mysql_error());
@@ -64,8 +71,7 @@ mysql_select_db($dbase) or die(mysql_error());
 
 #if (DB::isError($dbh)) {die ($dbh->getMessage());}
 
-$q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' - interval $Prevdays day AND '$dstart' + interval $Nextdays day) order by obs_time";
-// echo $q;
+$q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
 $result = mysql_query($q)
     or die(mysql_error());
 // echo $result;
@@ -83,6 +89,7 @@ passthru($command);
 // exec($command, $output);
 // echo $output;
 
+// NEED A CATCH FOR WHEN THE BUOY IS DEAD
 foreach ($rows as $data) {
 
 if ($table == 'ven'){
