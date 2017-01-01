@@ -2,7 +2,8 @@
 Make plot of recent buoy data.
 
 python plot_buoy.py -h for help
-python plot_buoy.py 'ven' 'tempfile' 'tempout'
+python plot_buoy.py 'ven' '../tmp/FvengV2KrI'
+python plot_buoy.py 'ven' '../tmp/Fven7YU0EB'
 '''
 
 import matplotlib.pyplot as plt
@@ -63,113 +64,139 @@ def ven(dataname):
 
     # max current value
     cmax = 60  # cm/s
-    kmax = cmax/51.4444444444  # knots
+    tokts = 51.4444444444  # conversion factor to knots
+    kmax = cmax/tokts  # knots
     lw = 1.5
 
     # plot
     fig, axes = plt.subplots(4, 1, figsize=(8.5,11), sharex=True)
     # bottom controlled later
-    fig.subplots_adjust(top=0.96, right=0.90, left=0.22, hspace=0.1)
-    # fig.suptitle('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
+    fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
 
     # current arrows
     ax = axes[0]
     # can't use datetime index directly unfortunately here, so can't use pandas later either
-    idx = mpl.dates.date2num(df.index.to_pydatetime())
+    idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
+    dT = idx[-1] - idx[0]  # length of dataset in days
 
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
-    ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
-              headaxislength=0, headlength=0, width=0.1,
-              units='y', scale_units='y', scale=1)
+    if dT <=2:  # less than or equal to two days
+        ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
+                  headaxislength=0, headlength=0, width=1.0,
+                  units='y', scale_units='y', scale=1)
+    else:
+        ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
+                  headaxislength=0, headlength=0, width=0.15,
+                  units='y', scale_units='y', scale=1)
+
     ax.set_ylim(-cmax, cmax)
     ax.set_ylabel('Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     ax.set_title('TGLO TABS Buoy ' + buoy + ': ' + locs[buoy]['lat'] + ', ' + locs[buoy]['lon'], fontsize=18)
 
     # compass arrow
-    ax.annotate("", xy=(0.97, 0.95), xytext=(0.97, 0.83),
+    ax.annotate("", xy=(1.1, 0.95), xytext=(1.1, 0.83),
             arrowprops=dict(arrowstyle="->"), xycoords='axes fraction')
-    ax.text(0.97, 0.77, 'N', transform=ax.transAxes,
+    ax.text(1.1, 0.77, 'N', transform=ax.transAxes,
             horizontalalignment='center', fontsize=10)
     # convert to knots
     axknots = ax.twinx()
     axknots.set_ylim(-kmax, kmax)
-    axknots.set_ylabel(r'[knots]')
+    axknots.set_ylabel('[knots]')
 
     ## cross-shelf flow ##
     ax = axes[1]
     ax.plot(idx, df.Across, 'k', lw=lw)
     ax.plot(idx, np.zeros(idx.size), 'k:')
-    # ax.set_ylim(-cmax-15, cmax+15)
     ylim = ax.get_ylim()
-    ax.set_ylim(ylim[0]*0.9, ylim[1]*1.1)
+    ax.set_ylim(ylim[0]*1.2, ylim[1]*1.2)  # assume one lim neg and one pos
+    ylim = ax.get_ylim()  # updated ylim values after shift
+    # force 0 line to be within y limits
+    if ylim[0]>=0:
+        ylim[0] = -2
+    elif ylim[1]<=0:
+        ylim[1] = 2
     ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     # convert to knots
     axknots = ax.twinx()
-    axknots.set_ylim(-kmax, kmax)
+    ylimk = [ylim[0]/tokts, ylim[1]/tokts]  # knots
+    axknots.set_ylim(ylimk[0], ylimk[1])
     axknots.set_ylabel('[knots]')
-    ax.text(0.02, 0.91, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle[buoy]) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
+    ax.text(0.02, 0.02, 'ONSHORE', fontsize=10, transform=ax.transAxes)
+    # add angle
+    ax.text(0.9, 0.91, str(angle[buoy]) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
     ####
 
     # along-shelf flow
     ax = axes[2]
     ax.plot(idx, df.Along, 'k', lw=lw)
     ax.plot(idx, np.zeros(idx.size), 'k:')
-    ax.set_ylim(-cmax-15, cmax+15)
+    ylim = ax.get_ylim()
+    ax.set_ylim(ylim[0]*1.2, ylim[1]*1.2)
+    ylim = ax.get_ylim()  # updated ylim values after shift
+    # force 0 line to be within y limits
+    if ylim[0]>=0:
+        ylim[0] = -2
+    elif ylim[1]<=0:
+        ylim[1] = 2
     ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     # ax.grid(which='major', color='k', linestyle='-', linewidth=0.05, alpha=0.5)
     # convert to knots
     axknots = ax.twinx()
-    ylim = ax.get_ylim()
-    axknots.set_ylim(ylim[0], ylim[1])
+    ylimk = [ylim[0]/tokts, ylim[1]/tokts]  # knots
+    axknots.set_ylim(ylimk[0], ylimk[1])
     axknots.set_ylabel('[knots]')
-    ax.text(0.02, 0.91, 'UPCOAST', fontsize=10, transform=ax.transAxes)
-    ax.text(0.02, 0.04, 'DOWNCOAST', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle[buoy]-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
+    ax.text(0.02, 0.02, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
+    # add angle
+    ax.text(0.9, 0.91, str(angle[buoy]-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
 
-    # T/S
-    cmicro = '0.6'
-    cDCS = '0.0'
+    # Temp
     ax = axes[3]
-    ax.plot(idx, df.WaterT, lw=lw, color=cDCS, linestyle='-')
-    ax.set_ylabel(r'Temperature $\left[^\circ\mathrm{C}\right]$')
-    # set bottom ylim a little large to make room for text
+    ax.plot(idx, df.WaterT, lw=lw, color='k', linestyle='-')
+    ax.set_ylabel(r'Temperature $\left[^\circ\!\mathrm{C}\right]$')
     ylim = ax.get_ylim()
-    ax.set_ylim(ylim[0]*0.98, ylim[1])
+    ax.set_ylim(ylim[0]*0.98, ylim[1]*1.02)
+    ylim = ax.get_ylim()  # update
     # Fahrenheit
     axF = ax.twinx()
-    axF.spines["left"].set_position(("axes", -0.16))
-    # make spine visible
-    # http://matplotlib.org/examples/pylab_examples/multiple_yaxis_with_spines.html
-    def make_patch_spines_invisible(ax):
-        ax.set_frame_on(True)
-        ax.patch.set_visible(False)
-        for sp in ax.spines.values():
-            sp.set_visible(False)
-    make_patch_spines_invisible(axF)
-    # put spine on left, and shift farther to the left too
-    # http://stackoverflow.com/questions/20146652/two-y-axis-on-the-left-side-of-the-figure
-    axF.spines["left"].set_visible(True)
-    axF.yaxis.set_label_position('left')
-    axF.yaxis.set_ticks_position('left')
-    axF.set_ylabel(r'$\left[^\circ\mathrm{F}\right]$')
-    ylim = ax.get_ylim()
+    axF.set_ylabel(r'$\left[^\circ\!\mathrm{F}\right]$')
     # convert to fahrenheit
     axF.set_ylim(ylim[0]*(9/5.)+32, ylim[1]*(9/5.)+32)
 
-    # # hourly minor ticks
-    # hours = mpl.dates.HourLocator()
-    # ax.xaxis.set_minor_locator(hours)
-    # halfdays = mpl.dates.HourLocator(byhour=[0,12])
-    # ax.xaxis.set_major_locator(halfdays)
-    ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+    # varied tick locations and labels for few days
+    if dT <=1:  # less than or equal to one day
+        # hourly minor ticks
+        hours = mpl.dates.HourLocator()
+        ax.xaxis.set_minor_locator(hours)
+        sixthdays = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
+        ax.xaxis.set_major_locator(sixthdays)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+    elif dT <=2:  # less than or equal to two days
+        # hourly minor ticks
+        hours = mpl.dates.HourLocator()
+        ax.xaxis.set_minor_locator(hours)
+        quarterdays = mpl.dates.HourLocator(byhour=np.arange(0,24,6))
+        ax.xaxis.set_major_locator(quarterdays)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+    else:
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
 
-    # Year for first entry
-    ax.text(0.98, -0.25, datetime.strftime(df.index[0], '%Y'),
+    # Year for last entry
+    # catch special case of last tick switching over to new year without actual data doing so
+    # do this if the data is for december only but the final tick label is for january
+    # import pdb; pdb.set_trace()
+    # if (df.index[-1].month == 12) and (ax.get_xticklabels(which='major')[-1].get_text()[:3] == 'Jan'):
+    #     ax.text(0.98, -0.25, datetime.strftime(df.index[-1].year+1, '%Y'),
+    #             transform=ax.transAxes, rotation=30)
+    # else:
+    # note: I haven't been able to figure out how to update this year in the special case
+    ax.text(0.98, -0.25, datetime.strftime(df.index[-1], '%Y'),
             transform=ax.transAxes, rotation=30)
 
+    # tighten only x axis
+    plt.autoscale(enable=True, axis='x', tight=True)
 
     # rotates and right aligns the x labels, and moves the bottom of the
     # axes up to make room for them

@@ -28,7 +28,7 @@ jQuery.fn.daterangepicker = function(settings){
 			{text: 'Month to date', dateStart: function(){ return Date.parse('today').moveToFirstDayOfMonth();  }, dateEnd: 'today' },
 			{text: 'Year to date', dateStart: function(){ var x= Date.parse('today'); x.setMonth(0); x.setDate(1); return x; }, dateEnd: 'today' },
 			//extras:
-			{text: 'The previous Month', dateStart: function(){ return Date.parse('1 month ago').moveToFirstDayOfMonth();  }, dateEnd: function(){ return Date.parse('1 month ago').moveToLastDayOfMonth();  } }
+			{text: 'Previous month', dateStart: function(){ return Date.parse('1 month ago').moveToFirstDayOfMonth();  }, dateEnd: function(){ return Date.parse('1 month ago').moveToLastDayOfMonth();  } }
 			//{text: 'Tomorrow', dateStart: 'Tomorrow', dateEnd: 'Tomorrow' },
 			//{text: 'Last 30 Days', dateStart: 'Today-30', dateEnd: 'Today' },
 			//{text: 'Next 30 Days', dateStart: 'Today', dateEnd: 'Today+30' },
@@ -100,7 +100,7 @@ jQuery.fn.daterangepicker = function(settings){
 	//Capture Dates from input(s)
 	var inputDateA, inputDateB = Date.parse('today');
 	var inputDateAtemp, inputDateBtemp;
-	if(rangeInput.size() == 2){
+	if(rangeInput.length == 2){
 		inputDateAtemp = Date.parse( rangeInput.eq(0).val() );
 		inputDateBtemp = Date.parse( rangeInput.eq(1).val() );
 		if(inputDateAtemp == null){inputDateAtemp = inputDateBtemp;}

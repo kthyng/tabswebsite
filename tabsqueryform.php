@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="js/daterangepicker.jQuery.js"></script>
 		<link rel="stylesheet" href="css/ui.daterangepicker.css" type="text/css" />
 		<link rel="stylesheet" href="css/redmond/jquery-ui-1.7.1.custom.css" type="text/css" title="ui-theme" />
+        <!-- <script src="http://code.jquery.com/jquery-migrate-1.4.1.js"></script> -->
 		<script type="text/javascript">
 			$(function(){
 				  $('#datepicker').daterangepicker({
