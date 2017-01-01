@@ -7,53 +7,20 @@
           src="https://code.jquery.com/jquery-2.2.4.min.js"
           integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
           crossorigin="anonymous"></script>
-<!-- <script src="http://code.jquery.com/jquery-migrate-1.4.1.js"></script> -->
-		<!-- <script type="text/javascript" src="js/jquery-3.1.1.min.js"></script> -->
-        <!-- <script type="text/javascript" src="js/jquery-1.3.1.min.js"></script> -->
 		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
-        <!-- <script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script> -->
 		<script type="text/javascript" src="js/daterangepicker.jQuery.js"></script>
 		<link rel="stylesheet" href="css/ui.daterangepicker.css" type="text/css" />
 		<link rel="stylesheet" href="css/redmond/jquery-ui-1.7.1.custom.css" type="text/css" title="ui-theme" />
-        <!-- <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>jQuery UI Datepicker - Default functionality</title>
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <link rel="stylesheet" href="/resources/demos/style.css">
-        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
-        <!-- <script type="text/javascript">
-            $(function(){
-                  $('input').daterangepicker({arrows: true, dateFormat: 'M d, yy'});
-             });
-        </script> -->
 		<script type="text/javascript">
 			$(function(){
 				  $('#datepicker').daterangepicker({
                     datepickerOptions: {changeMonth: true, changeYear: true,
                     minDate: new Date(1995, 1, 1), maxDate: 0,
                     yearRange: "1995:+0"}
-                    });//{arrows:true});
-                    // $('#datepicker').daterangepicker({
-                    //   datepickerOptions: {changeMonth: true, changeYear: true,
-                    //   minDate: new Date(1995, 1, 1), maxDate: 0,
-                    //   yearRange: "1995:" + new Date().getFullYear()}
-                    //   });//{arrows:true});
+                    });
 			 });
-// var date = document.getElementById("datepicker").value;
-//             console.log(date, "Hello, world!");
 		</script>
 
-		<!-- from here down, demo-related styles and scripts -->
-<!--		<style type="text/css">
-			body { font-size: 62.5%; }
-			input {width: 196px; height: 1.1em; display:block;}
-		</style>-->
-        <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> -->
-        <!-- <script type="text/javascript">
-        var date = document.getElementById("datepicker").value;
-            console.log(date, "Hello, world!");
-        </script> -->
 
         <!-- <script>
 
@@ -136,7 +103,6 @@ mysql_select_db($dbase) or die(mysql_error());
 
 <?php
 
-// OLD
 
 print <<<_HTML_
 <BR>
@@ -186,12 +152,14 @@ print <<<_HTML_
 </select>
 </TR></TD>-->
 
-_HTML_;
 
-print <<<_HTML_
+<TR><TD><br></TD></TR>
+<TR><TD><B>Select Date: </B> </TD>
+<TD>
+<input type="text" value="Click here" id="datepicker" name="datepicker"/>
+</TD>
 
-<input type="text" value="Choose date" id="datepicker" name="datepicker"/>
-
+<TR><TD><br></TD></TR>
 <br>
 <br>
 <TR><TD><B>Output Format: </B></TD><TD>
@@ -204,12 +172,11 @@ print <<<_HTML_
 <TR><TD>
 <input type=reset name="Reset" Value="Reset Fields">
 </TD><TD>
-<input type=submit color=#009933 value="Submit Query">
+<input type=submit color='#009933' value="Submit Query">
 </TD></TR>
 </TABLE>
 </form>
 <br><br>
-
 
 _HTML_;
 

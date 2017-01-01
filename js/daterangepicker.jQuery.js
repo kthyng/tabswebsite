@@ -30,10 +30,8 @@ jQuery.fn.daterangepicker = function(settings){
 			//extras:
 			{text: 'The previous Month', dateStart: function(){ return Date.parse('1 month ago').moveToFirstDayOfMonth();  }, dateEnd: function(){ return Date.parse('1 month ago').moveToLastDayOfMonth();  } }
 			//{text: 'Tomorrow', dateStart: 'Tomorrow', dateEnd: 'Tomorrow' },
-			//{text: 'Ad Campaign', dateStart: '03/07/08', dateEnd: 'Today' },
 			//{text: 'Last 30 Days', dateStart: 'Today-30', dateEnd: 'Today' },
 			//{text: 'Next 30 Days', dateStart: 'Today', dateEnd: 'Today+30' },
-			//{text: 'Our Ad Campaign', dateStart: '03/07/08', dateEnd: '07/08/08' }
 		],
 		//presetRanges: array of objects for each menu preset.
 		//Each obj must have text, dateStart, dateEnd. dateStart, dateEnd accept date.js string or a function which returns a date object
