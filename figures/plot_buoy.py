@@ -96,6 +96,11 @@ def read(dataname, which):
         #   UTC       &deg;C      ms/cm             kg/m^3     m/s
         df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
 
+    elif which == 'wave':
+        names = ['Date', 'Time', 'WaveHeight', 'MeanPeriod', 'PeakPeriod']
+        #   UTC      m      s       s
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
     df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
@@ -329,6 +334,10 @@ def plot(which):
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
         add_var(axes[1], 'Salinity', 'Salinity')
         add_var(axes[2], 'Cond', 'Conductivity [ms/cm]')
+    elif which == 'wave':
+        add_var(axes[0], 'WaveHeight', 'Wave Height [m]')
+        add_var(axes[1], 'MeanPeriod', 'Mean Period [s]')
+        add_var(axes[2], 'PeakPeriod', 'Peak Period [s]')
     elif which == 'sum':
         add_currents(axes[0], 'water')
         add_vel(axes[1], 'Across')
