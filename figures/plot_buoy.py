@@ -4,6 +4,7 @@ Make plot of recent buoy data.
 python plot_buoy.py -h for help
 python plot_buoy.py 'ven' '../tmp/FvengV2KrI'
 python plot_buoy.py 'ven' '../tmp/Fven7YU0EB'
+python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
 '''
 
 import matplotlib.pyplot as plt
@@ -45,135 +46,195 @@ args = parser.parse_args()
 
 buoy = args.dataname.split('/')[-1][0]
 
+# constants
+cmax = 60  # cm/s, max water arrow value
+wmax = 20  # m/s, max wind arrow value
+lw = 1.5
 
-def ven(dataname):
-    '''Plot ven data.
 
-    Find data in dataname and save fig, both in /tmp.
+def convert(vin, which):
+    '''Convert units.'''
+
+    if which == 'c2f':  # celsius to fahrenheit
+        return vin*1.8+32
+    elif which == 'mps2kts':  # m/s to knots
+        return vin*1.943844
+    elif which == 'cps2kts':  # cm/s to knots
+        return vin*0.0194384
+    elif which == 'mb2hg':  # MB to Hg
+        return vin*0.029529983071415973
+
+
+def read(dataname, which):
+    '''Load in data already saved into /tmp file by tabsquery.php
+
+    Time is in UTC.
     '''
 
-    ## Load in data already saved into /tmp file by tabsquery.php ##
-    # time in UTC, velocities in cm/s, direction in deg T, temp in deg C
-    names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
-    df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
-    # Calculate along- and across-shelf
-    # along-shelf rotation angle in math angle convention
-    theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
-    df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
-    df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
+    if which == 'ven':
+        # velocities in cm/s, direction in deg T, temp in deg C
+        names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
 
-    # max current value
-    cmax = 60  # cm/s
-    tokts = 51.4444444444  # conversion factor to knots
-    kmax = cmax/tokts  # knots
-    lw = 1.5
+        # Calculate along- and across-shelf
+        # along-shelf rotation angle in math angle convention
+        theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
+        df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
+        df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
 
-    # plot
-    fig, axes = plt.subplots(4, 1, figsize=(8.5,11), sharex=True)
-    # bottom controlled later
-    fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
+    elif which == 'eng':
+        names = ['Date', 'Time', 'VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
 
-    # current arrows
-    ax = axes[0]
+    elif which == 'met':
+        names = ['Date', 'Time', 'East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH', 'WSpeed', 'WDir']
+#        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+
+    elif which == 'salt':
+        names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+        #   UTC       &deg;C      ms/cm             kg/m^3     m/s
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+
     # can't use datetime index directly unfortunately here, so can't use pandas later either
-    idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
-    dT = idx[-1] - idx[0]  # length of dataset in days
+    df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
+    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+
+    return df
+
+
+def shifty(ax, N=0.05):
+    '''Shift y limit to give some space to data in plot.
+
+    N   decimal between 0 and 1 of range of y data to add onto y limits.
+    '''
+
+    ylims = ax.get_ylim()
+    dy = ylims[1] - ylims[0]
+    ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
+
+
+def add_currents(ax, which):
+    '''Add current arrows to plot
+
+    which   'water' or 'wind'
+    '''
 
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
-    if dT <=2:  # less than or equal to two days
-        ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
-                  headaxislength=0, headlength=0, width=1.0,
-                  units='y', scale_units='y', scale=1)
+    if df.dT <=2:  # less than or equal to two days
+        width = 1.0
     else:
-        ax.quiver(idx, np.zeros(df.index.size), df.East, df.North,
-                  headaxislength=0, headlength=0, width=0.15,
-                  units='y', scale_units='y', scale=1)
-
-    ax.set_ylim(-cmax, cmax)
-    ax.set_ylabel('Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    ax.set_title('TGLO TABS Buoy ' + buoy + ': ' + locs[buoy]['lat'] + ', ' + locs[buoy]['lon'], fontsize=18)
+        width = 0.15
+    ax.quiver(df.idx, np.zeros(len(df)), df.East, df.North, headaxislength=0,
+              headlength=0, width=width, units='y', scale_units='y', scale=1)
+    if which == 'water':
+        varmax = cmax
+        label = 'Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
+        varmax2 = convert(varmax, 'cps2kts')  # convert to knots
+    elif which == 'wind':
+        varmax = wmax
+        label = 'Wind velocity\n' + r'$\left[ \mathrm{m} \cdot \mathrm{s}^{-1} \right]$'
+        varmax2 = convert(varmax, 'mps2kts')  # convert to knots
+    ax.set_ylim(-varmax, varmax)
+    ax.set_ylabel(label)
 
     # compass arrow
     ax.annotate("", xy=(1.1, 0.95), xytext=(1.1, 0.83),
             arrowprops=dict(arrowstyle="->"), xycoords='axes fraction')
     ax.text(1.1, 0.77, 'N', transform=ax.transAxes,
             horizontalalignment='center', fontsize=10)
-    # convert to knots
+    # knots on right side
     axknots = ax.twinx()
-    axknots.set_ylim(-kmax, kmax)
+    axknots.set_ylim(-varmax2, varmax2)
     axknots.set_ylabel('[knots]')
 
-    ## cross-shelf flow ##
-    ax = axes[1]
-    ax.plot(idx, df.Across, 'k', lw=lw)
-    ax.plot(idx, np.zeros(idx.size), 'k:')
-    ylim = ax.get_ylim()
-    ax.set_ylim(ylim[0]*1.2, ylim[1]*1.2)  # assume one lim neg and one pos
-    ylim = ax.get_ylim()  # updated ylim values after shift
+
+def add_vel(ax, which):
+    '''Add along- or across-shelf velocity to plot
+
+    which   'Across' or 'Along'
+    '''
+
+    ax.plot(df.idx, df[which], 'k', lw=lw)
+    ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
+    shifty(ax, N=0.08)
     # force 0 line to be within y limits
+    ylim = ax.get_ylim()
     if ylim[0]>=0:
         ylim[0] = -2
     elif ylim[1]<=0:
         ylim[1] = 2
-    ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    if which == 'Across':
+        ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    elif which == 'Along':
+        ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     # convert to knots
     axknots = ax.twinx()
-    ylimk = [ylim[0]/tokts, ylim[1]/tokts]  # knots
-    axknots.set_ylim(ylimk[0], ylimk[1])
+    axknots.set_ylim(convert(ylim[0], 'cps2kts'), convert(ylim[1], 'cps2kts'))
     axknots.set_ylabel('[knots]')
-    ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.02, 0.02, 'ONSHORE', fontsize=10, transform=ax.transAxes)
-    # add angle
-    ax.text(0.9, 0.91, str(angle[buoy]) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
-    ####
+    if which == 'Across':
+        ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
+        # add angle
+        ax.text(0.9, 0.91, str(angle[buoy]) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
+    elif which == 'Along':
+        ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
+        # add angle
+        ax.text(0.9, 0.91, str(angle[buoy]-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
 
-    # along-shelf flow
-    ax = axes[2]
-    ax.plot(idx, df.Along, 'k', lw=lw)
-    ax.plot(idx, np.zeros(idx.size), 'k:')
-    ylim = ax.get_ylim()
-    ax.set_ylim(ylim[0]*1.2, ylim[1]*1.2)
-    ylim = ax.get_ylim()  # updated ylim values after shift
-    # force 0 line to be within y limits
-    if ylim[0]>=0:
-        ylim[0] = -2
-    elif ylim[1]<=0:
-        ylim[1] = 2
-    ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    # ax.grid(which='major', color='k', linestyle='-', linewidth=0.05, alpha=0.5)
-    # convert to knots
-    axknots = ax.twinx()
-    ylimk = [ylim[0]/tokts, ylim[1]/tokts]  # knots
-    axknots.set_ylim(ylimk[0], ylimk[1])
-    axknots.set_ylabel('[knots]')
-    ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
-    ax.text(0.02, 0.02, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
-    # add angle
-    ax.text(0.9, 0.91, str(angle[buoy]-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
 
-    # Temp
-    ax = axes[3]
-    ax.plot(idx, df.WaterT, lw=lw, color='k', linestyle='-')
-    ax.set_ylabel(r'Temperature $\left[^\circ\!\mathrm{C}\right]$')
-    ylim = ax.get_ylim()
-    ax.set_ylim(ylim[0]*0.98, ylim[1]*1.02)
-    ylim = ax.get_ylim()  # update
-    # Fahrenheit
-    axF = ax.twinx()
-    axF.set_ylabel(r'$\left[^\circ\!\mathrm{F}\right]$')
-    # convert to fahrenheit
-    axF.set_ylim(ylim[0]*(9/5.)+32, ylim[1]*(9/5.)+32)
+def add_var_2units(ax1, key, label1, con, label2):
+    '''Plot with units on both left and right sides of plot.'''
+
+    ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
+    ax1.set_ylabel(label1)
+    shifty(ax1)
+    # right side units
+    ax2 = ax1.twinx()
+    ax2.set_ylabel(label2)
+    ylim = ax1.get_ylim()
+    ax2.set_ylim(convert(ylim[0], con), convert(ylim[1], con))
+
+
+def add_var(ax, var, varlabel):
+    '''Add basic var to plot as line plot with no extra space.'''
+
+    ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
+    ax.set_ylabel(varlabel)
+    shifty(ax)
+
+
+def add_txty(ax1):
+    '''TxTy'''
+
+    c1, c2 = '#559349', '#874993'
+    # 1st var
+    ax1.plot(df.idx, df['Tx'], lw=lw, color=c1, linestyle='-')
+    ax1.set_ylabel('Tx', color=c1)
+    ax1.tick_params(axis='y', colors=c1)
+    shifty(ax1)
+    # 2nd var
+    ax2 = ax1.twinx()
+    ax2.plot(df.idx, df['Ty'], lw=lw, color=c2, linestyle='--')
+    ax2.set_ylabel('Ty [--]', color=c2)
+    ax2.tick_params(axis='y', colors=c2)
+    shifty(ax2)
+
+
+def add_xlabels(ax, fig):
+    '''Add date labels to bottom x axis'''
 
     # varied tick locations and labels for few days
-    if dT <=1:  # less than or equal to one day
+    if df.dT <=1:  # less than or equal to one day
         # hourly minor ticks
         hours = mpl.dates.HourLocator()
         ax.xaxis.set_minor_locator(hours)
         sixthdays = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
         ax.xaxis.set_major_locator(sixthdays)
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
-    elif dT <=2:  # less than or equal to two days
+    elif df.dT <=2:  # less than or equal to two days
         # hourly minor ticks
         hours = mpl.dates.HourLocator()
         ax.xaxis.set_minor_locator(hours)
@@ -215,9 +276,70 @@ def ven(dataname):
     fig.text(0.08, 0.035, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='left', verticalalignment='top')
 
-    fig.savefig(dataname + '.pdf')
-    fig.savefig(dataname + '.png')
 
+def setup(nsubplots):
+    '''Set up plot'''
+
+    # plot
+    fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
+    # bottom controlled later
+    fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
+    # title
+    axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' + locs[buoy]['lat'] + ', ' + locs[buoy]['lon'], fontsize=18)
+
+    return fig, axes
+
+
+def plot(which):
+    '''Plot data.
+
+    Find data in dataname and save fig, both in /tmp.
+    '''
+
+    if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
+        nsubplots = 4
+    elif which == 'salt' or which == 'wave':
+        nsubplots = 3
+
+    fig, axes = setup(nsubplots=nsubplots)
+
+    if which == 'ven':
+        add_currents(axes[0], 'water')
+        add_vel(axes[1], 'Across')
+        add_vel(axes[2], 'Along')
+        add_var_2units(axes[3], 'WaterT',
+            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
+            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+    elif which == 'eng':
+        add_var(axes[0], 'VBatt', 'V$_\mathrm{batt}$')
+        add_var(axes[1], 'SigStr', 'Sig Str')
+        add_var(axes[2], 'Nping', 'Ping Cnt')
+        add_txty(axes[3])
+    elif which == 'met':
+        add_currents(axes[0], 'wind')
+        add_var_2units(axes[1], 'AirT',
+            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
+            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var_2units(axes[2], 'AtmPr', 'Atmospheric pressure [MB]',
+            'mb2hg', 'Hg')
+        add_var(axes[3], 'RelH', 'Relative Humidity [%]')
+    elif which == 'salt':
+        add_var_2units(axes[0], 'Temp',
+            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
+            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var(axes[1], 'Salinity', 'Salinity')
+        add_var(axes[2], 'Cond', 'Conductivity [ms/cm]')
+    elif which == 'sum':
+        add_currents(axes[0], 'water')
+        add_vel(axes[1], 'Across')
+        add_vel(axes[2], 'Along')
+        add_var_2units(axes[3], 'WaterT',
+            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
+            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+
+    add_xlabels(axes[nsubplots-1], fig)
+
+    return fig
 
 
 def plot_buoy(loc):
@@ -404,5 +526,7 @@ def plot_buoy(loc):
 
 if __name__ == "__main__":
 
-    if args.which == 'ven':
-        ven(args.dataname)
+    df = read(args.dataname, args.which)
+    fig = plot(args.which)
+    fig.savefig(args.dataname + '.pdf')
+    fig.savefig(args.dataname + '.png')
