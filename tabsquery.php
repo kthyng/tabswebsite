@@ -92,36 +92,30 @@ mysql_close();
 // NEED A CATCH FOR WHEN THE BUOY IS DEAD
 foreach ($rows as $data) {
 
+// Reading in data to table
 if ($table == 'ven'){
 list($datetime,$date,$time,$ve,$vn,$comp,$twater,$tx,$ty)=$data;
 // Notes in index.php
 $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
 $date = $UTC->format('Y/m/d');
 $speed=hypot($ve,$vn);
-
-
 $dir=90.-(rad2deg(atan2($vn,$ve)));
 if ($dir < 0.) {$dir+=360.;}
-
 $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
 $outstr=sprintf("%s %s %8.2f %8.2f %8.2f %8.1f %8.1f\n",$date,$time,$ve,$vn,$speed,$dir,$twater);
 fputs($tmpfh,$outstr);
 fclose($tmpfh) or die($php_errormsg);
-
-
 }
 
 if ($table == 'met'){
 list($datetime,$date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh)=$data;
 $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
 $date = $UTC->format('Y/m/d');
-
 $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
 $outstr=sprintf("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %5.1f %4.0d %4.0d %7.1f %7.1f\n",
 $date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh);
 fputs($tmpfh,$outstr);
 fclose($tmpfh) or die($php_errormsg);
-
 }
 
 if ($table == 'eng'){
@@ -133,9 +127,7 @@ $outstr=sprintf("%s %s %7.1f %7.2f %7.1f %7.0f %3.0d %3.0d %7.1f %7.1f %7.1f\n",
 $date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2);
 fputs($tmpfh,$outstr);
 fclose($tmpfh) or die($php_errormsg);
-
 }
-
 
 if ($table == 'salt'){
 list($datetime,$date,$time,$watertemp,$conduct,$salinity,$density,$soundvel)=$data;
@@ -146,7 +138,17 @@ $outstr=sprintf("%s %s %7.2f %7.2f %7.2f %7.2f %7.2f\n",
 $date,$time,$watertemp,$conduct,$salinity,$density,$soundvel);
 fputs($tmpfh,$outstr);
 fclose($tmpfh) or die($php_errormsg);
+}
 
+if ($table == 'wave'){
+list($datetime,$date,$time,$wave_height,$mean_period,$peak_period)=$data;
+$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+$date = $UTC->format('Y/m/d');
+$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+$outstr=sprintf("%s %s %7.2f %7.2f %7.2f\n",
+$date,$time,$wave_height,$mean_period,$peak_period);
+fputs($tmpfh,$outstr);
+fclose($tmpfh) or die($php_errormsg);
 }
 
 }
@@ -391,6 +393,44 @@ foreach ($englines1 as $elem) {
 
 }
 }
+
+
+if ($table == 'wave' ) {
+
+// if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
+// 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
+
+$header="database/".$table."tableheader.php";
+print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+include($header);
+
+$wavelines1=file($tempfile);
+foreach ($wavelines1 as $elem) {
+        $elem=preg_replace("/\s+/"," ",$elem);
+        $data=explode(" ",$elem);
+        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+                // $ts_utc=strtotime($data[0]." ".$data[1]);
+                } else {
+                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+                }
+        $datestr = $ts_utc->format('Y/m/d');
+        $timestr = $ts_utc->format('H:i');
+        // $datestr=strftime("%m/%d/%Y",$ts_utc);
+        // $timestr=strftime("%T",$ts_utc);
+        $wave_height=$data[2];
+        $mean_period=$data[3];
+        $peak_period=$data[4];
+        // if ($units == 'E') {$watertemp=(1.8*$watertemp)+32;}
+
+ 	printf ("%s %s %11.2f %14.2f %13.2f \n",
+        $datestr,$timestr,$wave_height,$mean_period,$peak_period);
+
+}
+}
+
 
 }
 print "</pre></p>";

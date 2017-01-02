@@ -139,6 +139,7 @@ print <<<_HTML_
 <input type=radio name="table" value="met"> Meteorological Data
 <input type=radio name="table" value="eng">System Data
 <input type=radio name="table" value="salt">Water Property Data
+<input type=radio name="table" value="wave">Wave Data
 </TD></TR>
 
 <br>
