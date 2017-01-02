@@ -71,11 +71,10 @@ def read(dataname, which):
     Time is in UTC.
     '''
 
-    if which == 'ven':
+    if which == 'ven' or which == 'sum':
         # velocities in cm/s, direction in deg T, temp in deg C
         names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
         df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
-
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
@@ -100,6 +99,12 @@ def read(dataname, which):
         names = ['Date', 'Time', 'WaveHeight', 'MeanPeriod', 'PeakPeriod']
         #   UTC      m      s       s
         df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+
+    if which == 'sum':  # add onto read in from ven if sum
+        names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+        df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df['Salinity'] = df2['Salinity']  # from salt file
+        df['Temp'] = df2['Temp']  # from salt file
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
@@ -163,7 +168,7 @@ def add_vel(ax, which):
 
     ax.plot(df.idx, df[which], 'k', lw=lw)
     ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
-    shifty(ax, N=0.08)
+    shifty(ax, N=0.1)
     # force 0 line to be within y limits
     ylim = ax.get_ylim()
     if ylim[0]>=0:
