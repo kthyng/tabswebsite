@@ -28,6 +28,8 @@ echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 $Buoyname=$_POST["Buoyname"];
 $table=$_POST["table"];
 $datepicker=$_POST["datepicker"];
+$datetype=$_POST["Datatype"];
+$tz=$_POST["tz"];
 
 // change format of date from yyyy/m/d to yyyy-m-d
 $datepicker = str_replace ("/", "-", $datepicker);
@@ -166,7 +168,7 @@ else {
 
 chmod($tempfile, 0644);
 
-if ($_POST['Datatype']=="pic") {
+if ($datetype=="pic") {
     // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
     $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py '".$table."' '".$tempfile."'");
     system($command);
@@ -182,7 +184,7 @@ print "</table>\n";
 	print "</TD></TR></TABLE>\n";
 }
 
-if ($_POST['Datatype']=="data") {
+if ($datetype=="data") {
 print "<TABLE width=100%>";
 print "<TR><TD valign=top width=240 align=left>";
 print "<br> &nbsp;\n";
@@ -222,7 +224,7 @@ if (! $units) {$units = 'M';}
 
 $data=explode(" ",$venlines[0]);
 // Use UTC
-if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+if ($tz == 'UTC' || $tz == '') {
         // $ts_utc=strtotime($data[0]." ".$data[1]);
 		// $timez="UTC";
 
@@ -256,7 +258,7 @@ $venlines1=file($tempfile);
 foreach ($venlines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
-        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+        if ($tz == 'UTC' || $tz == '') {
             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
 
                 // $ts_utc=strtotime($data[0]." ".$data[1]);
@@ -291,7 +293,7 @@ $metlines1=file($tempfile);
 foreach ($metlines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
-        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+        if ($tz == 'UTC' || $tz == '') {
             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
                 // $ts_utc=strtotime($data[0]." ".$data[1]);
                 } else {
@@ -334,7 +336,7 @@ $englines1=file($tempfile);
 foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
-        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+        if ($tz == 'UTC' || $tz == '') {
                 // $ts_utc=strtotime($data[0]." ".$data[1]);
             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
                 } else {
@@ -370,7 +372,7 @@ $englines1=file($tempfile);
 foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
-        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+        if ($tz == 'UTC' || $tz == '') {
             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
                 // $ts_utc=strtotime($data[0]." ".$data[1]);
                 } else {
@@ -405,7 +407,7 @@ $wavelines1=file($tempfile);
 foreach ($wavelines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
         $data=explode(" ",$elem);
-        if ($_POST['tz'] == 'UTC' || $_POST['tz'] == '') {
+        if ($tz == 'UTC' || $tz == '') {
             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
                 // $ts_utc=strtotime($data[0]." ".$data[1]);
                 } else {
