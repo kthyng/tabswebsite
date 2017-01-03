@@ -204,10 +204,13 @@ foreach ($blet as $f) {
         $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
         $dtTXstr = $dtTX->format('H:i');
         $dtTXtz = $dtTX->format('T');
-
+        # date range for the php call
+        $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
+        $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
+        $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png rel=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png>$f</a></font></TD>\n";
-        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table="ven"&Datatype="pic"&datepicker="2017-01-01" >$f</a></font></TD>\n";
+        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png rel=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png>$f</a></font></TD>\n";
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange>$f</a></font></TD>\n";
 		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
 		}
 
