@@ -173,8 +173,8 @@ if ($_POST['Datatype']=="pic") {
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=240><font face=helvetica><BR>";
 print "<table>\n";
-print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>TABS Database query</a></TD></TR>\n";
-print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
+print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
+print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><br>";
         print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
@@ -211,8 +211,8 @@ print "<input NAME=Datatype TYPE=hidden value=$Datatype>\n";
 print "<BR><input type=submit  value=Change>\n</form>\n";
 
 print "<br><table>\n";
-print "<TR><TD>Return to <a href=tabsqueryform.php>TABS Database query</a></TD></TR>\n";
-print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
+print "<TR><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
+print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 print "</font>\n";
 print "</TD><TD style=\"text-align:left !important;\">";
@@ -244,7 +244,7 @@ if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
 	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
 
 $header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
+print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
 include($header);
 
 $venlines1=file($tempfile);
