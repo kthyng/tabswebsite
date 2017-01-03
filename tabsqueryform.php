@@ -87,7 +87,7 @@ $PageTitle="TABS Buoy Database Query page";
 include("includes/header.html");
 include("includes/navigation.html");
 
-print "<form action=\"tabsquery.php\" method=\"post\">\n";
+print "<form action=\"tabsquery.php\" method=\"get\">\n";
 
 
 // Connect to Database

@@ -17,7 +17,7 @@ include("includes/navigation.html");
 
 
 
-if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=http://tabs1.gerg.tamu.edu/tglo/tabsqueryform.php\">";
 echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 
@@ -25,11 +25,11 @@ echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 } else {
 
 // bring in data from tabsqueryform.php
-$Buoyname=$_POST["Buoyname"];
-$table=$_POST["table"];
-$datepicker=$_POST["datepicker"];
-$datetype=$_POST["Datatype"];
-$tz=$_POST["tz"];
+$Buoyname=$_GET["Buoyname"];
+$table=$_GET["table"];
+$datepicker=$_GET["datepicker"];
+$datetype=$_GET["Datatype"];
+$tz=$_GET["tz"];
 
 // change format of date from yyyy/m/d to yyyy-m-d
 $datepicker = str_replace ("/", "-", $datepicker);
