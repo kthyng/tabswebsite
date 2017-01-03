@@ -239,7 +239,11 @@ $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('America/Chicago'
 // $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
 }
 
-// Top of data table: brings in header and label for top
+// Top of data table:
+if ($table == 'met' ) {
+    print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
+}
+// brings in header and label for top
 $header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
 include($header);
@@ -282,8 +286,6 @@ foreach ($venlines1 as $elem) {
 elseif ($table == 'met' ) {
 if ($units=="M") {$convfac=1;$ut=" (m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
-
-	print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
 
 $metlines1=file($tempfile);
 foreach ($metlines1 as $elem) {
