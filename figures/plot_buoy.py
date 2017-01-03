@@ -74,7 +74,7 @@ def read(dataname, which):
     if which == 'ven' or which == 'sum':
         # velocities in cm/s, direction in deg T, temp in deg C
         names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
@@ -83,26 +83,26 @@ def read(dataname, which):
 
     elif which == 'eng':
         names = ['Date', 'Time', 'VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
 
     elif which == 'met':
-        names = ['Date', 'Time', 'East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH', 'WSpeed', 'WDir']
+        names = ['Date', 'Time', 'East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH']
 #        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
 
     elif which == 'salt':
         names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
         #   UTC       &deg;C      ms/cm             kg/m^3     m/s
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
 
     elif which == 'wave':
         names = ['Date', 'Time', 'WaveHeight', 'MeanPeriod', 'PeakPeriod']
         #   UTC      m      s       s
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
 
     if which == 'sum':  # add onto read in from ven if sum
         names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
-        df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
+        df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
         df['Salinity'] = df2['Salinity']  # from salt file
         df['Temp'] = df2['Temp']  # from salt file
 
@@ -134,6 +134,8 @@ def add_currents(ax, which):
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
     if df.dT <=2:  # less than or equal to two days
         width = 1.0
+        if which == 'wind':
+            width /= 3
     else:
         width = 0.15
     ax.quiver(df.idx, np.zeros(len(df)), df.East, df.North, headaxislength=0,
@@ -200,6 +202,7 @@ def add_var_2units(ax1, key, label1, con, label2):
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     ax1.set_ylabel(label1)
+    ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     shifty(ax1)
     # right side units
     ax2 = ax1.twinx()
@@ -330,8 +333,8 @@ def plot(which):
         add_var_2units(axes[1], 'AirT',
             r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
-        add_var_2units(axes[2], 'AtmPr', 'Atmospheric pressure [MB]',
-            'mb2hg', 'Hg')
+        add_var_2units(axes[2], 'AtmPr', 'Atmospheric pressure\n[MB]',
+            'mb2hg', '[Hg]')
         add_var(axes[3], 'RelH', 'Relative Humidity [%]')
     elif which == 'salt':
         add_var_2units(axes[0], 'Temp',
