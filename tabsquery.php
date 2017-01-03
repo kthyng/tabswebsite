@@ -49,8 +49,15 @@ $tempout=basename($tempfile);
 
 #echo "BUOY: $Buoyname  $table<br>TMP: $tempout  $tempfile<BR>";
 
+# Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
-die( "<h2>No Met Data Available for selected station</h2>\n" ); }
+die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" ); }
+# Salt instrument availability
+if ($table == "salt" && ! preg_match('/B|D|F|J|K|N|R|V|W|X/',$Buoyname) ) {
+die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" ); }
+# Wave instrument availability
+if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
+die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 
 #if ($table == salt && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 #die( "<h2>No Water Property Data Available for selected station</h2>\n" ); }
@@ -154,7 +161,7 @@ fclose($tmpfh) or die($php_errormsg);
 }
 }
 else {
-    die( "<h2>No data available for selected station at the selected time.</h2>\n" );
+    die( "<h2>No data available at the selected time for buoy ".$Buoyname."</h2>\n" );
 }
 
 chmod($tempfile, 0644);

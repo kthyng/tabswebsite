@@ -109,23 +109,23 @@ print <<<_HTML_
 <BR>
 <TABLE border=0>
 <TR>
-<TD><B>Select Buoy:</B></TD>
+<TD><B>Select Buoy:</B> (* inactive)</TD>
 <TD><SELECT name="Buoyname" id="json-one">
 <OPTION SELECTED value="$buoy">$buoy
-<OPTION value="A">A
+<OPTION value="A">A*
 <OPTION value="B">B
-<OPTION value="C">C
+<OPTION value="C">C*
 <OPTION value="D">D
-<OPTION value="E">E
+<OPTION value="E">E*
 <OPTION value="F">F
-<OPTION value="G">G
-<OPTION value="H">H
+<OPTION value="G">G*
+<OPTION value="H">H*
 <OPTION value="J">J
 <OPTION value="K">K
 <OPTION value="N">N
-<OPTION value="P">P
+<OPTION value="P">P*
 <OPTION value="R">R
-<OPTION value="S">S
+<OPTION value="S">S*
 <OPTION value="V">V
 <OPTION value="W">W
 <OPTION value="X">X
