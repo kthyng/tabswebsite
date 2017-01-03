@@ -239,13 +239,14 @@ $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('America/Chicago'
 // $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
 }
 
-if ($table == 'ven' ) {
-if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
-	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
-
+// Top of data table: brings in header and label for top
 $header="database/".$table."tableheader.php";
 print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
 include($header);
+
+if ($table == 'ven' ) {
+if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
+	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
 
 $venlines1=file($tempfile);
 foreach ($venlines1 as $elem) {
@@ -286,10 +287,6 @@ if ($table=='met') {
 	print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from</i>\n<br>";
 
 }
-$header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
-
-include($header);
 
 $metlines1=file($tempfile);
 foreach ($metlines1 as $elem) {
@@ -334,10 +331,6 @@ foreach ($metlines1 as $elem) {
 
 if ($table == 'eng' ) {
 
-$header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
-include($header);
-
 $englines1=file($tempfile);
 foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
@@ -374,10 +367,6 @@ if ($table == 'salt' ) {
 if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
 
-$header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
-include($header);
-
 $englines1=file($tempfile);
 foreach ($englines1 as $elem) {
         $elem=preg_replace("/\s+/"," ",$elem);
@@ -412,10 +401,6 @@ if ($table == 'wave' ) {
 
 // if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 // 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
-
-$header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS Data query</big></b>(<a href=/tglo/tmp/$tempout>download</a>)<br>\n";
-include($header);
 
 $wavelines1=file($tempfile);
 foreach ($wavelines1 as $elem) {
