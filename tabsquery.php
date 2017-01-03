@@ -171,12 +171,12 @@ if ($_POST['Datatype']=="pic") {
     $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py '".$table."' '".$tempfile."'");
     system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
-	print "<TR><TD valign=top width=240><font face=helvetica><HR width=100%><BR>";
+	print "<TR><TD valign=top width=240><font face=helvetica><BR>";
 print "<table>\n";
 print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>TABS Database query</a></TD></TR>\n";
 print "<TR><TD>Return to <a href=index.php>TABS page</a></TR></TD>\n";
 print "</table>\n";
-	print "</TD><TD valign=top><HR width=100%><br>";
+	print "</TD><TD valign=top><br>";
         print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
 	print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";
 	print "</TD></TR></TABLE>\n";
