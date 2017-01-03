@@ -1,5 +1,5 @@
 /* Image w/ description tooltip v2.0
-* Created: April 23rd, 2010. This notice must stay intact for usage 
+* Created: April 23rd, 2010. This notice must stay intact for usage
 * Author: Dynamic Drive at http://www.dynamicdrive.com/
 * Visit http://www.dynamicdrive.com/ for full source code
 */
@@ -12,15 +12,16 @@ var ddimgtooltip={
 		//define each tooltip below: tooltip[inc]=['path_to_image', 'optional desc', optional_CSS_object]
 		//For desc parameter, backslash any special characters inside your text such as apotrophes ('). Example: "I\'m the king of the world"
 		//For CSS object, follow the syntax: {property1:"cssvalue1", property2:"cssvalue2", etc}
-		tooltips[0]=["images/tabs_B_ven.png", "", {width:500, height: 375}]
-		tooltips[1]=["images/tabs_D_ven.png", "", {width:500, height: 375}]
-		tooltips[2]=["images/tabs_F_ven.png", "", {width:500, height: 375}]
-		tooltips[3]=["images/tabs_J_ven.png", "", {width:500, height: 375}]
-		tooltips[4]=["images/tabs_K_ven.png", "", {width:500, height: 375}]
-		tooltips[5]=["images/tabs_N_ven.png", "", {width:500, height: 375}]
-		tooltips[6]=["images/tabs_R_ven.png", "", {width:500, height: 375}]
-		tooltips[7]=["images/tabs_V_ven.png", "", {width:500, height: 375}]
-		tooltips[8]=["images/tabs_W_ven.png", "", {width:500, height: 375}]
+        tooltips[0]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png", "", {width:'auto', height: 650}]
+		tooltips[1]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_D_ven.png", "", {width:'auto', height: 650}]
+		tooltips[2]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_F_ven.png", "", {width:'auto', height: 650}]
+		tooltips[3]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_J_ven.png", "", {width:'auto', height: 650}]
+		tooltips[4]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_K_ven.png", "", {width:'auto', height: 650}]
+		tooltips[5]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_N_ven.png", "", {width:'auto', height: 650}]
+		tooltips[6]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_R_ven.png", "", {width:'auto', height: 650}]
+		tooltips[7]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_V_ven.png", "", {width:'auto', height: 650}]
+		tooltips[8]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_W_ven.png", "", {width:'auto', height: 650}]
+		tooltips[9]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_X_ven.png", "", {width:'auto', height: 650}]
 
 
 
@@ -56,12 +57,12 @@ var ddimgtooltip={
 
 	positiontooltip:function($, $tooltip, e){
 		var x=e.pageX+this.tooltipoffsets[0], y=e.pageY+this.tooltipoffsets[1]
-		var tipw=$tooltip.outerWidth(), tiph=$tooltip.outerHeight(), 
+		var tipw=$tooltip.outerWidth(), tiph=$tooltip.outerHeight(),
 		x=(x+tipw>$(document).scrollLeft()+$(window).width())? x-tipw-(ddimgtooltip.tooltipoffsets[0]*2) : x
 		y=(y+tiph>$(document).scrollTop()+$(window).height())? $(document).scrollTop()+$(window).height()-tiph-10 : y
 		$tooltip.css({left:x, top:y})
 	},
-	
+
 	showbox:function($, $tooltip, e){
 		$tooltip.show()
 		this.positiontooltip($, $tooltip, e)

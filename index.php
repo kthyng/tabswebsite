@@ -76,23 +76,17 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 </script> -->
 
-<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script> -->
-
-<!-- <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" /> -->
-
-<!-- <script type="text/javascript" src="js/ddimgtooltip.js">
-
+<!-- This is for the hovering images -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
+<script type="text/javascript" src="js/ddimgtooltip.js">
 /***********************************************
 * Image w/ description tooltip v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
 * This notice MUST stay intact for legal use
 * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
 ***********************************************/
-
-
-
 tooltips[0]=["images/tabs_B_ven.png", {width:"200px", height: "100px";}]
-
-</script> -->
+</script>
 
 <!-- <script type="text/javascript">
 $(document).ready(function(){
@@ -210,7 +204,7 @@ foreach ($blet as $f) {
         $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png rel=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png>$f</a></font></TD>\n";
-        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange>$f</a></font></TD>\n";
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
 		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
 		}
 
