@@ -89,7 +89,7 @@ mysql_close();
 // exec($command, $output);
 // echo $output;
 
-// NEED A CATCH FOR WHEN THE BUOY IS DEAD
+if ($rows) {  // only runs this code if there is data available
 foreach ($rows as $data) {
 
 // Reading in data to table
@@ -152,10 +152,16 @@ fclose($tmpfh) or die($php_errormsg);
 }
 
 }
+}
+else {
+    die( "<h2>No data available for selected station at the selected time.</h2>\n" );
+}
+
 chmod($tempfile, 0644);
 
 if ($_POST['Datatype']=="pic") {
-    $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
+    // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
+    $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py '".$table."' '".$tempfile."'");
     system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=240><font face=helvetica><HR width=100%><BR>";
