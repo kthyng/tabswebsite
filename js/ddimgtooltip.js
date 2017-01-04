@@ -12,16 +12,17 @@ var ddimgtooltip={
 		//define each tooltip below: tooltip[inc]=['path_to_image', 'optional desc', optional_CSS_object]
 		//For desc parameter, backslash any special characters inside your text such as apotrophes ('). Example: "I\'m the king of the world"
 		//For CSS object, follow the syntax: {property1:"cssvalue1", property2:"cssvalue2", etc}
-        tooltips[0]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png", "", {width:'auto', height: 650}]
-		tooltips[1]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_D_ven.png", "", {width:'auto', height: 650}]
-		tooltips[2]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_F_ven.png", "", {width:'auto', height: 650}]
-		tooltips[3]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_J_ven.png", "", {width:'auto', height: 650}]
-		tooltips[4]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_K_ven.png", "", {width:'auto', height: 650}]
-		tooltips[5]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_N_ven.png", "", {width:'auto', height: 650}]
-		tooltips[6]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_R_ven.png", "", {width:'auto', height: 650}]
-		tooltips[7]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_V_ven.png", "", {width:'auto', height: 650}]
-		tooltips[8]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_W_ven.png", "", {width:'auto', height: 650}]
-		tooltips[9]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_X_ven.png", "", {width:'auto', height: 650}]
+        // tooltips[0]=["http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png", "", {width:'auto', height: 650}]
+        tooltips[0]=["daily/tabs_B_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[1]=["daily/tabs_D_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[2]=["daily/tabs_F_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[3]=["daily/tabs_J_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[4]=["daily/tabs_K_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[5]=["daily/tabs_N_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[6]=["daily/tabs_R_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[7]=["daily/tabs_V_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[8]=["daily/tabs_W_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[9]=["daily/tabs_X_ven_low.png", "", {width:'auto', height: 'auto'}]
 
 
 

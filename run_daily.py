@@ -72,20 +72,23 @@ if __name__ == "__main__":
 
     engine = setup()
 
-    # # loop through buoys: query, make text file, make plot
-    # for buoy in buoys:
+    # loop through buoys: query, make text file, make plot
+    for buoy in buoys:
     #
     #     for table in tables:  # loop through tables for each buoy
+    # buoy = 'X'
+        table = 'ven'
+        # PUT IN CHECK FOR TABLE EXISTENCE
+        q = query_setup(engine, buoy, table)
+        # df = query_setup(engine, buoy, table)
+        df = plot_buoy.read(buoy, [q, engine], table)
 
-    buoy = 'F'
-    table = 'ven'
-    q = query_setup(engine, buoy, table)
-    # df = query_setup(engine, buoy, table)
-    df = plot_buoy.read(buoy, [q, engine], table)
-
-    # import pdb; pdb.set_trace()
-    make_text(buoy, table)
-    # make_plot(buoy, table)
-    fig = plot_buoy.plot(df, buoy, table)
-    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
-    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+        # import pdb; pdb.set_trace()
+        make_text(buoy, table)
+        # make_plot(buoy, table)
+        fig = plot_buoy.plot(df, buoy, table)
+        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
+        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+        # save smaller for hover
+        if table == 'ven':
+            fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)

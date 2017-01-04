@@ -63,17 +63,24 @@ def read(buoy, dataname, which):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.
+
+    if dataname is a string, it is a file location. If it is a list with two
+    entries, they give the query string and the mysql engine.
     '''
+
+    # read method: from a file or from mysql
+    if isinstance(dataname, str):
+        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, index_col=0, na_values='-999')
+    elif len(dataname) == 2:
+        query = dataname[0]; engine = dataname[1]
+        df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 
     if which == 'ven' or which == 'sum':
         # velocities in cm/s, direction in deg T, temp in deg C
-        names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
         if isinstance(dataname, str):
-            df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+            names = ['East', 'North', 'Speed', 'Dir', 'WaterT']
+            df.columns = names
         elif len(dataname) == 2:
-            query = dataname[0]; engine = dataname[1]
-            # import pdb; pdb.set_trace()
-            df = pd.read_sql_query(query, engine, index_col=['obs_time'])
             df = df.drop(['date','time'], axis=1)
             df.columns = ['East', 'North', 'Dir', 'WaterT', 'Tx', 'Ty']
             df = df.drop(['Tx', 'Ty'], axis=1)
@@ -87,29 +94,46 @@ def read(buoy, dataname, which):
         df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
 
     elif which == 'eng':
-        names = ['Date', 'Time', 'VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
+        if isinstance(dataname, str):
+            df.columns = names
+            # import pdb; pdb.set_trace()
+        elif len(dataname) == 2:
+            df = df.drop(['date','time'], axis=1)
+            df.columns = names
 
     elif which == 'met':
-        names = ['Date', 'Time', 'East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH']
+        names = ['East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH']
+        if isinstance(dataname, str):
 #        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+            df.columns = names
+        elif len(dataname) == 2:
+            df = df.drop(['date','time'], axis=1)
+            df.columns = names
 
     elif which == 'salt':
-        names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+        names = ['Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
         #   UTC       &deg;C      ms/cm             kg/m^3     m/s
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        if isinstance(dataname, str):
+            df.columns = names
+        elif len(dataname) == 2:
+            df = df.drop(['date','time'], axis=1)
+            df.columns = names
 
     elif which == 'wave':
-        names = ['Date', 'Time', 'WaveHeight', 'MeanPeriod', 'PeakPeriod']
+        names = ['WaveHeight', 'MeanPeriod', 'PeakPeriod']
         #   UTC      m      s       s
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        if isinstance(dataname, str):
+            df.columns = names
+        elif len(dataname) == 2:
+            df = df.drop(['date','time'], axis=1)
+            df.columns = names
 
-    if which == 'sum':  # add onto read in from ven if sum
-        names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
-        df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
-        df['Salinity'] = df2['Salinity']  # from salt file
-        df['Temp'] = df2['Temp']  # from salt file
+    # if which == 'sum':  # add onto read in from ven if sum
+    #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+    #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+    #     df['Salinity'] = df2['Salinity']  # from salt file
+    #     df['Temp'] = df2['Temp']  # from salt file
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
@@ -178,10 +202,15 @@ def add_vel(ax, df, buoy, which):
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
     ylim = ax.get_ylim()
+    # adjust shifty to cover this case too
+    dy = ylim[1] - ylim[0]
+
     if ylim[0]>=0:
-        ylim[0] = -2
+        # ylim[0] = -2
+        ax.set_ylim(-dy*0.05, ylim[1])
     elif ylim[1]<=0:
-        ylim[1] = 2
+        # ylim[1] = 2
+        ax.set_ylim(ylim[0], dy*0.05)
     if which == 'Across':
         ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     elif which == 'Along':
