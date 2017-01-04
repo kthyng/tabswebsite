@@ -13,6 +13,7 @@ import numpy as np
 import csv
 import plot_buoy
 import os
+from matplotlib.pyplot import close
 
 buoys = ['B','D','F','J','K','N','R','V','W','X']
 tables = ['ven', 'met', 'eng', 'salt', 'wave']
@@ -64,31 +65,33 @@ def make_text(buoy, table):
 
     df.to_csv(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.txt'), sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 
-# reference plot_buoy for plots (all kinds not just ven)
-# read in text from previously made text files
-
 
 if __name__ == "__main__":
 
     engine = setup()
 
+    avail = {}
+    avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
+    avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
+    avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
+    avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
+    avail['wave'] = ['K', 'N', 'V', 'X']
+
     # loop through buoys: query, make text file, make plot
     for buoy in buoys:
-    #
-    #     for table in tables:  # loop through tables for each buoy
-    # buoy = 'X'
-        table = 'ven'
-        # PUT IN CHECK FOR TABLE EXISTENCE
-        q = query_setup(engine, buoy, table)
-        # df = query_setup(engine, buoy, table)
-        df = plot_buoy.read(buoy, [q, engine], table)
 
-        # import pdb; pdb.set_trace()
-        make_text(buoy, table)
-        # make_plot(buoy, table)
-        fig = plot_buoy.plot(df, buoy, table)
-        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
-        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
-        # save smaller for hover
-        if table == 'ven':
-            fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
+        for table in tables:  # loop through tables for each buoy
+
+            if not buoy in avail[table]:
+                continue  # instrument not available for this buoy
+            else:
+                q = query_setup(engine, buoy, table)
+                df = plot_buoy.read(buoy, [q, engine], table)
+                make_text(buoy, table)
+                fig = plot_buoy.plot(df, buoy, table)
+                fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
+                fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+                # save smaller for hover
+                if table == 'ven':
+                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
+                close(fig)
