@@ -171,6 +171,15 @@ foreach ($blet as $f) {
 		print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
 		}
     else {
+
+        // this is too slow to do on the fly. Need to have files pre-made.
+        $command = escapeshellcmd('/anaconda/bin/python frontpagequery.py "'.$f.'"');
+        passthru($command);
+        // exec($command, $output);
+        // echo $output[0];
+
+
+
 	$venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
 	$lines=file($venfile);
 	$l=array_pop($lines);

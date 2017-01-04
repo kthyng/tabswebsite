@@ -170,7 +170,7 @@ chmod($tempfile, 0644);
 
 if ($datetype=="pic") {
     // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
-    $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py '".$table."' '".$tempfile."'");
+    $command = escapeshellcmd("/anaconda/bin/python run_plot_buoy.py '".$table."' '".$tempfile."'");
     system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=240><font face=helvetica><BR>";

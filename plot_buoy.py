@@ -14,7 +14,9 @@ import netCDF4 as netCDF
 import numpy as np
 import time
 from datetime import datetime
-import argparse
+import os
+from sqlalchemy import create_engine
+
 
 mpl.rcParams.update({'font.size': 14})
 mpl.rcParams['font.sans-serif'] = 'Arev Sans, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Helvetica, Avant Garde, sans-serif'
@@ -38,14 +40,6 @@ locs = {'B': {'lon': '94 53.943W', 'lat': '28 58.938N'}, 'K': {'lon': '96 29.988
         'R': {'lon': '93 38.502W', 'lat': '29 38.100N'}, 'V': {'lon': '93 35.838W', 'lat': '27 53.796N'},
         'W': {'lon': '96 00.348W', 'lat': '28 21.042N'}, 'X': {'lon': '96 20.298W', 'lat': '27 03.960N'}}
 
-# parse the input arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
-parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
-args = parser.parse_args()
-
-buoy = args.dataname.split('/')[-1][0]
-
 # constants
 cmax = 60  # cm/s, max water arrow value
 wmax = 20  # m/s, max wind arrow value
@@ -65,7 +59,7 @@ def convert(vin, which):
         return vin*0.029529983071415973
 
 
-def read(dataname, which):
+def read(buoy, dataname, which):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.
@@ -74,7 +68,18 @@ def read(dataname, which):
     if which == 'ven' or which == 'sum':
         # velocities in cm/s, direction in deg T, temp in deg C
         names = ['Date', 'Time', 'East', 'North', 'Speed', 'Dir', 'WaterT']
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        if isinstance(dataname, str):
+            df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        elif len(dataname) == 2:
+            query = dataname[0]; engine = dataname[1]
+            # import pdb; pdb.set_trace()
+            df = pd.read_sql_query(query, engine, index_col=['obs_time'])
+            df = df.drop(['date','time'], axis=1)
+            df.columns = ['East', 'North', 'Dir', 'WaterT', 'Tx', 'Ty']
+            df = df.drop(['Tx', 'Ty'], axis=1)
+            df['Speed'] = np.sqrt(df['East']**2 + df['North']**2)
+            df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
+
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
@@ -124,7 +129,7 @@ def shifty(ax, N=0.05):
     ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
 
 
-def add_currents(ax, which):
+def add_currents(ax, df, which):
     '''Add current arrows to plot
 
     which   'water' or 'wind'
@@ -162,7 +167,7 @@ def add_currents(ax, which):
     axknots.set_ylabel('[knots]')
 
 
-def add_vel(ax, which):
+def add_vel(ax, df, buoy, which):
     '''Add along- or across-shelf velocity to plot
 
     which   'Across' or 'Along'
@@ -197,7 +202,7 @@ def add_vel(ax, which):
         ax.text(0.9, 0.91, str(angle[buoy]-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, key, label1, con, label2):
+def add_var_2units(ax1, df, key, label1, con, label2):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
@@ -211,7 +216,7 @@ def add_var_2units(ax1, key, label1, con, label2):
     ax2.set_ylim(convert(ylim[0], con), convert(ylim[1], con))
 
 
-def add_var(ax, var, varlabel):
+def add_var(ax, df, var, varlabel):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
@@ -219,7 +224,7 @@ def add_var(ax, var, varlabel):
     shifty(ax)
 
 
-def add_txty(ax1):
+def add_txty(ax1, df):
     '''TxTy'''
 
     c1, c2 = '#559349', '#874993'
@@ -236,7 +241,7 @@ def add_txty(ax1):
     shifty(ax2)
 
 
-def add_xlabels(ax, fig):
+def add_xlabels(ax, df, fig):
     '''Add date labels to bottom x axis'''
 
     # varied tick locations and labels for few days
@@ -290,7 +295,7 @@ def add_xlabels(ax, fig):
              horizontalalignment='left', verticalalignment='top')
 
 
-def setup(nsubplots):
+def setup(buoy, nsubplots):
     '''Set up plot'''
 
     # plot
@@ -303,7 +308,7 @@ def setup(nsubplots):
     return fig, axes
 
 
-def plot(which):
+def plot(df, buoy, which):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
@@ -314,47 +319,47 @@ def plot(which):
     elif which == 'salt' or which == 'wave':
         nsubplots = 3
 
-    fig, axes = setup(nsubplots=nsubplots)
+    fig, axes = setup(buoy, nsubplots=nsubplots)
 
     if which == 'ven':
-        add_currents(axes[0], 'water')
-        add_vel(axes[1], 'Across')
-        add_vel(axes[2], 'Along')
-        add_var_2units(axes[3], 'WaterT',
+        add_currents(axes[0], df, 'water')
+        add_vel(axes[1], df, buoy, 'Across')
+        add_vel(axes[2], df, buoy, 'Along')
+        add_var_2units(axes[3], df, 'WaterT',
             r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
     elif which == 'eng':
-        add_var(axes[0], 'VBatt', 'V$_\mathrm{batt}$')
-        add_var(axes[1], 'SigStr', 'Sig Str')
-        add_var(axes[2], 'Nping', 'Ping Cnt')
-        add_txty(axes[3])
+        add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
+        add_var(axes[1], df, 'SigStr', 'Sig Str')
+        add_var(axes[2], df, 'Nping', 'Ping Cnt')
+        add_txty(axes[3], df)
     elif which == 'met':
-        add_currents(axes[0], 'wind')
-        add_var_2units(axes[1], 'AirT',
+        add_currents(axes[0], df, 'wind')
+        add_var_2units(axes[1], df, 'AirT',
             r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
-        add_var_2units(axes[2], 'AtmPr', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[2], df, 'AtmPr', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[Hg]')
-        add_var(axes[3], 'RelH', 'Relative Humidity [%]')
+        add_var(axes[3], df, 'RelH', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], 'Temp',
+        add_var_2units(axes[0], df, 'Temp',
             r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
-        add_var(axes[1], 'Salinity', 'Salinity')
-        add_var(axes[2], 'Cond', 'Conductivity [ms/cm]')
+        add_var(axes[1], df, 'Salinity', 'Salinity')
+        add_var(axes[2], df, 'Cond', 'Conductivity [ms/cm]')
     elif which == 'wave':
-        add_var(axes[0], 'WaveHeight', 'Wave Height [m]')
-        add_var(axes[1], 'MeanPeriod', 'Mean Period [s]')
-        add_var(axes[2], 'PeakPeriod', 'Peak Period [s]')
+        add_var(axes[0], df, 'WaveHeight', 'Wave Height [m]')
+        add_var(axes[1], df, 'MeanPeriod', 'Mean Period [s]')
+        add_var(axes[2], df, 'PeakPeriod', 'Peak Period [s]')
     elif which == 'sum':
-        add_currents(axes[0], 'water')
-        add_vel(axes[1], 'Across')
-        add_vel(axes[2], 'Along')
-        add_var_2units(axes[3], 'WaterT',
+        add_currents(axes[0], df, 'water')
+        add_vel(axes[1], df, 'Across')
+        add_vel(axes[2], df, 'Along')
+        add_var_2units(axes[3], df, 'WaterT',
             r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
             'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
 
-    add_xlabels(axes[nsubplots-1], fig)
+    add_xlabels(axes[nsubplots-1], df, fig)
 
     return fig
 
@@ -538,12 +543,3 @@ def plot_buoy(loc):
              horizontalalignment='left', verticalalignment='top')
 
     fig.savefig('test.pdf')
-
-
-
-if __name__ == "__main__":
-
-    df = read(args.dataname, args.which)
-    fig = plot(args.which)
-    fig.savefig(args.dataname + '.pdf')
-    fig.savefig(args.dataname + '.png')
