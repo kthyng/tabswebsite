@@ -214,12 +214,12 @@ def add_vel(ax, df, buoy, which):
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2):
@@ -323,7 +323,13 @@ def setup(buoy, nsubplots):
     # bottom controlled later
     fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
     # title
-    axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' + buoy_data.locs(buoy)['lat'] + ', ' + buoy_data.locs(buoy)['lon'], fontsize=18)
+    axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' +
+                      buoy_data.locs(buoy)['lat'][0] + '˚' +
+                      buoy_data.locs(buoy)['lat'][1] + '\'' +
+                      buoy_data.locs(buoy)['lat'][2] + '  ' +
+                      buoy_data.locs(buoy)['lon'][0] + '˚' +
+                      buoy_data.locs(buoy)['lon'][1] + '\'' +
+                      buoy_data.locs(buoy)['lon'][2], fontsize=18)
 
     return fig, axes
 
@@ -345,9 +351,7 @@ def plot(df, buoy, which):
         add_currents(axes[0], df, 'water')
         add_vel(axes[1], df, buoy, 'Across')
         add_vel(axes[2], df, buoy, 'Along')
-        add_var_2units(axes[3], df, 'WaterT',
-            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
-            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var_2units(axes[3], df, 'WaterT', 'Temperature [˚C]', 'c2f', '[˚F]')
     elif which == 'eng':
         add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
         add_var(axes[1], df, 'SigStr', 'Sig Str')
@@ -355,16 +359,12 @@ def plot(df, buoy, which):
         add_txty(axes[3], df)
     elif which == 'met':
         add_currents(axes[0], df, 'wind')
-        add_var_2units(axes[1], df, 'AirT',
-            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
-            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var_2units(axes[1], df, 'AirT', 'Temperature [˚C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[Hg]')
         add_var(axes[3], df, 'RelH', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp',
-            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
-            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var_2units(axes[0], df, 'Temp', 'Temperature [˚C]', 'c2f', '[˚F]')
         add_var(axes[1], df, 'Salinity', 'Salinity')
         add_var(axes[2], df, 'Cond', 'Conductivity [ms/cm]')
     elif which == 'wave':
@@ -375,9 +375,7 @@ def plot(df, buoy, which):
         add_currents(axes[0], df, 'water')
         add_vel(axes[1], df, 'Across')
         add_vel(axes[2], df, 'Along')
-        add_var_2units(axes[3], df, 'WaterT',
-            r'Temperature $\left[^\circ\!\mathrm{C}\right]$',
-            'c2f', r'$\left[^\circ\!\mathrm{F}\right]$')
+        add_var_2units(axes[3], df, 'WaterT', 'Temperature [˚C]', 'c2f', '[˚F]')
 
     add_xlabels(axes[nsubplots-1], df, fig)
 
@@ -466,7 +464,7 @@ def plot_buoy(loc):
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(buoy_data.angle('B')) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(buoy_data.angle('B')) + '˚T', fontsize=11, transform=ax.transAxes)
     ####
 
     # along-shelf wind
@@ -482,7 +480,7 @@ def plot_buoy(loc):
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'UPCOAST', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'DOWNCOAST', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(buoy_data.angle('B')-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(buoy_data.angle('B')-90) + '˚T', fontsize=11, transform=ax.transAxes)
 
     # T/S
     cmicro = '0.6'
@@ -493,7 +491,7 @@ def plot_buoy(loc):
     ax.plot(idx, df.WaterT, lw=lw, color=cDCS, linestyle='-')
     idx = mpl.dates.date2num(dfsalt.index.to_pydatetime())
     ax.plot(idx, dfsalt.Temp, lw=lw, color=cmicro, linestyle='-')
-    ax.set_ylabel(r'Temperature $\left[^\circ\mathrm{C}\right]$')
+    ax.set_ylabel('Temperature [˚C]')
     # set bottom ylim a little large to make room for text
     ylim = ax.get_ylim()
     ax.set_ylim(ylim[0]*0.98, ylim[1])
@@ -513,7 +511,7 @@ def plot_buoy(loc):
     axF.spines["left"].set_visible(True)
     axF.yaxis.set_label_position('left')
     axF.yaxis.set_ticks_position('left')
-    axF.set_ylabel(r'$\left[^\circ\mathrm{F}\right]$')
+    axF.set_ylabel('[˚F]')
     ylim = ax.get_ylim()
     # convert to fahrenheit
     axF.set_ylim(ylim[0]*(9/5.)+32, ylim[1]*(9/5.)+32)

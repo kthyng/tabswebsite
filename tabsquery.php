@@ -32,6 +32,16 @@ $datetype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 
 // change format of date from yyyy/m/d to yyyy-m-d
+if ($datepicker == "recent") {
+// Put in header
+// Show already-made image
+$fname = "daily/tabs_".$Buoyname."_".$table.".png";
+print "<img src=$fname>";
+// keep options on the side
+// die
+}
+
+else{
 $datepicker = str_replace ("/", "-", $datepicker);
 // split date range into two dates. if it is just one date, still becomes an array but of length 1
 $dates = explode(" - ", $datepicker);
@@ -43,6 +53,7 @@ if (count($dates)==2) {
 } else {
     // if there is not an end date, use start date
     $dend = $dstart;
+}
 }
 
 $tempfile=tempnam("tmp",$Buoyname . $table);
@@ -167,6 +178,11 @@ else {
 }
 
 chmod($tempfile, 0644);
+
+// header
+$command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
+passthru($command);
+
 
 if ($datetype=="pic") {
     // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");

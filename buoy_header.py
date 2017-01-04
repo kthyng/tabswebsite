@@ -12,7 +12,7 @@ buoy = args.buoy
 # read in vel file
 which = 'ven'
 fname = 'daily/tabs_' + buoy + '_' + which + '.txt'
-df = plot_buoy.read(buoy, dataname, which)
+df = plot_buoy.read(buoy, fname, which)
 # df = pd.read_table('daily/tabs_' + buoy + '_ven.txt')
 speed = df[-1,4]
 

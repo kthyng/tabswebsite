@@ -11,7 +11,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
 parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
 args = parser.parse_args()
-
 buoy = args.dataname.split('/')[-1][0]
 
 if __name__ == "__main__":

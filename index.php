@@ -173,14 +173,15 @@ foreach ($blet as $f) {
     else {
 
         // this is too slow to do on the fly. Need to have files pre-made.
-        $command = escapeshellcmd('/anaconda/bin/python frontpagequery.py "'.$f.'"');
-        passthru($command);
+        // $command = escapeshellcmd('/anaconda/bin/python frontpagequery.py "'.$f.'"');
+        // passthru($command);
         // exec($command, $output);
         // echo $output[0];
 
 
 
-	$venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
+	$venfile="daily/tabs_".$f."_ven.txt";
+    // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
 	$lines=file($venfile);
 	$l=array_pop($lines);
 	if (trim($l)) {
@@ -212,8 +213,10 @@ foreach ($blet as $f) {
         $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
         $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png rel=http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_B_ven.png>$f</a></font></TD>\n";
-        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=daily/tabs_B_ven.png rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+        // this is too slow to do on the fly. Need to have files pre-made.
+        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
 		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
 		}
 
