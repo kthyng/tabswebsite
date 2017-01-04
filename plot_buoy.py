@@ -16,6 +16,7 @@ import time
 from datetime import datetime
 import os
 from sqlalchemy import create_engine
+import buoy_data
 
 
 mpl.rcParams.update({'font.size': 14})
@@ -29,16 +30,6 @@ mpl.rcParams['mathtext.bf'] = 'sans:bold'
 mpl.rcParams['mathtext.sf'] = 'sans'
 mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
-# degree True for across-shelf rotation angle (rotated x axis is offshore)
-angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
-         'V': 173, 'W': 173, 'X': 90}
-
-# locations for buoys
-locs = {'B': {'lon': '94 53.943W', 'lat': '28 58.938N'}, 'K': {'lon': '96 29.988W', 'lat': '26 13.008N'},
-        'D': {'lon': '96 50.574W', 'lat': '27 56.376N'}, 'F': {'lon': '94 14.496W', 'lat': '28 50.550N'},
-        'J': {'lon': '97 03.042W', 'lat': '26 11.484N'}, 'N': {'lon': '94 02.202W', 'lat': '27 53.418N'},
-        'R': {'lon': '93 38.502W', 'lat': '29 38.100N'}, 'V': {'lon': '93 35.838W', 'lat': '27 53.796N'},
-        'W': {'lon': '96 00.348W', 'lat': '28 21.042N'}, 'X': {'lon': '96 20.298W', 'lat': '27 03.960N'}}
 
 # constants
 cmax = 60  # cm/s, max water arrow value
@@ -89,7 +80,7 @@ def read(buoy, dataname, which):
 
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
-        theta = np.deg2rad(-(angle[buoy]-90))  # convert from compass to math angle
+        theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
         df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
         df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
 
@@ -223,12 +214,12 @@ def add_vel(ax, df, buoy, which):
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(angle[buoy]) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(angle[buoy]-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '$^\circ$T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2):
@@ -332,7 +323,7 @@ def setup(buoy, nsubplots):
     # bottom controlled later
     fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
     # title
-    axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' + locs[buoy]['lat'] + ', ' + locs[buoy]['lon'], fontsize=18)
+    axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' + buoy_data.locs(buoy)['lat'] + ', ' + buoy_data.locs(buoy)['lon'], fontsize=18)
 
     return fig, axes
 
@@ -405,7 +396,7 @@ def plot_buoy(loc):
     df = pd.read_table(loc, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0)
     # Calculate along- and across-shelf
     # along-shelf rotation angle in math angle convention
-    theta = np.deg2rad(-(angle['B']-90))  # convert from compass to math angle
+    theta = np.deg2rad(-(buoy_data.angle('B')-90))  # convert from compass to math angle
     # # rotation matrix
     # rot = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
     # vec = np.array([[df['East']], [df['North']]])
@@ -438,7 +429,6 @@ def plot_buoy(loc):
     fig, axes = plt.subplots(4, 1, figsize=(8.5,11), sharex=True)
     # bottom controlled later
     fig.subplots_adjust(top=0.96, right=0.90, left=0.22, hspace=0.1)
-    # fig.suptitle('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
 
     # current arrows
     ax = axes[0]
@@ -451,7 +441,7 @@ def plot_buoy(loc):
               headaxislength=0, headlength=0, width=0.001)
     ax.set_ylim(-cmax, cmax)
     ax.set_ylabel('Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    ax.set_title('TGLO TABS Buoy B: ' + locs['B'][0] + ', ' + locs['B'][1], fontsize=18)
+    ax.set_title('TGLO TABS Buoy B: ' + buoy_data.locs(buoy)[0] + ', ' + buoy_data.locs(buoy)[1], fontsize=18)
 
     # compass arrow
     ax.annotate("", xy=(0.97, 0.95), xytext=(0.97, 0.83),
@@ -476,7 +466,7 @@ def plot_buoy(loc):
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle['B']) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(buoy_data.angle('B')) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
     ####
 
     # along-shelf wind
@@ -492,7 +482,7 @@ def plot_buoy(loc):
     axknots.set_ylabel('[knots]')
     ax.text(0.02, 0.91, 'UPCOAST', fontsize=10, transform=ax.transAxes)
     ax.text(0.02, 0.04, 'DOWNCOAST', fontsize=10, transform=ax.transAxes)
-    ax.text(0.9, 0.9, str(angle['B']-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
+    ax.text(0.9, 0.9, str(buoy_data.angle('B')-90) + '$^\circ$T', fontsize=11, transform=ax.transAxes)
 
     # T/S
     cmicro = '0.6'
