@@ -180,7 +180,7 @@ foreach ($blet as $f) {
 
 
 
-	$venfile="daily/tabs_".$f."_ven.txt";
+	$venfile="daily/tabs_".$f."_ven";
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
 	$lines=file($venfile);
 	$l=array_pop($lines);

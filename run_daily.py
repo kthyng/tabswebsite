@@ -64,7 +64,7 @@ def query_setup(engine, buoy, table):
 def make_text(df, buoy, table, fname):
     '''Make text file of data'''
 
-    df.to_csv(fname + '.txt', sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar=' ')
+    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar=' ')
     # with no header:
     # df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 

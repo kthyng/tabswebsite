@@ -39,6 +39,10 @@ $tempaccess = "daily/tabs_".$Buoyname."_".$table;
 // print "<img src=$fname>";
 // keep options on the side
 // die
+
+// header
+$command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
+passthru($command);
 }
 
 else{
@@ -61,7 +65,7 @@ $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
 $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
 
-chmod($tempfile, 0644);
+chmod($tempaccess, 0644);
 
 }
 
@@ -116,9 +120,6 @@ die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 // echo $output;
 
 
-// // header
-// $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
-// passthru($command);
 
 
 // if ($datatype=="pic") {
@@ -132,7 +133,7 @@ print "<table>\n";
 // print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><br>";
-    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess.txt>download</a>)</font><br>\n";
+    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
     // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=tmp/$tempout>download</a>)</font><br>\n";
         // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
     if ($datepicker!="recent"){
