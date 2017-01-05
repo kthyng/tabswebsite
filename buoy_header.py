@@ -55,10 +55,12 @@ wperiod = tail['MeanPeriod  [s]'].values[0]
 
 # print out titles
 print('<br><br><br><table>')
+print("<TR><TD valign=top width=120 align=left rowspan=6>")
+print("</td></tr>")
 print('<tr>')
 print('<td><h2>Buoy ' + buoy + '</h2></td>')
 print('<TD colspan=3 valign=top>')
-print('<b>Conditions at ' + time + 'CONV</b>')
+print('<h2>Conditions at ' + time + 'CONV</h2>')
 # print('<b>Conditions at 01/04/2017 11:19 UTC (01/04/2017 05:19 CST)')
 print('</TD></TR>')
 
@@ -78,7 +80,7 @@ else:
     an = 'No anemometer'
 d = buoy_data.depth(buoy)
 depth = 'Water depth: ' + str(d) + 'm (' + str(d*3.28084) + ' ft)'
-print('<td rowspan=4>' + loc + '<br>' + sensor + '<br>' + an + '<br>' + depth + '</td>')
+print('<td rowspan=4><small>' + loc + '<br>' + sensor + '<br>' + an + '<br>' + depth + '</small></td>')
 
 # print out rest of this row as single rows
 print('<td>Speed: ' + str(speed) + ' cm/s (CONV)</td>')
@@ -88,23 +90,23 @@ print('</tr>')
 
 # next row
 print('<tr>')
-print('<td>System voltage: ' + str(volt) + ' V</td>')
-print('<td>Signal strength: ' + str(sigstr) + ' dB</td>')
-print('<td>Ping count: ' + str(ping) + '</td>')
+print('<td><small>System voltage: ' + str(volt) + ' V</small></td>')
+print('<td><small>Signal strength: ' + str(sigstr) + ' dB</small></td>')
+print('<td><small>Ping count: ' + str(ping) + '</small></td>')
 print('</tr>')
 
 # next row
 print('<tr>')
-print('<td>Wind: ' + str(wind) + ' m/s (CONV)</td>')
-print('<td>Air temp: ' + str(temp) + ' deg C (CONV)</td>')
-print('<td>Pressure: ' + str(press) + ' MB (CONV)</td>')
+print('<td><small>Wind: ' + str(wind) + ' m/s (CONV)</small></td>')
+print('<td><small>Air temp: ' + str(temp) + ' deg C (CONV)</small></td>')
+print('<td><small>Pressure: ' + str(press) + ' MB (CONV)</small></td>')
 print('</tr>')
 
 # next row
 print('<tr>')
-print('<td>    from ' + str(wdirect) + ' deg T (DIRECTION?)</td>')
-print('<td>Relative humidity: ' + str(humid) + '%</td>')
-print('<td>Waves: ' + str(wheight) + ' m (CONV) @ ' + str(wperiod) + ' sec</td>')
+print('<td><small>    from ' + str(wdirect) + ' deg T (DIRECTION?)</small></td>')
+print('<td><small>Relative humidity: ' + str(humid) + '%</small></td>')
+print('<td><small>Waves: ' + str(wheight) + ' m (CONV) @ ' + str(wperiod) + ' sec</small></td>')
 print('</tr>')
 
 print('</table>')

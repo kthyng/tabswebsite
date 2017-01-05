@@ -31,13 +31,22 @@ def query_setup(engine, buoy, table):
     '''Query mysql database for data.'''
 
     # query for last entry
-    lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 1'
-    # FIX THIS
+    lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 5'
+    # FIX THIS too repetitive
     df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
-    dend = df.index[0].strftime("%Y-%m-%d")  # date for last available data
+
+    # check for real data, based on temperature value. Is this a good choice?
+    counter = 1
+    while (df.tail(1)['tx'].values[0] == -99):# and (df.head(1)['vnorth'].values[0] == 0):
+        counter += 1
+        lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit ' + str(counter)
+        # FIX THIS too repetitive
+        df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
+
+    dend = df.index[-1].strftime("%Y-%m-%d")  # date for last available data
     # dend = df.index[0].strftime("%Y-%m-%d %H:%M")  # datetime for last available data
 
-    dstart = (df.index[0] - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
+    dstart = (df.index[-1] - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
 
     # get 5 days of data
     query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
@@ -81,21 +90,23 @@ if __name__ == "__main__":
     avail['wave'] = ['K', 'N', 'V', 'X']
 
     # loop through buoys: query, make text file, make plot
-    for buoy in buoys:
-
-        for table in tables:  # loop through tables for each buoy
-
-            if not buoy in avail[table]:
-                continue  # instrument not available for this buoy
-            else:
-                q = query_setup(engine, buoy, table)
-                df = plot_buoy.read(buoy, [q, engine], table)
-                fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
-                make_text(df, buoy, table, fname)
-                fig = plot_buoy.plot(df, buoy, table)
-                fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
-                fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
-                # save smaller for hover
-                if table == 'ven':
-                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
-                close(fig)
+    buoy = 'N'
+    table = 'ven'
+    # for buoy in buoys:
+    #
+    #     for table in tables:  # loop through tables for each buoy
+    #
+    #         if not buoy in avail[table]:
+    #             continue  # instrument not available for this buoy
+    #         else:
+    q = query_setup(engine, buoy, table)
+    df = plot_buoy.read(buoy, [q, engine], table)
+    fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
+    make_text(df, buoy, table, fname)
+    fig = plot_buoy.plot(df, buoy, table)
+    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
+    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+    # save smaller for hover
+    if table == 'ven':
+        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
+    close(fig)
