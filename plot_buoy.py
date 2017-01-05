@@ -46,8 +46,21 @@ def convert(vin, which):
         return vin*1.943844
     elif which == 'cps2kts':  # cm/s to knots
         return vin*0.0194384
-    elif which == 'mb2hg':  # MB to Hg
+    elif which == 'mb2hg':  # MB to inHg
         return vin*0.029529983071415973
+    elif which == 'm2ft':  # meters to feet
+        return vin*3.28084
+
+
+def degrees_to_cardinal(d):
+    '''
+    note: this is highly approximate...
+    https://gist.github.com/RobertSudwarts/acf8df23a16afdb5837f
+    '''
+    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+    ix = int((d + 11.25)/22.5)
+    return dirs[ix % 16]
 
 
 def read(buoy, dataname, which):
@@ -354,7 +367,7 @@ def plot(df, buoy, which):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Temperature [˚ C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-            'mb2hg', '[Hg]')
+            'mb2hg', '[inHg]')
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]')
