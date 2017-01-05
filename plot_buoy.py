@@ -68,18 +68,7 @@ def read(buoy, dataname, which):
 
     if which == 'ven':# or which == 'sum':
         names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']
-        # velocities in cm/s, direction in deg T, temp in deg C
-        # if isinstance(dataname, str):
-        #     names = ['East', 'North', 'Speed', 'Dir', 'WaterT']
-        #     df.columns = names
-        # elif len(dataname) == 2:
-        # df = df.drop(['date','time'], axis=1)
-        # df.columns = names
-        # df.index.name = 'Dates [UTC]'
-        # df = df.drop(['Tx', 'Ty'], axis=1)
         df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
-        # df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
-
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
@@ -88,43 +77,17 @@ def read(buoy, dataname, which):
 
     elif which == 'eng':
         names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt2']
-        # if isinstance(dataname, str):
-        #     df.columns = names
-        #     # import pdb; pdb.set_trace()
-        # elif len(dataname) == 2:
-        # df = df.drop(['date','time'], axis=1)
-        # df.columns = names
-        # df.index.name = 'Dates [UTC]'
 
     elif which == 'met':
         names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
         df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
         df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
-# $wdir=90.-(rad2deg(atan2(-$vnorth,-$veast)));
-#         if isinstance(dataname, str):
-# #        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
-#             df.columns = names
-#         elif len(dataname) == 2:
-        # df = df.drop(['date','time'], axis=1)
-        # df.columns = names
 
     elif which == 'salt':
         names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
-        #   UTC       &deg;C      ms/cm             kg/m^3     m/s
-        # if isinstance(dataname, str):
-        #     df.columns = names
-        # elif len(dataname) == 2:
-        #     df = df.drop(['date','time'], axis=1)
-        #     df.columns = names
 
     elif which == 'wave':
         names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
-        #   UTC      m      s       s
-        # if isinstance(dataname, str):
-        #     df.columns = names
-        # elif len(dataname) == 2:
-        #     df = df.drop(['date','time'], axis=1)
-        #     df.columns = names
 
     # if which == 'sum':  # add onto read in from ven if sum
     #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
