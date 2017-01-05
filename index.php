@@ -216,8 +216,18 @@ foreach ($blet as $f) {
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=daily/tabs_B_ven.png rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
         // this is too slow to do on the fly. Need to have files pre-made.
         // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+
+        // check for if report is more than about 5 days old (ignoring time zones, etc)
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+        $interval = date_diff($dtUTC, $today);  # difference in days between now and 5 days ago
+        $intervalstr = $interval->format('%R%a days');
         print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-		print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n";
+        if ($intervalstr>5){ // old report
+            print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
+        }
+        else { // bold for recent report
+            print "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
+        }
 		}
 
     }
