@@ -81,8 +81,7 @@ def read(buoy, dataname, which):
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 
         if which == 'ven':# or which == 'sum':
-            names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']
-            # df.columns = names
+            names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
             df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             # Calculate along- and across-shelf
             # along-shelf rotation angle in math angle convention
@@ -92,21 +91,17 @@ def read(buoy, dataname, which):
 
         elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
-            # df.columns = names
 
         elif which == 'met':
             names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
-            # df.columns = names
             df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
 
         elif which == 'salt':
             names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
-            # df.columns = names
 
         elif which == 'wave':
             names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
-            # df.columns = names
 
         # if which == 'sum':  # add onto read in from ven if sum
         #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']

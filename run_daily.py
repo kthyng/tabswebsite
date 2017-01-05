@@ -27,47 +27,44 @@ def setup():
     return engine
 
 
-def query_setup(engine, buoy, table):
-    '''Query mysql database for data.'''
+def query_setup_recent(engine, buoy):
+    '''return most recent datetime object for buoy that has reasonable data.
+
+    Condition of data being reasonable is based on ven table tx!=-99.
+    '''
 
     # query for last entry
-    lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 5'
-    # FIX THIS too repetitive
+    lastline = 'SELECT * FROM tabs_' + buoy + '_ven order by obs_time DESC limit 1'
+    # read in query
     df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
 
-    # check for real data, based on temperature value. Is this a good choice?
+    # check for real data, based on tx value
     counter = 1
-    while (df.tail(1)['tx'].values[0] == -99):# and (df.head(1)['vnorth'].values[0] == 0):
+    # while tx=-99 in the latest database entry, read in more lines from
+    # database, 1 by 1, until finding one that has a real value.
+    # Return the date time of this entry.
+    while (df.tail(1)['tx'].values[0] == -99):
         counter += 1
         lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit ' + str(counter)
-        # FIX THIS too repetitive
         df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
 
-    dend = df.index[-1].strftime("%Y-%m-%d")  # date for last available data
+    return df.index[-1]  #.strftime("%Y-%m-%d %H:%M")  # date for last available data
+
+
+def query_setup(engine, buoy, table, dend):
+    '''Query mysql database for data, given end date dend from
+    query_setup_recent().'''
+
+    # dend = df.index[-1].strftime("%Y-%m-%d")  # date for last available data
     # dend = df.index[0].strftime("%Y-%m-%d %H:%M")  # datetime for last available data
 
-    dstart = (df.index[-1] - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
+    dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
+    # dstart = (df.index[-1] - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
 
     # get 5 days of data
-    query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+    # want from beginning of first day but only up until data time on final day
+    query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend.strftime("%Y-%m-%d %H:%M") + '") order by obs_time'
     return query
-    # df = pd.read_sql_query(query, engine, index_col=['obs_time'])
-    # # remove extra date/time columns
-    # df = df.drop(['date','time'], axis=1)
-    # df.columns = ['East', 'North', 'Dir', 'WaterT', 'Tx', 'Ty']
-    # # df.columns = ['East [cm/s]', 'North [cm/s]', 'Dir to [&deg;T]',
-    # #               'WaterT [&deg;C]', 'Tx', 'Ty']
-    # df.index.name = 'Dates [UTC]'
-    # # drop Tx, Ty
-    # df = df.drop(['Tx','Ty'], axis=1)
-    # # add magnitude
-    # df['Speed'] = np.sqrt(df['East']**2 + df['North']**2)
-    # # df['Speed [cm/s]'] = np.sqrt(df['East [cm/s]']**2 + df['North [cm/s]']**2)
-    # # reorder
-    # df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
-    # # df = df[['East [cm/s]', 'North [cm/s]', 'Speed [cm/s]', 'Dir to [&deg;T]',
-    # #               'WaterT [&deg;C]']]
-    # return df
 
 
 def make_text(df, buoy, table, fname):
@@ -90,23 +87,29 @@ if __name__ == "__main__":
     avail['wave'] = ['K', 'N', 'V', 'X']
 
     # loop through buoys: query, make text file, make plot
-    buoy = 'N'
-    table = 'ven'
-    # for buoy in buoys:
-    #
-    #     for table in tables:  # loop through tables for each buoy
-    #
-    #         if not buoy in avail[table]:
-    #             continue  # instrument not available for this buoy
-    #         else:
-    q = query_setup(engine, buoy, table)
-    df = plot_buoy.read(buoy, [q, engine], table)
-    fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
-    make_text(df, buoy, table, fname)
-    fig = plot_buoy.plot(df, buoy, table)
-    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
-    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
-    # save smaller for hover
-    if table == 'ven':
-        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
-    close(fig)
+    for buoy in buoys:
+        for table in tables:  # loop through tables for each buoy
+
+            if table == 'ven':
+                # find end date of recent legitimate data
+                dend = query_setup_recent(engine, buoy)
+
+            if not buoy in avail[table]:
+                continue  # instrument not available for this buoy
+            else:
+                try:
+                    q = query_setup(engine, buoy, table, dend)
+                    df = plot_buoy.read(buoy, [q, engine], table)
+                    fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
+                    make_text(df, buoy, table, fname)
+                    fig = plot_buoy.plot(df, buoy, table)
+                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
+                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+                    # save smaller for hover
+                    if table == 'ven':
+                        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
+                    close(fig)
+                # if data isn't available at the same time as the ven file,
+                # leave as not written
+                except:
+                    pass
