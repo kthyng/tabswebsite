@@ -86,13 +86,14 @@ def read(buoy, dataname, which):
         df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
     elif which == 'eng':
-        names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
-        if isinstance(dataname, str):
-            df.columns = names
-            # import pdb; pdb.set_trace()
-        elif len(dataname) == 2:
-            df = df.drop(['date','time'], axis=1)
-            df.columns = names
+        names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt2']
+        # if isinstance(dataname, str):
+        #     df.columns = names
+        #     # import pdb; pdb.set_trace()
+        # elif len(dataname) == 2:
+        df = df.drop(['date','time'], axis=1)
+        df.columns = names
+        df.index.name = 'Dates [UTC]'
 
     elif which == 'met':
         names = ['East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH']
@@ -245,21 +246,24 @@ def add_var(ax, df, var, varlabel):
     shifty(ax)
 
 
-def add_txty(ax1, df):
-    '''TxTy'''
+def add_2var(ax1, df, var1, label1, var2, label2, sameylim=True):
+    '''2 variables, one on each y axis. same y limits if set True.'''
 
     c1, c2 = '#559349', '#874993'
     # 1st var
-    ax1.plot(df.idx, df['Tx'], lw=lw, color=c1, linestyle='-')
-    ax1.set_ylabel('Tx', color=c1)
+    ax1.plot(df.idx, df[var1], lw=lw, color=c1, linestyle='-')
+    ax1.set_ylabel(label1, color=c1)
     ax1.tick_params(axis='y', colors=c1)
     shifty(ax1)
     # 2nd var
     ax2 = ax1.twinx()
-    ax2.plot(df.idx, df['Ty'], lw=lw, color=c2, linestyle='--')
-    ax2.set_ylabel('Ty [--]', color=c2)
+    ax2.plot(df.idx, df[var2], lw=lw, color=c2, linestyle='--')
+    ax2.set_ylabel(label2 + ' [--]', color=c2)
     ax2.tick_params(axis='y', colors=c2)
     shifty(ax2)
+    if sameylim:
+        ylim = ax1.get_ylim()
+        ax2.set_ylim(ylim[0], ylim[1])
 
 
 def add_xlabels(ax, df, fig):
@@ -354,10 +358,12 @@ def plot(df, buoy, which):
         add_vel(axes[2], df, buoy, 'Along [cm/s]')
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]')
     elif which == 'eng':
-        add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
+        add_2var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$', 'VBatt2', 'V$_\mathrm{batt}$')
+        # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
+        # add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
         add_var(axes[1], df, 'SigStr', 'Sig Str')
         add_var(axes[2], df, 'Nping', 'Ping Cnt')
-        add_txty(axes[3], df)
+        add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
         add_var_2units(axes[1], df, 'AirT', 'Temperature [˚C]', 'c2f', '[˚F]')
