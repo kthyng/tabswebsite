@@ -32,6 +32,7 @@ def query_setup(engine, buoy, table):
 
     # query for last entry
     lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 1'
+    # FIX THIS
     df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
     dend = df.index[0].strftime("%Y-%m-%d")  # date for last available data
     # dend = df.index[0].strftime("%Y-%m-%d %H:%M")  # datetime for last available data
@@ -60,10 +61,12 @@ def query_setup(engine, buoy, table):
     # return df
 
 
-def make_text(buoy, table):
-    '''Make text files with 5 days of data'''
+def make_text(df, buoy, table, fname):
+    '''Make text file of data'''
 
-    df.to_csv(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.txt'), sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
+    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar=' ')
+    # with no header:
+    # df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 
 
 if __name__ == "__main__":
@@ -87,7 +90,8 @@ if __name__ == "__main__":
             else:
                 q = query_setup(engine, buoy, table)
                 df = plot_buoy.read(buoy, [q, engine], table)
-                make_text(buoy, table)
+                fname = os.path.join('daily', 'tabs_' + buoy + '_' + table + '.txt')
+                make_text(df, buoy, table, fname)
                 fig = plot_buoy.plot(df, buoy, table)
                 fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
                 fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))

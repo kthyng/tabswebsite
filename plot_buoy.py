@@ -66,23 +66,24 @@ def read(buoy, dataname, which):
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 
-    if which == 'ven' or which == 'sum':
+    if which == 'ven':# or which == 'sum':
         # velocities in cm/s, direction in deg T, temp in deg C
-        if isinstance(dataname, str):
-            names = ['East', 'North', 'Speed', 'Dir', 'WaterT']
-            df.columns = names
-        elif len(dataname) == 2:
-            df = df.drop(['date','time'], axis=1)
-            df.columns = ['East', 'North', 'Dir', 'WaterT', 'Tx', 'Ty']
-            df = df.drop(['Tx', 'Ty'], axis=1)
-            df['Speed'] = np.sqrt(df['East']**2 + df['North']**2)
-            df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
+        # if isinstance(dataname, str):
+        #     names = ['East', 'North', 'Speed', 'Dir', 'WaterT']
+        #     df.columns = names
+        # elif len(dataname) == 2:
+        df = df.drop(['date','time'], axis=1)
+        df.columns = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty']
+        df.index.name = 'Dates [UTC]'
+        # df = df.drop(['Tx', 'Ty'], axis=1)
+        df['Speed [cm/s]'] = np.sqrt(df['East [cm/s]']**2 + df['North [cm/s]']**2)
+        # df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
 
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
-        df['Across'] = df['East']*np.cos(-theta) - df['North']*np.sin(-theta)
-        df['Along'] = df['East']*np.sin(-theta) + df['North']*np.cos(-theta)
+        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
+        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
     elif which == 'eng':
         names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt']
@@ -144,7 +145,7 @@ def shifty(ax, N=0.05):
     ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
 
 
-def add_currents(ax, df, which):
+def add_currents(ax, df, which, east, north):
     '''Add current arrows to plot
 
     which   'water' or 'wind'
@@ -158,7 +159,7 @@ def add_currents(ax, df, which):
             width /= 3
     else:
         width = 0.15
-    ax.quiver(df.idx, np.zeros(len(df)), df.East, df.North, headaxislength=0,
+    ax.quiver(df.idx, np.zeros(len(df)), df[east], df[north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1)
     if which == 'water':
         varmax = cmax
@@ -348,17 +349,17 @@ def plot(df, buoy, which):
     fig, axes = setup(buoy, nsubplots=nsubplots)
 
     if which == 'ven':
-        add_currents(axes[0], df, 'water')
-        add_vel(axes[1], df, buoy, 'Across')
-        add_vel(axes[2], df, buoy, 'Along')
-        add_var_2units(axes[3], df, 'WaterT', 'Temperature [˚C]', 'c2f', '[˚F]')
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
+        add_vel(axes[1], df, buoy, 'Across [cm/s]')
+        add_vel(axes[2], df, buoy, 'Along [cm/s]')
+        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]')
     elif which == 'eng':
         add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
         add_var(axes[1], df, 'SigStr', 'Sig Str')
         add_var(axes[2], df, 'Nping', 'Ping Cnt')
         add_txty(axes[3], df)
     elif which == 'met':
-        add_currents(axes[0], df, 'wind')
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
         add_var_2units(axes[1], df, 'AirT', 'Temperature [˚C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[Hg]')

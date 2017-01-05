@@ -28,7 +28,7 @@ echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 $Buoyname=$_GET["Buoyname"];
 $table=$_GET["table"];
 $datepicker=$_GET["datepicker"];
-$datetype=$_GET["Datatype"];
+$datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 
 // change format of date from yyyy/m/d to yyyy-m-d
@@ -56,9 +56,9 @@ if (count($dates)==2) {
 }
 }
 
-$tempfile=tempnam("tmp",$Buoyname . $table);
+$tempfile=tempnam("tmp",$Buoyname . $table);  // full file location
 // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
-$tempout=basename($tempfile);
+$tempout=basename($tempfile);  // just file name itself
 
 #echo "BUOY: $Buoyname  $table<br>TMP: $tempout  $tempfile<BR>";
 
@@ -72,137 +72,150 @@ die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" ); }
 if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
 die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 
-#if ($table == salt && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
-#die( "<h2>No Water Property Data Available for selected station</h2>\n" ); }
+// $q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
 
-if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
-	die("Can't connect: ".mysql_error());
-	}
+$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+// echo $tempout;
+// echo $tempfile;
+// echo $command;
+// system($command);
+// passthru($command);
+// what to do if no data
 
-#$dbase="tabs_".$Buoyname;
-$dbase="tabsdb";
-$tablename="tabs_".$Buoyname."_".$table;
-#echo "DB: $dbase  TAB: $tablename<br>\n";
-
-#$dsn='mysql://woody@localhost/'.$dbase;
-
-mysql_select_db($dbase) or die(mysql_error());
-#$dbh=DB::connect($dsn);
-
-#if (DB::isError($dbh)) {die ($dbh->getMessage());}
-
-$q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
-$result = mysql_query($q)
-    or die(mysql_error());
-// echo $result;
-
-#$rows=$dbh->getAll($q);
-while ($row = mysql_fetch_row($result)) {
-$rows[] = $row;
-#print_r($row);echo "<br>";
-}
-
-mysql_close();
+// if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
+// 	die("Can't connect: ".mysql_error());
+// 	}
+//
+// #$dbase="tabs_".$Buoyname;
+// $dbase="tabsdb";
+// $tablename="tabs_".$Buoyname."_".$table;
+// #echo "DB: $dbase  TAB: $tablename<br>\n";
+//
+// #$dsn='mysql://woody@localhost/'.$dbase;
+//
+// mysql_select_db($dbase) or die(mysql_error());
+// #$dbh=DB::connect($dsn);
+//
+// #if (DB::isError($dbh)) {die ($dbh->getMessage());}
+//
+// $q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
+// $result = mysql_query($q)
+//     or die(mysql_error());
+// // echo $result;
+//
+// #$rows=$dbh->getAll($q);
+// while ($row = mysql_fetch_row($result)) {
+// $rows[] = $row;
+// #print_r($row);echo "<br>";
+// }
+//
+// mysql_close();
 
 // $command = escapeshellcmd('/anaconda/bin/python tabsquery.py "'.$tablename.'" "'.$dstart.'" "'.$Prevdays.'" "'.$Nextdays.'"');
 // passthru($command);
 // exec($command, $output);
 // echo $output;
 
-if ($rows) {  // only runs this code if there is data available
-foreach ($rows as $data) {
-
-// Reading in data to table
-if ($table == 'ven'){
-list($datetime,$date,$time,$ve,$vn,$comp,$twater,$tx,$ty)=$data;
-// Notes in index.php
-$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
-$date = $UTC->format('Y/m/d');
-$speed=hypot($ve,$vn);
-$dir=90.-(rad2deg(atan2($vn,$ve)));
-if ($dir < 0.) {$dir+=360.;}
-$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
-$outstr=sprintf("%s %s %8.2f %8.2f %8.2f %8.1f %8.1f\n",$date,$time,$ve,$vn,$speed,$dir,$twater);
-fputs($tmpfh,$outstr);
-fclose($tmpfh) or die($php_errormsg);
-}
-
-if ($table == 'met'){
-list($datetime,$date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh)=$data;
-$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
-$date = $UTC->format('Y/m/d');
-$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
-$outstr=sprintf("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %5.1f %4.0d %4.0d %7.1f %7.1f\n",
-$date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh);
-fputs($tmpfh,$outstr);
-fclose($tmpfh) or die($php_errormsg);
-}
-
-if ($table == 'eng'){
-list($datetime,$date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2)=$data;
-$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
-$date = $UTC->format('Y/m/d');
-$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
-$outstr=sprintf("%s %s %7.1f %7.2f %7.1f %7.0f %3.0d %3.0d %7.1f %7.1f %7.1f\n",
-$date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2);
-fputs($tmpfh,$outstr);
-fclose($tmpfh) or die($php_errormsg);
-}
-
-if ($table == 'salt'){
-list($datetime,$date,$time,$watertemp,$conduct,$salinity,$density,$soundvel)=$data;
-$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
-$date = $UTC->format('Y/m/d');
-$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
-$outstr=sprintf("%s %s %7.2f %7.2f %7.2f %7.2f %7.2f\n",
-$date,$time,$watertemp,$conduct,$salinity,$density,$soundvel);
-fputs($tmpfh,$outstr);
-fclose($tmpfh) or die($php_errormsg);
-}
-
-if ($table == 'wave'){
-list($datetime,$date,$time,$wave_height,$mean_period,$peak_period)=$data;
-$UTC = new DateTime($data[1], new DateTimeZone('UTC'));
-$date = $UTC->format('Y/m/d');
-$tmpfh=fopen($tempfile,'a') or die($php_errormsg);
-$outstr=sprintf("%s %s %7.2f %7.2f %7.2f\n",
-$date,$time,$wave_height,$mean_period,$peak_period);
-fputs($tmpfh,$outstr);
-fclose($tmpfh) or die($php_errormsg);
-}
-
-}
-}
-else {
-    die( "<h2>No data available at the selected time for buoy ".$Buoyname."</h2>\n" );
-}
+// if ($rows) {  // only runs this code if there is data available
+// foreach ($rows as $data) {
+//
+// // Reading in data to table and writing to temp file
+// if ($table == 'ven'){
+// list($datetime,$date,$time,$ve,$vn,$comp,$twater,$tx,$ty)=$data;
+// // Notes in index.php
+// $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+// $date = $UTC->format('Y/m/d');
+// $speed=hypot($ve,$vn);
+// $dir=90.-(rad2deg(atan2($vn,$ve)));
+// if ($dir < 0.) {$dir+=360.;}
+// $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+// $outstr=sprintf("%s %s %8.2f %8.2f %8.2f %8.1f %8.1f\n",$date,$time,$ve,$vn,$speed,$dir,$twater);
+// fputs($tmpfh,$outstr);
+// fclose($tmpfh) or die($php_errormsg);
+// }
+//
+// if ($table == 'met'){
+// list($datetime,$date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh)=$data;
+// $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+// $date = $UTC->format('Y/m/d');
+// $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+// $outstr=sprintf("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %5.1f %4.0d %4.0d %7.1f %7.1f\n",
+// $date,$time,$ve,$vn,$airt,$atmp,$gust,$comp,$tx,$ty,$par,$relh);
+// fputs($tmpfh,$outstr);
+// fclose($tmpfh) or die($php_errormsg);
+// }
+//
+// if ($table == 'eng'){
+// list($datetime,$date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2)=$data;
+// $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+// $date = $UTC->format('Y/m/d');
+// $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+// $outstr=sprintf("%s %s %7.1f %7.2f %7.1f %7.0f %3.0d %3.0d %7.1f %7.1f %7.1f\n",
+// $date,$time,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpv,$adcpcurr,$vbatt2);
+// fputs($tmpfh,$outstr);
+// fclose($tmpfh) or die($php_errormsg);
+// }
+//
+// if ($table == 'salt'){
+// list($datetime,$date,$time,$watertemp,$conduct,$salinity,$density,$soundvel)=$data;
+// $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+// $date = $UTC->format('Y/m/d');
+// $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+// $outstr=sprintf("%s %s %7.2f %7.2f %7.2f %7.2f %7.2f\n",
+// $date,$time,$watertemp,$conduct,$salinity,$density,$soundvel);
+// fputs($tmpfh,$outstr);
+// fclose($tmpfh) or die($php_errormsg);
+// }
+//
+// if ($table == 'wave'){
+// list($datetime,$date,$time,$wave_height,$mean_period,$peak_period)=$data;
+// $UTC = new DateTime($data[1], new DateTimeZone('UTC'));
+// $date = $UTC->format('Y/m/d');
+// $tmpfh=fopen($tempfile,'a') or die($php_errormsg);
+// $outstr=sprintf("%s %s %7.2f %7.2f %7.2f\n",
+// $date,$time,$wave_height,$mean_period,$peak_period);
+// fputs($tmpfh,$outstr);
+// fclose($tmpfh) or die($php_errormsg);
+// }
+//
+// }
+// }
+// else {
+//     die( "<h2>No data available at the selected time for buoy ".$Buoyname."</h2>\n" );
+// }
 
 chmod($tempfile, 0644);
 
-// header
-$command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
-passthru($command);
+// // header
+// $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
+// passthru($command);
 
 
-if ($datetype=="pic") {
-    // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
-    $command = escapeshellcmd("/anaconda/bin/python run_plot_buoy.py '".$table."' '".$tempfile."'");
-    system($command);
+// if ($datatype=="pic") {
+//     // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
+//     $command = escapeshellcmd("/anaconda/bin/python run_plot_buoy.py '".$table."' '".$tempfile."'");
+//     system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
-	print "<TR><TD valign=top width=240><font face=helvetica><BR>";
+	print "<TR><TD valign=top width=120><font face=helvetica><BR>";
 print "<table>\n";
-print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
-print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
+// print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
+// print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><br>";
-        print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
-	print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";
+    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=tmp/$tempout>download</a>)</font><br>\n";
+        // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
+    // if ($datatype=="data"){
+        passthru($command);//}
+    if ($datatype=="pic"){
+	print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
 	print "</TD></TR></TABLE>\n";
-}
+// }
 
-if ($datetype=="data") {
+// if ($datatype=="data") {
 print "<TABLE width=100%>";
-print "<TR><TD valign=top width=240 align=left>";
+print "<TR><TD valign=top width=120 align=left>";
+print "</td>";
+print "<td>";
 print "<br> &nbsp;\n";
 print "<br><FORM Action=$PHP_SELF method=\"POST\">\n";
 print "<input NAME=buoy TYPE=hidden value=$buoylet>\n";
@@ -238,216 +251,216 @@ print "<pre>";
 
 if (! $units) {$units = 'M';}
 
-$data=explode(" ",$venlines[0]);
-// Use UTC
-if ($tz == 'UTC' || $tz == '') {
-        // $ts_utc=strtotime($data[0]." ".$data[1]);
-		// $timez="UTC";
-
-        $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-        // $dtUTCstr = $dtUTC->format('M d, Y H:i');
-
-
-        }
-// Use Station Local, $_POST['tz'] == 'STN'
-else {
-// HOW TO UPDATE THIS???
-$ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('America/Chicago'));
-        // $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-}
-
-// Top of data table:
-if ($table == 'met' ) {
-    print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
-}
-// brings in header and label for top
-$header="database/".$table."tableheader.php";
-print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
-include($header);
-
-if ($table == 'ven' ) {
-if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
-	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
-
-$venlines1=file($tempfile);
-foreach ($venlines1 as $elem) {
-        $elem=preg_replace("/\s+/"," ",$elem);
-        $data=explode(" ",$elem);
-        if ($tz == 'UTC' || $tz == '') {
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-
-                // $ts_utc=strtotime($data[0]." ".$data[1]);
-                }
-        else {
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-
-        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-                }
-        $datestr = $ts_utc->format('Y/m/d');
-        $timestr = $ts_utc->format('H:i');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
-        // $timestr=strftime("%T",$ts_utc);
-        $east=$data[2] * $convfac;
-        $north=$data[3]* $convfac;
-        $speed=$data[4] * $convfac;
-        $dir=$data[5];
-        $temp=$data[6];
-        if ($units == 'E') {$temp=(1.8*$temp)+32;}
-        printf ("%8s %8s %8.2f %8.2f %8.2f %6.1f %7.1f\n",
-        $datestr,$timestr,$east,$north,$speed,$dir,$temp);
-}
-
-}
-
-elseif ($table == 'met' ) {
-if ($units=="M") {$convfac=1;$ut=" (m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
-	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
-
-$metlines1=file($tempfile);
-foreach ($metlines1 as $elem) {
-        $elem=preg_replace("/\s+/"," ",$elem);
-        $data=explode(" ",$elem);
-        if ($tz == 'UTC' || $tz == '') {
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-                // $ts_utc=strtotime($data[0]." ".$data[1]);
-                } else {
-                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-                }
-        $datestr = $ts_utc->format('Y/m/d');
-        $timestr = $ts_utc->format('H:i');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
-        // $timestr=strftime("%T",$ts_utc);
-        $veast_c=$data[2] * $convfac;
-        $vnorth_c=$data[3]* $convfac;
-        $veast=$data[2];
-        $vnorth=$data[3];
-	$airtemp=$data[4];
-        $atmpr=$data[5] / $atmconv;
-        $gust=$data[6] * $convfac;
-	$comp=$data[7];
-	$tx=$data[8]; $ty=$data[9];
-	$par=$data[10]; $relh=$data[11];
-	$wspeed=hypot($veast,$vnorth);
-	$wspd=$wspeed * $convfac;
-	$wdir=90.-(rad2deg(atan2(-$vnorth,-$veast)));
-	if ($wdir < 0.) {$wdir+=360.;}
-
-
-        if ($units == 'E') {$airtemp=(1.8*$airtemp)+32;}
- 	printf ("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %7.1f %4d %4d %6.1f %6.1f %7.2f %7.1f\n",
-        $datestr,$timestr,$veast_c,$vnorth_c,$airtemp,$atmpr,$gust,$comp,$tx,$ty,$par,$relh,$wspd,$wdir);
-
-}
-
-}
-
-
-elseif ($table == 'eng' ) {
-
-$englines1=file($tempfile);
-foreach ($englines1 as $elem) {
-        $elem=preg_replace("/\s+/"," ",$elem);
-        $data=explode(" ",$elem);
-        if ($tz == 'UTC' || $tz == '') {
-                // $ts_utc=strtotime($data[0]." ".$data[1]);
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-                } else {
-                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-                // $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-                }
-        $datestr = $ts_utc->format('Y/m/d');
-        $timestr = $ts_utc->format('H:i');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
-        // $timestr=strftime("%T",$ts_utc);
-        $vbatt=$data[2];
-        $sigstr=$data[3];
-	$comp=$data[4];
-        $nping=$data[5];
-	$tx=$data[6]; $ty=$data[7];
-	$adcpvolt=$data[8]; $adcpcurr=$data[9];
-        $vbatt2=$data[10];
-
- 	printf ("%s %s %7.1f %7.2f %7.1f %6.0f %4d %4d %6.1f %6.1f %6.1f\n",
-        $datestr,$timestr,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpvolt,$adcpcurr,$vbatt2);
-
-}
-}
-
-
-elseif ($table == 'salt' ) {
-
-if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
-	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
-
-$englines1=file($tempfile);
-foreach ($englines1 as $elem) {
-        $elem=preg_replace("/\s+/"," ",$elem);
-        $data=explode(" ",$elem);
-        if ($tz == 'UTC' || $tz == '') {
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-                // $ts_utc=strtotime($data[0]." ".$data[1]);
-                } else {
-                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-                }
-        $datestr = $ts_utc->format('Y/m/d');
-        $timestr = $ts_utc->format('H:i');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
-        // $timestr=strftime("%T",$ts_utc);
-        $watertemp=$data[2];
-        $conduct=$data[3];
-	$salinity=$data[4];
-        $density=$data[5];
-	$soundvel=$data[6];
-        if ($units == 'E') {$watertemp=(1.8*$watertemp)+32;}
-
- 	printf ("%s %s %8.2f %8.2f %8.2f %8.2f %8.2f\n",
-        $datestr,$timestr,$watertemp,$conduct,$salinity,$density,$soundvel);
-
-}
-}
-
-
-elseif ($table == 'wave' ) {
-
+// $data=explode(" ",$venlines[0]);
+// // Use UTC
+// if ($tz == 'UTC' || $tz == '') {
+//         // $ts_utc=strtotime($data[0]." ".$data[1]);
+// 		// $timez="UTC";
+//
+//         $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//         // $dtUTCstr = $dtUTC->format('M d, Y H:i');
+//
+//
+//         }
+// // Use Station Local, $_POST['tz'] == 'STN'
+// else {
+// // HOW TO UPDATE THIS???
+// $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('America/Chicago'));
+//         // $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// // $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+// }
+//
+// // Top of data table:
+// if ($table == 'met' ) {
+//     print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
+// }
+// // brings in header and label for top
+// $header="database/".$table."tableheader.php";
+// print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
+// include($header);
+//
+// if ($table == 'ven' ) {
+// if ($units=="M") {$convfac=1;$ut="(cm/s)";$tut=$degc;}
+// 	else {$convfac=$cm2e;$ut=" (kts)";$tut=$degf;}
+//
+// $venlines1=file($tempfile);
+// foreach ($venlines1 as $elem) {
+//         $elem=preg_replace("/\s+/"," ",$elem);
+//         $data=explode(" ",$elem);
+//         if ($tz == 'UTC' || $tz == '') {
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]);
+//                 }
+//         else {
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//
+//         //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+//                 }
+//         $datestr = $ts_utc->format('Y/m/d');
+//         $timestr = $ts_utc->format('H:i');
+//         // $datestr=strftime("%m/%d/%Y",$ts_utc);
+//         // $timestr=strftime("%T",$ts_utc);
+//         $east=$data[2] * $convfac;
+//         $north=$data[3]* $convfac;
+//         $speed=$data[4] * $convfac;
+//         $dir=$data[5];
+//         $temp=$data[6];
+//         if ($units == 'E') {$temp=(1.8*$temp)+32;}
+//         printf ("%8s %8s %8.2f %8.2f %8.2f %6.1f %7.1f\n",
+//         $datestr,$timestr,$east,$north,$speed,$dir,$temp);
+// }
+//
+// }
+//
+// elseif ($table == 'met' ) {
+// if ($units=="M") {$convfac=1;$ut=" (m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
+// 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
+//
+// $metlines1=file($tempfile);
+// foreach ($metlines1 as $elem) {
+//         $elem=preg_replace("/\s+/"," ",$elem);
+//         $data=explode(" ",$elem);
+//         if ($tz == 'UTC' || $tz == '') {
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]);
+//                 } else {
+//                     $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//         //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+//                 }
+//         $datestr = $ts_utc->format('Y/m/d');
+//         $timestr = $ts_utc->format('H:i');
+//         // $datestr=strftime("%m/%d/%Y",$ts_utc);
+//         // $timestr=strftime("%T",$ts_utc);
+//         $veast_c=$data[2] * $convfac;
+//         $vnorth_c=$data[3]* $convfac;
+//         $veast=$data[2];
+//         $vnorth=$data[3];
+// 	$airtemp=$data[4];
+//         $atmpr=$data[5] / $atmconv;
+//         $gust=$data[6] * $convfac;
+// 	$comp=$data[7];
+// 	$tx=$data[8]; $ty=$data[9];
+// 	$par=$data[10]; $relh=$data[11];
+// 	$wspeed=hypot($veast,$vnorth);
+// 	$wspd=$wspeed * $convfac;
+// 	$wdir=90.-(rad2deg(atan2(-$vnorth,-$veast)));
+// 	if ($wdir < 0.) {$wdir+=360.;}
+//
+//
+//         if ($units == 'E') {$airtemp=(1.8*$airtemp)+32;}
+//  	printf ("%s %s %7.2f %7.2f %7.1f %7.2f %7.2f %7.1f %4d %4d %6.1f %6.1f %7.2f %7.1f\n",
+//         $datestr,$timestr,$veast_c,$vnorth_c,$airtemp,$atmpr,$gust,$comp,$tx,$ty,$par,$relh,$wspd,$wdir);
+//
+// }
+//
+// }
+//
+//
+// elseif ($table == 'eng' ) {
+//
+// $englines1=file($tempfile);
+// foreach ($englines1 as $elem) {
+//         $elem=preg_replace("/\s+/"," ",$elem);
+//         $data=explode(" ",$elem);
+//         if ($tz == 'UTC' || $tz == '') {
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]);
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//                 } else {
+//                     $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+//                 }
+//         $datestr = $ts_utc->format('Y/m/d');
+//         $timestr = $ts_utc->format('H:i');
+//         // $datestr=strftime("%m/%d/%Y",$ts_utc);
+//         // $timestr=strftime("%T",$ts_utc);
+//         $vbatt=$data[2];
+//         $sigstr=$data[3];
+// 	$comp=$data[4];
+//         $nping=$data[5];
+// 	$tx=$data[6]; $ty=$data[7];
+// 	$adcpvolt=$data[8]; $adcpcurr=$data[9];
+//         $vbatt2=$data[10];
+//
+//  	printf ("%s %s %7.1f %7.2f %7.1f %6.0f %4d %4d %6.1f %6.1f %6.1f\n",
+//         $datestr,$timestr,$vbatt,$sigstr,$comp,$nping,$tx,$ty,$adcpvolt,$adcpcurr,$vbatt2);
+//
+// }
+// }
+//
+//
+// elseif ($table == 'salt' ) {
+//
 // if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
 // 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
-
-$wavelines1=file($tempfile);
-foreach ($wavelines1 as $elem) {
-        $elem=preg_replace("/\s+/"," ",$elem);
-        $data=explode(" ",$elem);
-        if ($tz == 'UTC' || $tz == '') {
-            $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-                // $ts_utc=strtotime($data[0]." ".$data[1]);
-                } else {
-                    $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
-        //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
-		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
-                }
-        $datestr = $ts_utc->format('Y/m/d');
-        $timestr = $ts_utc->format('H:i');
-        // $datestr=strftime("%m/%d/%Y",$ts_utc);
-        // $timestr=strftime("%T",$ts_utc);
-        $wave_height=$data[2];
-        $mean_period=$data[3];
-        $peak_period=$data[4];
-        // if ($units == 'E') {$watertemp=(1.8*$watertemp)+32;}
-
- 	printf ("%s %s %11.2f %14.2f %13.2f \n",
-        $datestr,$timestr,$wave_height,$mean_period,$peak_period);
-
-}
-}
-
-
-}
+//
+// $englines1=file($tempfile);
+// foreach ($englines1 as $elem) {
+//         $elem=preg_replace("/\s+/"," ",$elem);
+//         $data=explode(" ",$elem);
+//         if ($tz == 'UTC' || $tz == '') {
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]);
+//                 } else {
+//                     $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//         //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+//                 }
+//         $datestr = $ts_utc->format('Y/m/d');
+//         $timestr = $ts_utc->format('H:i');
+//         // $datestr=strftime("%m/%d/%Y",$ts_utc);
+//         // $timestr=strftime("%T",$ts_utc);
+//         $watertemp=$data[2];
+//         $conduct=$data[3];
+// 	$salinity=$data[4];
+//         $density=$data[5];
+// 	$soundvel=$data[6];
+//         if ($units == 'E') {$watertemp=(1.8*$watertemp)+32;}
+//
+//  	printf ("%s %s %8.2f %8.2f %8.2f %8.2f %8.2f\n",
+//         $datestr,$timestr,$watertemp,$conduct,$salinity,$density,$soundvel);
+//
+// }
+// }
+//
+//
+// elseif ($table == 'wave' ) {
+//
+// // if ($units=="M") {$convfac=1;$ut="(m/s)";$tut=$degc;$aut=' (mb) ';$atmconv=1;}
+// // 	else {$convfac=$m2e; $ut="(kts)";$tut=$degf;$aut='(inHg)';$atmconv=33.863886;}
+//
+// $wavelines1=file($tempfile);
+// foreach ($wavelines1 as $elem) {
+//         $elem=preg_replace("/\s+/"," ",$elem);
+//         $data=explode(" ",$elem);
+//         if ($tz == 'UTC' || $tz == '') {
+//             $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//                 // $ts_utc=strtotime($data[0]." ".$data[1]);
+//                 } else {
+//                     $ts_utc = new DateTime($data[0]." ".$data[1], new DateTimeZone('UTC'));
+//         //         $ts_utc=strtotime($data[0]." ".$data[1]." UTC");
+// 		// $timez=strftime("%Z",strtotime($data[0]." ".$data[1]));
+//                 }
+//         $datestr = $ts_utc->format('Y/m/d');
+//         $timestr = $ts_utc->format('H:i');
+//         // $datestr=strftime("%m/%d/%Y",$ts_utc);
+//         // $timestr=strftime("%T",$ts_utc);
+//         $wave_height=$data[2];
+//         $mean_period=$data[3];
+//         $peak_period=$data[4];
+//         // if ($units == 'E') {$watertemp=(1.8*$watertemp)+32;}
+//
+//  	printf ("%s %s %11.2f %14.2f %13.2f \n",
+//         $datestr,$timestr,$wave_height,$mean_period,$peak_period);
+//
+// }
+// }
+//
+//
+// }
 print "</pre></p>";
 print "</TD></TR></TABLE>";
 
