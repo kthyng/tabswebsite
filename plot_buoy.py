@@ -67,23 +67,24 @@ def read(buoy, dataname, which):
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 
     if which == 'ven':# or which == 'sum':
+        names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']
         # velocities in cm/s, direction in deg T, temp in deg C
         # if isinstance(dataname, str):
         #     names = ['East', 'North', 'Speed', 'Dir', 'WaterT']
         #     df.columns = names
         # elif len(dataname) == 2:
-        df = df.drop(['date','time'], axis=1)
-        df.columns = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty']
-        df.index.name = 'Dates [UTC]'
+        # df = df.drop(['date','time'], axis=1)
+        # df.columns = names
+        # df.index.name = 'Dates [UTC]'
         # df = df.drop(['Tx', 'Ty'], axis=1)
-        df['Speed [cm/s]'] = np.sqrt(df['East [cm/s]']**2 + df['North [cm/s]']**2)
+        df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
         # df = df[['East', 'North', 'Speed', 'Dir', 'WaterT']]
 
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
         theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
-        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
-        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+        df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
+        df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
 
     elif which == 'eng':
         names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt2']
@@ -91,42 +92,49 @@ def read(buoy, dataname, which):
         #     df.columns = names
         #     # import pdb; pdb.set_trace()
         # elif len(dataname) == 2:
-        df = df.drop(['date','time'], axis=1)
-        df.columns = names
-        df.index.name = 'Dates [UTC]'
+        # df = df.drop(['date','time'], axis=1)
+        # df.columns = names
+        # df.index.name = 'Dates [UTC]'
 
     elif which == 'met':
-        names = ['East', 'North', 'AirT', 'AtmPr', 'Gust', 'Comp', 'Tx', 'Ty', 'PAR', 'RelH']
-        if isinstance(dataname, str):
-#        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
-            df.columns = names
-        elif len(dataname) == 2:
-            df = df.drop(['date','time'], axis=1)
-            df.columns = names
+        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
+        df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
+        df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
+# $wdir=90.-(rad2deg(atan2(-$vnorth,-$veast)));
+#         if isinstance(dataname, str):
+# #        |  (UTC) |  (m/s)|  (m/s)|  (°C) |  (mb) |  (m/s)|  (°M) |    |    |      |  (%) |  (m/s)| (From)|
+#             df.columns = names
+#         elif len(dataname) == 2:
+        # df = df.drop(['date','time'], axis=1)
+        # df.columns = names
 
     elif which == 'salt':
-        names = ['Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+        names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
         #   UTC       &deg;C      ms/cm             kg/m^3     m/s
-        if isinstance(dataname, str):
-            df.columns = names
-        elif len(dataname) == 2:
-            df = df.drop(['date','time'], axis=1)
-            df.columns = names
+        # if isinstance(dataname, str):
+        #     df.columns = names
+        # elif len(dataname) == 2:
+        #     df = df.drop(['date','time'], axis=1)
+        #     df.columns = names
 
     elif which == 'wave':
-        names = ['WaveHeight', 'MeanPeriod', 'PeakPeriod']
+        names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
         #   UTC      m      s       s
-        if isinstance(dataname, str):
-            df.columns = names
-        elif len(dataname) == 2:
-            df = df.drop(['date','time'], axis=1)
-            df.columns = names
+        # if isinstance(dataname, str):
+        #     df.columns = names
+        # elif len(dataname) == 2:
+        #     df = df.drop(['date','time'], axis=1)
+        #     df.columns = names
 
     # if which == 'sum':  # add onto read in from ven if sum
     #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
     #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
     #     df['Salinity'] = df2['Salinity']  # from salt file
     #     df['Temp'] = df2['Temp']  # from salt file
+
+    df = df.drop(['date','time'], axis=1)
+    df.columns = names
+    df.index.name = 'Dates [UTC]'
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
@@ -246,7 +254,7 @@ def add_var(ax, df, var, varlabel):
     shifty(ax)
 
 
-def add_2var(ax1, df, var1, label1, var2, label2, sameylim=True):
+def add_2var(ax1, df, var1, label1, var2, label2, sameylim=False):
     '''2 variables, one on each y axis. same y limits if set True.'''
 
     c1, c2 = '#559349', '#874993'
@@ -264,6 +272,15 @@ def add_2var(ax1, df, var1, label1, var2, label2, sameylim=True):
     if sameylim:
         ylim = ax1.get_ylim()
         ax2.set_ylim(ylim[0], ylim[1])
+
+
+def add_2var_sameplot(ax, df, var1, label1, var2):
+    '''2 variables, one on each y axis. same y limits if set True.'''
+
+    ax.plot(df.idx, df[var1], lw=lw, color='k', linestyle='-')
+    ax.plot(df.idx, df[var2], lw=lw, color='k', linestyle='--')
+    ax.set_ylabel(label1, color='k')
+    shifty(ax)
 
 
 def add_xlabels(ax, df, fig):
@@ -358,7 +375,7 @@ def plot(df, buoy, which):
         add_vel(axes[2], df, buoy, 'Along [cm/s]')
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]')
     elif which == 'eng':
-        add_2var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$', 'VBatt2', 'V$_\mathrm{batt}$')
+        add_2var_sameplot(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$', 'VBatt2')
         # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
         # add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
         add_var(axes[1], df, 'SigStr', 'Sig Str')
@@ -366,18 +383,18 @@ def plot(df, buoy, which):
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
-        add_var_2units(axes[1], df, 'AirT', 'Temperature [˚C]', 'c2f', '[˚F]')
-        add_var_2units(axes[2], df, 'AtmPr', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AirT [deg C]', 'Temperature [˚ C]', 'c2f', '[˚F]')
+        add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[Hg]')
-        add_var(axes[3], df, 'RelH', 'Relative Humidity [%]')
+        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp', 'Temperature [˚C]', 'c2f', '[˚F]')
+        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]')
         add_var(axes[1], df, 'Salinity', 'Salinity')
-        add_var(axes[2], df, 'Cond', 'Conductivity [ms/cm]')
+        add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]')
     elif which == 'wave':
-        add_var(axes[0], df, 'WaveHeight', 'Wave Height [m]')
-        add_var(axes[1], df, 'MeanPeriod', 'Mean Period [s]')
-        add_var(axes[2], df, 'PeakPeriod', 'Peak Period [s]')
+        add_var(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]')
+        add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
+        add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]')
     elif which == 'sum':
         add_currents(axes[0], df, 'water')
         add_vel(axes[1], df, 'Across')

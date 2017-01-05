@@ -271,9 +271,9 @@ if (! $units) {$units = 'M';}
 // }
 //
 // // Top of data table:
-// if ($table == 'met' ) {
-//     print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
-// }
+if ($table == 'met' ) {
+    print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
+}
 // // brings in header and label for top
 // $header="database/".$table."tableheader.php";
 // print "<b><big>Results of TABS data query</big></b>(<a href=tmp/$tempout>download data</a>)<br>\n";
