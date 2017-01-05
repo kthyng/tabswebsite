@@ -61,43 +61,49 @@ def read(buoy, dataname, which):
 
     # read method: from a file or from mysql
     if isinstance(dataname, str):
-        df = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, index_col=0, na_values='-999')
+        # columns have already been processed previously and can be inferred
+        df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values='-999')
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 
-    if which == 'ven':# or which == 'sum':
-        names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']
-        df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
-        # Calculate along- and across-shelf
-        # along-shelf rotation angle in math angle convention
-        theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
-        df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
-        df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
+        if which == 'ven':# or which == 'sum':
+            names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']
+            # df.columns = names
+            df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
+            # Calculate along- and across-shelf
+            # along-shelf rotation angle in math angle convention
+            theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
+            df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
+            df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
 
-    elif which == 'eng':
-        names = ['VBatt', 'SigStr', 'Comp', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt2']
+        elif which == 'eng':
+            names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
+            # df.columns = names
 
-    elif which == 'met':
-        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
-        df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
-        df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
+        elif which == 'met':
+            names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
+            # df.columns = names
+            df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
+            df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
 
-    elif which == 'salt':
-        names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
+        elif which == 'salt':
+            names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
+            # df.columns = names
 
-    elif which == 'wave':
-        names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
+        elif which == 'wave':
+            names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
+            # df.columns = names
 
-    # if which == 'sum':  # add onto read in from ven if sum
-    #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
-    #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
-    #     df['Salinity'] = df2['Salinity']  # from salt file
-    #     df['Temp'] = df2['Temp']  # from salt file
+        # if which == 'sum':  # add onto read in from ven if sum
+        #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
+        #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
+        #     df['Salinity'] = df2['Salinity']  # from salt file
+        #     df['Temp'] = df2['Temp']  # from salt file
 
-    df = df.drop(['date','time'], axis=1)
-    df.columns = names
-    df.index.name = 'Dates [UTC]'
+        df = df.drop(['date','time'], axis=1)
+        df.columns = names
+        df.index.name = 'Dates [UTC]'
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
@@ -338,10 +344,10 @@ def plot(df, buoy, which):
         add_vel(axes[2], df, buoy, 'Along [cm/s]')
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]')
     elif which == 'eng':
-        add_2var_sameplot(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$', 'VBatt2')
+        add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]')
         # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
         # add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
-        add_var(axes[1], df, 'SigStr', 'Sig Str')
+        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]')
         add_var(axes[2], df, 'Nping', 'Ping Cnt')
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
