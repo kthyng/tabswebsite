@@ -35,8 +35,8 @@ $tz=$_GET["tz"];
 if ($datepicker == "recent") {
 // Put in header
 // Show already-made image
-$fname = "daily/tabs_".$Buoyname."_".$table.".png";
-print "<img src=$fname>";
+$tempaccess = "daily/tabs_".$Buoyname."_".$table;
+// print "<img src=$fname>";
 // keep options on the side
 // die
 }
@@ -54,11 +54,17 @@ if (count($dates)==2) {
     // if there is not an end date, use start date
     $dend = $dstart;
 }
-}
-
 $tempfile=tempnam("tmp",$Buoyname . $table);  // full file location
 // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
 $tempout=basename($tempfile);  // just file name itself
+$tempaccess = "tmp/".$tempout;  // relative path to buoy
+
+$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+
+chmod($tempfile, 0644);
+
+}
+
 
 #echo "BUOY: $Buoyname  $table<br>TMP: $tempout  $tempfile<BR>";
 
@@ -74,13 +80,6 @@ die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 
 // $q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
 
-$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
-// echo $tempout;
-// echo $tempfile;
-// echo $command;
-// system($command);
-// passthru($command);
-// what to do if no data
 
 // if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
 // 	die("Can't connect: ".mysql_error());
@@ -116,7 +115,6 @@ $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$
 // exec($command, $output);
 // echo $output;
 
-chmod($tempfile, 0644);
 
 // // header
 // $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
@@ -134,12 +132,14 @@ print "<table>\n";
 // print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 	print "</TD><TD valign=top><br>";
-    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=tmp/$tempout>download</a>)</font><br>\n";
+    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess.txt>download</a>)</font><br>\n";
+    // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=tmp/$tempout>download</a>)</font><br>\n";
         // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
-    // if ($datatype=="data"){
-        passthru($command);//}
+    if ($datepicker!="recent"){
+        passthru($command);}
     if ($datatype=="pic"){
-	print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
+	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";}
+    // print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
 	print "</TD></TR></TABLE>\n";
 // }
 

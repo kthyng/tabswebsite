@@ -64,7 +64,7 @@ def query_setup(engine, buoy, table):
 def make_text(df, buoy, table, fname):
     '''Make text file of data'''
 
-    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar=' ')
+    df.to_csv(fname + '.txt', sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar=' ')
     # with no header:
     # df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             else:
                 q = query_setup(engine, buoy, table)
                 df = plot_buoy.read(buoy, [q, engine], table)
-                fname = os.path.join('daily', 'tabs_' + buoy + '_' + table + '.txt')
+                fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
                 make_text(df, buoy, table, fname)
                 fig = plot_buoy.plot(df, buoy, table)
                 fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
