@@ -170,13 +170,40 @@ print "<option value=''>Units</Option>\n";
 print "<option value='M'>Metric</Option>\n";
 print "<option value='E'>English</option>\n</select>\n";
 }
-print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
+
+// Change table (variable file)
+print "<Select Name=table>\n";
+print "<OPTION SELECTED value='$table'>Data type</option>\n";
+print "<option value='ven'>Velocity</option>\n";
+print "<option value='met'>Meteorological</option>\n";
+print "<option value='eng'>System</option>\n";
+print "<option value='salt'>Water property</option>\n";
+print "<option value='wave'>Wave</option>\n</select>\n";
+
+
+// Change buoy
+print "<Select Name=Buoyname>\n";
+print "<OPTION SELECTED value='$Buoyname'>$Buoyname</option>\n";
+print "<option value='A'>A*</option>\n";
+print "<option value='B'>B</option>\n";
+print "<option value='C'>C*</option>\n";
+print "<option value='D'>D</option>\n";
+print "<option value='E'>E*</option>\n";
+print "<option value='F'>F</option>\n";
+print "<option value='G'>G*</option>\n";
+print "<option value='H'>H*</option>\n";
+print "<option value='J'>J</option>\n";
+print "<option value='K'>K</option>\n";
+print "<option value='N'>N</option>\n";
+print "<option value='P'>P*</option>\n";
+print "<option value='R'>R</option>\n";
+print "<option value='S'>S*</option>\n";
+print "<option value='V'>V</option>\n";
+print "<option value='W'>W</option>\n";
+print "<option value='X'>X</option>\n</select>\n";
+
+// print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 print "<input NAME=table TYPE=hidden value=$table>\n";
-// print "<input NAME=Prevdays TYPE=hidden value=$Prevdays>\n";
-// print "<input NAME=Nextdays TYPE=hidden value=$Nextdays>\n";
-// print "<input NAME=Year TYPE=hidden value=$Year>\n";
-// print "<input NAME=Month TYPE=hidden value=$Month>\n";
-// print "<input NAME=Day TYPE=hidden value=$Day>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
 
