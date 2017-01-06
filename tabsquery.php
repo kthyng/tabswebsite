@@ -48,6 +48,9 @@ if ($datepicker == "recent") {
     // header
     $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
     passthru($command);
+    // command to show table
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'"');
+
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
 else{
@@ -69,7 +72,7 @@ else{
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
-    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'"');
     // $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
 
     chmod($tempaccess, 0644);
@@ -115,6 +118,7 @@ else{
 
     print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
     // if not using recent image, call to database
+    // Runs table or image for database
     if ($datepicker!="recent"){
         // exec($command, $output);
         passthru($command);
@@ -123,6 +127,9 @@ else{
             print "<br>";
             print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
         }
+    }
+    elseif ($datepicker == "recent" && $datatype == "data"){
+        passthru($command);
     }
     if ($datatype=="pic"){
         if (file_exists($tempaccess.".png")){

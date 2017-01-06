@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.dates import date2num
 import buoy_data
+from prettypandas import PrettyPandas
 
 
 def convert(vin, which):
@@ -90,3 +91,9 @@ def read(buoy, dataname, which):
     df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
 
     return df
+
+
+def present(df):
+    '''Present dataframe df nicely by printing to screen'''
+
+    print(PrettyPandas(df).render())
