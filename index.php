@@ -151,7 +151,8 @@ foreach ($blet as $f) {
     print $buoystr;
     $bidx++;
 }
-
+print "<tr></tr>";
+print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
 echo "</table>";
 ?>
 <BR>
