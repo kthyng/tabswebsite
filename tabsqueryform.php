@@ -90,14 +90,14 @@ include("includes/navigation.html");
 print "<form action=\"tabsquery.php\" method=\"get\">\n";
 
 
-// Connect to Database
-if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
-	die("Can't connect: ".mysql_error());
-	}
-
-$dbase="tabsdb";
-
-mysql_select_db($dbase) or die(mysql_error());
+// // Connect to Database
+// if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
+// 	die("Can't connect: ".mysql_error());
+// 	}
+//
+// $dbase="tabsdb";
+//
+// mysql_select_db($dbase) or die(mysql_error());
 
 ?>
 

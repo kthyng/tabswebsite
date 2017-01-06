@@ -31,6 +31,8 @@ $datepicker=$_GET["datepicker"];
 $datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 
+if (! $units) {$units = 'M';}
+
 # Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" ); }
@@ -148,14 +150,15 @@ elseif ($datatype=="pic"){
 	print "</TD></TR></TABLE>\n";
 // }
 
-// if ($datatype=="data") {
 print "<TABLE width=100%>";
 print "<TR><TD valign=top width=120 align=left>";
 print "</td>";
 print "<td>";
 print "<br> &nbsp;\n";
-print "<br><FORM Action=$PHP_SELF method=\"POST\">\n";
-print "<input NAME=buoy TYPE=hidden value=$buoylet>\n";
+// print "<br><FORM Action=$PHP_SELF method=\"GET\">\n";
+print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
+
+// print "<input NAME=buoy TYPE=hidden value=$buoylet>\n";
 print "<font face=\"Helvetica\" size=-1>\n";
 print "<Select Name=tz>\n";
 print "<option value=''>Time Zone</Option>\n";
@@ -169,12 +172,13 @@ print "<option value='E'>English</option>\n</select>\n";
 }
 print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 print "<input NAME=table TYPE=hidden value=$table>\n";
-print "<input NAME=Prevdays TYPE=hidden value=$Prevdays>\n";
-print "<input NAME=Nextdays TYPE=hidden value=$Nextdays>\n";
-print "<input NAME=Year TYPE=hidden value=$Year>\n";
-print "<input NAME=Month TYPE=hidden value=$Month>\n";
-print "<input NAME=Day TYPE=hidden value=$Day>\n";
-print "<input NAME=Datatype TYPE=hidden value=$Datatype>\n";
+// print "<input NAME=Prevdays TYPE=hidden value=$Prevdays>\n";
+// print "<input NAME=Nextdays TYPE=hidden value=$Nextdays>\n";
+// print "<input NAME=Year TYPE=hidden value=$Year>\n";
+// print "<input NAME=Month TYPE=hidden value=$Month>\n";
+// print "<input NAME=Day TYPE=hidden value=$Day>\n";
+print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
+print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
 
 print "<BR><input type=submit  value=Change>\n</form>\n";
 
@@ -189,7 +193,49 @@ print "</font>\n";
 print "</TD><TD style=\"text-align:left !important;\">";
 print "<pre>";
 
-if (! $units) {$units = 'M';}
+
+// save: botton options
+// print "<TABLE width=100%>";
+// print "<TR><TD valign=top width=120 align=left>";
+// print "</td>";
+// print "<td>";
+// print "<br> &nbsp;\n";
+// print "<br><FORM Action=$PHP_SELF method=\"POST\">\n";
+// print "<input NAME=buoy TYPE=hidden value=$buoylet>\n";
+// print "<font face=\"Helvetica\" size=-1>\n";
+// print "<Select Name=tz>\n";
+// print "<option value=''>Time Zone</Option>\n";
+// print "<option value='UTC'>UTC</Option>\n";
+// print "<option value='STN'>Station Local</option>\n</select><br>\n";
+// if ($table != "eng") {
+// print "<Select Name=units>\n";
+// print "<option value=''>Units</Option>\n";
+// print "<option value='M'>Metric</Option>\n";
+// print "<option value='E'>English</option>\n</select>\n";
+// }
+// print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
+// print "<input NAME=table TYPE=hidden value=$table>\n";
+// print "<input NAME=Prevdays TYPE=hidden value=$Prevdays>\n";
+// print "<input NAME=Nextdays TYPE=hidden value=$Nextdays>\n";
+// print "<input NAME=Year TYPE=hidden value=$Year>\n";
+// print "<input NAME=Month TYPE=hidden value=$Month>\n";
+// print "<input NAME=Day TYPE=hidden value=$Day>\n";
+// print "<input NAME=Datatype TYPE=hidden value=$Datatype>\n";
+//
+// print "<BR><input type=submit  value=Change>\n</form>\n";
+//
+// print "<br><table>\n";
+// // Switch to
+// print "<TR><TD>Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&datepicker=$datepicker>$newdatatypename</a></TD></TR>\n";
+//
+// print "<TR><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
+// print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
+// print "</table>\n";
+// print "</font>\n";
+// print "</TD><TD style=\"text-align:left !important;\">";
+// print "<pre>";
+
+
 
 // $data=explode(" ",$venlines[0]);
 // // Use UTC
