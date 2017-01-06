@@ -31,45 +31,6 @@ $datepicker=$_GET["datepicker"];
 $datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 
-// change format of date from yyyy/m/d to yyyy-m-d
-if ($datepicker == "recent") {
-// Put in header
-// Show already-made image
-$tempaccess = "daily/tabs_".$Buoyname."_".$table;
-// print "<img src=$fname>";
-// keep options on the side
-// die
-
-// header
-$command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
-passthru($command);
-}
-
-else{
-$datepicker = str_replace ("/", "-", $datepicker);
-// split date range into two dates. if it is just one date, still becomes an array but of length 1
-$dates = explode(" - ", $datepicker);
-// start date is the first date
-$dstart = $dates[0];
-if (count($dates)==2) {
-    // if there is an end date, use it
-    $dend = $dates[1];
-} else {
-    // if there is not an end date, use start date
-    $dend = $dstart;
-}
-$tempfile=tempnam("tmp","tabs_".$Buoyname."_".$table."_");  // full file location
-// $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
-$tempout=basename($tempfile);  // just file name itself
-$tempaccess = "tmp/".$tempout;  // relative path to buoy
-
-$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
-// $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
-
-chmod($tempaccess, 0644);
-
-}
-
 # Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" ); }
@@ -79,6 +40,41 @@ die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" ); }
 # Wave instrument availability
 if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
 die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
+
+# if being called from front page, show previously-made "recent" image from daily directory
+if ($datepicker == "recent") {
+    $tempaccess = "daily/tabs_".$Buoyname."_".$table;
+    // keep options on the side
+    // header
+    $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
+    passthru($command);
+}
+// If being called from tabs query form, need to interpret dates chosen, etc.
+else{
+    // change format of date from yyyy/m/d to yyyy-m-d
+    $datepicker = str_replace ("/", "-", $datepicker);
+    // split date range into two dates. if it is just one date, still becomes an array but of length 1
+    $dates = explode(" - ", $datepicker);
+    // start date is the first date
+    $dstart = $dates[0];
+    if (count($dates)==2) {
+            // if there is an end date, use it
+            $dend = $dates[1];
+    } else {
+            // if there is not an end date, use start date
+            $dend = $dstart;
+    }
+    $tempfile=tempnam("tmp","tabs_".$Buoyname."_".$table."_");  // full file location
+    // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
+    $tempout=basename($tempfile);  // just file name itself
+    $tempaccess = "tmp/".$tempout;  // relative path to buoy
+
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+    // $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+
+    chmod($tempaccess, 0644);
+
+}
 
 
 
@@ -111,33 +107,28 @@ die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 //
 // mysql_close();
 
-// $command = escapeshellcmd('/anaconda/bin/python tabsquery.py "'.$tablename.'" "'.$dstart.'" "'.$Prevdays.'" "'.$Nextdays.'"');
-// passthru($command);
-// exec($command, $output);
-// echo $output;
-
-
-
-
-// if ($datatype=="pic") {
-//     // $command = escapeshellcmd("/anaconda/bin/python figures/plot_buoy.py 'ven' '".$tempfile."'");
-//     $command = escapeshellcmd("/anaconda/bin/python run_plot_buoy.py '".$table."' '".$tempfile."'");
-//     system($command);
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TR><TD valign=top width=120><font face=helvetica><BR>";
-print "<table>\n";
-// print "<TR valign=top><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
-// print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
-print "</table>\n";
+    print "<table>\n";
+    print "</table>\n";
 	print "</TD><TD valign=top><br>";
+
     print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
-    // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=tmp/$tempout>download</a>)</font><br>\n";
-        // print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=/tglo/viewtmp.php?file=$tempout>download</a>)</font><br>\n";
+    // if not using recent image, call to database
     if ($datepicker!="recent"){
-        passthru($command);}
+        // exec($command, $output);
+        passthru($command);
+        // if data is missing from this time period, just say that
+        if (filesize($tempaccess) == 0){
+            print "<br>";
+            print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
+        }
+    }
     if ($datatype=="pic"){
-	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";}
-    // print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
+        if (file_exists($tempaccess.".png")){
+        	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";}
+            // print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
+        }
 	print "</TD></TR></TABLE>\n";
 // }
 
