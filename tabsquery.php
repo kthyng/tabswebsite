@@ -80,6 +80,15 @@ else{
 }
 
 
+// if recent and data table, give ability to switch to recent and image
+if ($datatype=="data"){
+    $newdatatype="pic";
+    $newdatatypename="image";
+}
+elseif ($datatype=="pic"){
+    $newdatatype="data";
+    $newdatatypename="table";
+}
 
 // if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
 // 	die("Can't connect: ".mysql_error());
@@ -170,6 +179,9 @@ print "<input NAME=Datatype TYPE=hidden value=$Datatype>\n";
 print "<BR><input type=submit  value=Change>\n</form>\n";
 
 print "<br><table>\n";
+// Switch to
+print "<TR><TD>Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&datepicker=$datepicker>$newdatatypename</a></TD></TR>\n";
+
 print "<TR><TD>Return to <a href=tabsqueryform.php>database query</a></TD></TR>\n";
 print "<TR><TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
