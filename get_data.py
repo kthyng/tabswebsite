@@ -3,6 +3,7 @@ Get data into temporary text files.
 '''
 
 import run_daily
+import tools
 import plot_buoy
 import argparse
 from prettypandas import PrettyPandas
@@ -30,7 +31,7 @@ datatype = args.datatype
 engine = run_daily.setup()
 query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
 # t1 = time()
-df = plot_buoy.read(buoy, [query, engine], table)
+df = tools.read(buoy, [query, engine], table)
 # t2 = time()
 # print('time to read data: ', t2-t1)
 run_daily.make_text(df, buoy, table, fname)

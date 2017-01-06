@@ -34,48 +34,6 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <!-- <link rel="stylesheet" href="css/zentools.css" type="text/css" /> -->
 <!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
-
-
-<!-- <script type="text/javascript" src="js/jquery.min.js?v=1.8.2"></script>
-<script type="text/javascript" src="js/jquery.once.js?v=1.2"></script>
-<script type="text/javascript" src="js/tamustyle.js"></script>
-<script type="text/javascript" src="js/bootstrap.min.js"></script>
- <script type="text/javascript" src="js/leaflet.js"></script> -->
-<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" /> -->
-<!--[if lte IE 8]>
-     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.ie.css" />
- <![endif]-->
-  <!-- <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script> -->
-
-<!-- <script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-21828695-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })
-  //example user location
-//var userLocation = new L.LatLng();
-   function initmap() {
-	var userLocation = new L.LatLng(30.623944, -96.354405);
-
-// var map = L.map('map').setView(userLocation, 13)
-//
-// 	L.tileLayer('http://{s}.tile.cloudmade.com/f6a65c832e93471b9c3f55e6a1cc1f83/997/256/{z}/{x}/{y}.png', {
-// 	    maxZoom: 18,
-// 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="http://cloudmade.com">CloudMade</a>'
-// 	}).addTo(map);
-// }
-
-	var marker = new L.Marker(userLocation);
-	map.addLayer(marker);
-
-</script> -->
-
 <!-- This is for the hovering images -->
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
@@ -87,42 +45,6 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 ***********************************************/
 tooltips[0]=["images/tabs_B_ven.png", {width:"200px", height: "100px";}]
 </script>
-
-<!-- <script type="text/javascript">
-$(document).ready(function(){
-	var pagebody = $("#head");
-	var themenu = $("#navmenu");
-	var topbar  = $("#toolbarnav");
-	var content = $("#content");
-	var viewport = {
-  	width : $(window).width(),
-  	height : $(window).height()
-	};
-	// retrieve variables as
-	// viewport.width / viewport.height
-
-	function openme() {
-	$(function () {
-	  topbar.animate({
-	    left: "290px"
-	  }, { duration: 300, queue: false });
-	  pagebody.animate({
-	    left: "290px"
-	  }, { duration: 300, queue: false });
-	});
-}
-
-function closeme() {
-	var closeme = $(function() {
-  	topbar.animate({
-      left: "0px"
-  	}, { duration: 180, queue: false });
-  	pagebody.animate({
-      left: "0px"
-  	}, { duration: 180, queue: false });
-	});
-}
-</script> -->
 
 </HEAD>
 
@@ -163,6 +85,10 @@ The date and time at each station indicates the end of the three-hour average.<b
 <?php
 echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
+$command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
+exec($command, $output);
+var_dump($output);
+
 $blet=array("B","D","F","J","K","N","R","V","W","X");
 	$bidx=0;
 foreach ($blet as $f) {
@@ -171,13 +97,10 @@ foreach ($blet as $f) {
 		print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
 		}
     else {
-
-        // this is too slow to do on the fly. Need to have files pre-made.
-        // $command = escapeshellcmd('/anaconda/bin/python frontpagequery.py "'.$f.'"');
-        // passthru($command);
+        // $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py "'.$f.'"');
         // exec($command, $output);
-        // echo $output[0];
-
+        // var_dump($output);
+        // echo $output;
 
 
 	$venfile="daily/tabs_".$f."_ven";
@@ -223,10 +146,14 @@ foreach ($blet as $f) {
         $intervalstr = $interval->format('%R%a days');
         print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
         if ($intervalstr>5){ // old report
+
             print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
         }
-        else { // bold for recent report
+        elseif ($intervalstr<=5) { // bold for recent report
             print "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
+        }
+        else {  // missing plot
+            print "not reporting";
         }
 		}
 

@@ -8,15 +8,11 @@ python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
 '''
 
 import matplotlib.pyplot as plt
-import pandas as pd
 import matplotlib as mpl
-import netCDF4 as netCDF
 import numpy as np
-import time
-from datetime import datetime
-import os
-from sqlalchemy import create_engine
 import buoy_data
+from datetime import datetime
+import tools
 
 
 mpl.rcParams.update({'font.size': 14})
@@ -35,89 +31,6 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 cmax = 60  # cm/s, max water arrow value
 wmax = 20  # m/s, max wind arrow value
 lw = 1.5
-
-
-def convert(vin, which):
-    '''Convert units.'''
-
-    if which == 'c2f':  # celsius to fahrenheit
-        return vin*1.8+32
-    elif which == 'mps2kts':  # m/s to knots
-        return vin*1.943844
-    elif which == 'cps2kts':  # cm/s to knots
-        return vin*0.0194384
-    elif which == 'mb2hg':  # MB to inHg
-        return vin*0.029529983071415973
-    elif which == 'm2ft':  # meters to feet
-        return vin*3.28084
-
-
-def degrees_to_cardinal(d):
-    '''
-    note: this is highly approximate...
-    https://gist.github.com/RobertSudwarts/acf8df23a16afdb5837f
-    '''
-    dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
-            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
-    ix = int((d + 11.25)/22.5)
-    return dirs[ix % 16]
-
-
-def read(buoy, dataname, which):
-    '''Load in data already saved into /tmp file by tabsquery.php
-
-    Time is in UTC.
-
-    if dataname is a string, it is a file location. If it is a list with two
-    entries, they give the query string and the mysql engine.
-    '''
-
-    # read method: from a file or from mysql
-    if isinstance(dataname, str):
-        # columns have already been processed previously and can be inferred
-        df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values='-999')
-    elif len(dataname) == 2:
-        query = dataname[0]; engine = dataname[1]
-        df = pd.read_sql_query(query, engine, index_col=['obs_time'])
-
-        if which == 'ven':# or which == 'sum':
-            names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
-            df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
-            # Calculate along- and across-shelf
-            # along-shelf rotation angle in math angle convention
-            theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
-            df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
-            df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
-
-        elif which == 'eng':
-            names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
-
-        elif which == 'met':
-            names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
-            df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
-            df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
-
-        elif which == 'salt':
-            names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
-
-        elif which == 'wave':
-            names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
-
-        # if which == 'sum':  # add onto read in from ven if sum
-        #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
-        #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
-        #     df['Salinity'] = df2['Salinity']  # from salt file
-        #     df['Temp'] = df2['Temp']  # from salt file
-
-        df = df.drop(['date','time'], axis=1)
-        df.columns = names
-        df.index.name = 'Dates [UTC]'
-
-    # can't use datetime index directly unfortunately here, so can't use pandas later either
-    df.idx = mpl.dates.date2num(df.index.to_pydatetime())  # in units of days
-    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
-
-    return df
 
 
 def shifty(ax, N=0.05):
@@ -150,11 +63,11 @@ def add_currents(ax, df, which, east, north):
     if which == 'water':
         varmax = cmax
         label = 'Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
-        varmax2 = convert(varmax, 'cps2kts')  # convert to knots
+        varmax2 = tools.convert(varmax, 'cps2kts')  # convert to knots
     elif which == 'wind':
         varmax = wmax
         label = 'Wind velocity\n' + r'$\left[ \mathrm{m} \cdot \mathrm{s}^{-1} \right]$'
-        varmax2 = convert(varmax, 'mps2kts')  # convert to knots
+        varmax2 = tools.convert(varmax, 'mps2kts')  # convert to knots
     ax.set_ylim(-varmax, varmax)
     ax.set_ylabel(label)
 
@@ -189,20 +102,20 @@ def add_vel(ax, df, buoy, which):
     elif ylim[1]<=0:
         # ylim[1] = 2
         ax.set_ylim(ylim[0], dy*0.05)
-    if which == 'Across':
+    if which == 'Across [cm/s]':
         ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    elif which == 'Along':
+    elif which == 'Along [cm/s]':
         ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     # convert to knots
     axknots = ax.twinx()
-    axknots.set_ylim(convert(ylim[0], 'cps2kts'), convert(ylim[1], 'cps2kts'))
+    axknots.set_ylim(tools.convert(ylim[0], 'cps2kts'), tools.convert(ylim[1], 'cps2kts'))
     axknots.set_ylabel('[knots]')
-    if which == 'Across':
+    if which == 'Across [cm/s]':
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
-    elif which == 'Along':
+    elif which == 'Along [cm/s]':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
@@ -220,7 +133,7 @@ def add_var_2units(ax1, df, key, label1, con, label2):
     ax2 = ax1.twinx()
     ax2.set_ylabel(label2)
     ylim = ax1.get_ylim()
-    ax2.set_ylim(convert(ylim[0], con), convert(ylim[1], con))
+    ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
 def add_var(ax, df, var, varlabel):
@@ -290,7 +203,7 @@ def add_xlabels(ax, df, fig):
     #             transform=ax.transAxes, rotation=30)
     # else:
     # note: I haven't been able to figure out how to update this year in the special case
-    ax.text(0.98, -0.25, datetime.strftime(df.index[-1], '%Y'),
+    ax.text(0.98, -0.25, df.index.strftime("%Y")[-1],
             transform=ax.transAxes, rotation=30)
 
     # tighten only x axis
@@ -303,7 +216,7 @@ def add_xlabels(ax, df, fig):
     # text at bottom
     # right hand side
     text = 'Oceanography and GERG at Texas A&M University\n' \
-           + time.strftime('%a %b %d, %Y %H:%M GMT%z')
+           + datetime.utcnow().strftime('%a %b %d, %Y %H:%M GMT')
     fig.text(0.95, 0.035, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='right', verticalalignment='top')
     # left hand side
