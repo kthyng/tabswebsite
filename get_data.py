@@ -34,13 +34,13 @@ table = fname.split('/')[1][7:10]
 # from daily file
 if dstart is None:
 
-    df = tools.read(buoy, fname, table)
+    df = tools.read(fname)
 
 # Call to database if needed
 else:
     engine = run_daily.setup()
     query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
-    df = tools.read(buoy, [query, engine], table)
+    df = tools.read([query, engine], buoy, table)
     run_daily.make_text(df, buoy, table, fname)
 
 print('<br><br>')

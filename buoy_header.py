@@ -13,7 +13,7 @@ buoy = args.buoy
 # read in vel file
 which = 'ven'
 fname = 'daily/tabs_' + buoy + '_' + which
-df = tools.read(buoy, fname, which)
+df = tools.read(fname)
 df = df.tz_localize('UTC')  # timezone is UTC
 tail = df.tail(1)
 time = tail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
@@ -25,7 +25,7 @@ temp = tail['WaterT [deg C]'].values[0]
 # read in eng file
 which = 'eng'
 fname = 'daily/tabs_' + buoy + '_' + which
-df = tools.read(buoy, fname, which)
+df = tools.read(fname)
 tail = df.tail(1)
 volt = tail['VBatt [Oper]'].values[0]
 sigstr = tail['SigStr [dB]'].values[0]
@@ -37,7 +37,7 @@ fname = 'daily/tabs_' + buoy + '_' + which
 domet = False
 if os.path.exists(fname):
     domet = True
-    df = tools.read(buoy, fname, which)
+    df = tools.read(fname)
     tail = df.tail(1)
     wind = tail['Speed [m/s]'].values[0]
     airtemp = tail['AirT [deg C]'].values[0]
@@ -51,7 +51,7 @@ fname = 'daily/tabs_' + buoy + '_' + which
 dowave = False
 if os.path.exists(fname):
     dowave = True
-    df = tools.read(buoy, fname, which)
+    df = tools.read(fname)
     tail = df.tail(1)
     # time = tail.index.strftime("%Y-%m-%d %H:%M")[0]
     wheight = tail['WaveHeight [m]'].values[0]

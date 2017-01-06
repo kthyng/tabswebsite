@@ -101,7 +101,7 @@ if __name__ == "__main__":
             else:
                 try:
                     q = query_setup(engine, buoy, table, dend)
-                    df = tools.read(buoy, [q, engine], table)
+                    df = tools.read([q, engine], buoy, table)
                     fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
                     make_text(df, buoy, table, fname)
                     fig = plot_buoy.plot(df, buoy, table)

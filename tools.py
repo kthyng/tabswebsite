@@ -36,7 +36,7 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
-def read(buoy, dataname, which):
+def read(dataname, buoy=None, which=None):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.

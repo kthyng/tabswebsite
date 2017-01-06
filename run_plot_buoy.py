@@ -16,7 +16,7 @@ buoy = args.dataname.split('/')[-1][0]
 
 if __name__ == "__main__":
 
-    df = tools.read(buoy, args.dataname, args.which)
+    df = tools.read(args.dataname)
     fig = plot_buoy.plot(df, buoy, args.which)
     fig.savefig(args.dataname + '.pdf')
     fig.savefig(args.dataname + '.png')
