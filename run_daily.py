@@ -14,6 +14,8 @@ import csv
 import plot_buoy
 import os
 from matplotlib.pyplot import close
+import tools
+
 
 buoys = ['B','D','F','J','K','N','R','V','W','X']
 tables = ['ven', 'met', 'eng', 'salt', 'wave']
@@ -99,7 +101,7 @@ if __name__ == "__main__":
             else:
                 try:
                     q = query_setup(engine, buoy, table, dend)
-                    df = plot_buoy.read(buoy, [q, engine], table)
+                    df = tools.read(buoy, [q, engine], table)
                     fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
                     make_text(df, buoy, table, fname)
                     fig = plot_buoy.plot(df, buoy, table)

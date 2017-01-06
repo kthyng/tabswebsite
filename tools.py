@@ -6,6 +6,7 @@ Useful functions
 import numpy as np
 import pandas as pd
 from matplotlib.dates import date2num
+import buoy_data
 
 
 def convert(vin, which):

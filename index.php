@@ -85,18 +85,19 @@ The date and time at each station indicates the end of the three-hour average.<b
 <?php
 echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
-$command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
-exec($command, $output);
-var_dump($output);
+// slow!
+// $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
+// exec($command, $output);
+// var_dump($output);
 
 $blet=array("B","D","F","J","K","N","R","V","W","X");
 	$bidx=0;
 foreach ($blet as $f) {
-	if (preg_match("/Z/",$f)) {
-		print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=$f>$f</a></font></TD>\n";
-		print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
-		}
-    else {
+	// if (preg_match("/Z/",$f)) {
+	// 	print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><A href=/tglo/ven.php?buoy=$f>$f</a></font></TD>\n";
+	// 	print "<td nowrap valign=top><font class=bksm>Not Reporting</font>\n";
+	// 	}
+    // else {
         // $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py "'.$f.'"');
         // exec($command, $output);
         // var_dump($output);
@@ -105,60 +106,71 @@ foreach ($blet as $f) {
 
 	$venfile="daily/tabs_".$f."_ven";
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
-	$lines=file($venfile);
-	$l=array_pop($lines);
-	if (trim($l)) {
-		$line=trim($l);
-		$data=explode(' ',$line);$datestr=$data[0];
-		$timestr=substr($data[1],0,5);
+    if (file_exists($venfile)) {
 
-        // tabs datetime in UTC and Texas time (CST/CDT)
-        // set up date and time together with UTC timezone (which is what the data is in)
-        $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
-        // echo $dtUTC->format('Y-m-d H:i');
-        // save formatted string
-        // http://php.net/manual/en/datetime.formats.date.php
-        // $dtUTCstr = $dtUTC->format('Y-m-d H:i');
-        $dtUTCstr = $dtUTC->format('M d, Y H:i');
-        // find time zone abbreviation
-        // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
-        $dtUTCtz = $dtUTC->format('T');
+        $lines=file($venfile);
+    	$l=array_pop($lines);
+    	if (trim($l)) {
+    		$line=trim($l);
+            $data = preg_split('/\s+/', $line);  # split by white space or by tab
+            $datestr=$data[0];
+    		$timestr=substr($data[1],0,5);
 
-        // start from UTC datetime
-        $dtTX = $dtUTC;
-        // convert to TX
-        // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
-        $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
-        $dtTXstr = $dtTX->format('H:i');
-        $dtTXtz = $dtTX->format('T');
-        # date range for the php call
-        $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
-        $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
-        $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
-        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=daily/tabs_B_ven.png rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-        // this is too slow to do on the fly. Need to have files pre-made.
-        // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+            // tabs datetime in UTC and Texas time (CST/CDT)
+            // set up date and time together with UTC timezone (which is what the data is in)
+            $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
+            // echo $dtUTC->format('Y-m-d H:i');
+            // save formatted string
+            // http://php.net/manual/en/datetime.formats.date.php
+            // $dtUTCstr = $dtUTC->format('Y-m-d H:i');
+            $dtUTCstr = $dtUTC->format('M d, Y H:i');
+            // find time zone abbreviation
+            // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
+            $dtUTCtz = $dtUTC->format('T');
 
-        // check for if report is more than about 5 days old (ignoring time zones, etc)
-        $today = new DateTime('now', new DateTimeZone('UTC'));
-        $interval = date_diff($dtUTC, $today);  # difference in days between now and 5 days ago
-        $intervalstr = $interval->format('%R%a days');
-        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
-        if ($intervalstr>5){ // old report
+            // start from UTC datetime
+            $dtTX = $dtUTC;
+            // convert to TX
+            // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
+            $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
+            $dtTXstr = $dtTX->format('M d, Y H:i');
+            $dtTXtz = $dtTX->format('T');
+            # date range for the php call
+            $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
+            $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
+            $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
+            // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=/tglo/ven.php?buoy=$f rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+            // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=daily/tabs_B_ven.png rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+            // this is too slow to do on the fly. Need to have files pre-made.
+            // print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=$timerange rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
 
-            print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
-        }
-        elseif ($intervalstr<=5) { // bold for recent report
-            print "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
-        }
-        else {  // missing plot
-            print "not reporting";
-        }
-		}
+            // check for if report is more than about 5 days old (ignoring time zones, etc)
+            $today = new DateTime('now', new DateTimeZone('UTC'));
+            $interval = date_diff($dtUTC, $today);  # difference in days between now and 5 days ago
+            $intervalstr = $interval->format('%R%a days');
+            if ($intervalstr>5){ // old report
 
+                $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
+                // print "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
+            }
+            elseif ($intervalstr<=5) { // bold for recent report
+                $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
+                // print "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
+            }
+            else {  // missing plot
+                $buoystr = "<td>Not reporting</td></tr>";
+            }
+    		// }
+
+            }
     }
-	$bidx++;
+    else {
+        $buoystr = "<td>Not reporting</td></tr>";
+        // print "not reporting";
+    }
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+    print $buoystr;
+    $bidx++;
 }
 echo "</table>";
 ?>
