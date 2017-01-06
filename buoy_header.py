@@ -22,14 +22,11 @@ speed = tail['Speed [cm/s]'].values[0]
 direct = tail['Dir [deg T]'].values[0]
 temp = tail['WaterT [deg C]'].values[0]
 
-# DO I NEED TO MAKE SURE THE PROPERTIES ARE AT THE SAME TIME?
-
 # read in eng file
 which = 'eng'
 fname = 'daily/tabs_' + buoy + '_' + which
 df = tools.read(buoy, fname, which)
 tail = df.tail(1)
-# time = tail.index.strftime("%Y-%m-%d %H:%M")[0]
 volt = tail['VBatt [Oper]'].values[0]
 sigstr = tail['SigStr [dB]'].values[0]
 ping = tail['Nping'].values[0]
@@ -42,7 +39,6 @@ if os.path.exists(fname):
     domet = True
     df = tools.read(buoy, fname, which)
     tail = df.tail(1)
-    # time = tail.index.strftime("%Y-%m-%d %H:%M")[0]
     wind = tail['Speed [m/s]'].values[0]
     airtemp = tail['AirT [deg C]'].values[0]
     press = tail['AtmPr [MB]'].values[0]
@@ -70,14 +66,7 @@ loc = buoy_data.locs(buoy)['lat'][0] + '&deg; ' +\
     buoy_data.locs(buoy)['lon'][2]
 kind = buoy_data.kind(buoy)
 sensor = buoy_data.sensor(buoy)
-# a = buoy_data.anemometer(buoy)  # 0 if doesn't exist
-# if a:
-#     an = 'Anemometer height: ' + str(a) + 'm'
-# else:
-#     an = 'No anemometer'
 d = buoy_data.depth(buoy)
-# depth = 'Water depth: ' + str(d) + 'm (' + str(tools.convert(d, 'm2ft')) + ' ft)'
-
 
 # print out titles
 print('<table>')
@@ -86,8 +75,6 @@ print("<TR><TD valign=top width=120 align=left rowspan=9>")
 print("</td></tr>")
 print('<tr>')
 print('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td></tr>' % (buoy, loc))
-# print('<td><h2>Buoy ' + buoy + '</h2></td></tr>')
-# print('<td><font color="gray">%s</font></td></tr>' % (loc))
 print('<tr><TD colspan=3 valign=top>')
 print('<large><i>Conditions at ' + time + ' (' + time2 + ')</i></large>')
 print('</TD></TR>')
@@ -98,14 +85,12 @@ print('<td><big>Direction: %3.0f&deg;T (%s)&nbsp;&nbsp;&nbsp;</big></td>' % (dir
 print('<td><big>Water temp: %2.1f&deg;C (%2.0f&deg;F)</big></td>' % (temp, tools.convert(temp, 'c2f')))
 print('</tr>')
 
-# next row
 print('<tr>')
 print('<td><small>System voltage: ' + str(volt) + ' V</small></td>')
 print('<td><small>Signal strength: ' + str(sigstr) + ' dB</small></td>')
 print('<td><small>Ping count: ' + str(ping) + '</small></td>')
 print('</tr>')
 
-# next row
 if domet:
     print('<tr>')
     print('<td><small>Wind: %2.2f m/s (%2.2f kts) from %3.0f&deg;T (%s)</small></td>' % (wind, tools.convert(wind, 'mps2kts'), wdirect, tools.degrees_to_cardinal(wdirect)))
@@ -115,14 +100,10 @@ if domet:
 
 print('<tr>')
 if domet:
-# next row
-# print('<td><small>&nbsp;&nbsp;&nbsp;  from %3.0f&deg;T (%s)</small></td>' % (wdirect, tools.degrees_to_cardinal(wdirect)))
     print('<td><small>Relative humidity: %2.0f&#37;</small></td>' % (humid))
 if dowave:
     print('<td><small>Waves: %2.1fm (%2.1f ft) @ %2.1f sec</small></td>' % (wheight, tools.convert(wheight, 'm2ft'), wperiod))
 print('</tr>')
-
-# next row
 
 print('<tr>')
 print('<td><small>%s - sensor depth: %1im</small></td>' % (kind, sensor))
@@ -132,8 +113,6 @@ if a:
 else:
     print('<td><small>No anemometer</small></td>')
 
-# print('<td><small> sensor depth: %im, anemometer height %im</small></td>' % (sensor, a))
-# print('<td><small>' + an + '</small></td>')
 print('<td><small>Water depth: %3.0f (%3.0f ft)</small></td>' % (d, tools.convert(d, 'm2ft')))
 print('</tr>')
 

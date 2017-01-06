@@ -69,9 +69,6 @@ chmod($tempaccess, 0644);
 
 }
 
-
-#echo "BUOY: $Buoyname  $table<br>TMP: $tempout  $tempfile<BR>";
-
 # Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" ); }
@@ -82,7 +79,6 @@ die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" ); }
 if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
 die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 
-// $q="SELECT * FROM $tablename WHERE (date BETWEEN '$dstart' AND '$dend') order by obs_time";
 
 
 // if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
