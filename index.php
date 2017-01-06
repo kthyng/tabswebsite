@@ -152,11 +152,13 @@ foreach ($blet as $f) {
     $bidx++;
 }
 print "<tr></tr>";
-print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
+print "<tr><td></td> <td><a href=tabsqueryform.php>Search TABS database</a></td></tr>";
+// print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
 echo "</table>";
 ?>
 <BR>
-<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
+<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
+<!-- <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a> -->
 </TD>
 </TR>
 

@@ -74,15 +74,15 @@ print('<table>')
 print("<TR><TD valign=top width=120 align=left rowspan=9>")
 print("</td></tr>")
 print('<tr>')
-print('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td></tr>' % (buoy, loc))
-print('<tr><TD colspan=3 valign=top>')
-print('<large><i>Conditions at ' + time + ' (' + time2 + ')</i></large>')
-print('</TD></TR>')
+print('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, loc))
+print('<TD colspan=3 style="text-align:right"><b>' + time + '</b> (' + time2 + ')</td>')
+print('</TR>')
+print('<tr></tr>')  # blank row
 
 print('<tr>')
-print('<td><big>Speed: %2.2f cm/s (%2.2f kts)&nbsp;&nbsp;&nbsp;</big></td>' % (speed, tools.convert(speed, 'cps2kts')))
-print('<td><big>Direction: %3.0f&deg;T (%s)&nbsp;&nbsp;&nbsp;</big></td>' % (direct, tools.degrees_to_cardinal(direct)))
-print('<td><big>Water temp: %2.1f&deg;C (%2.0f&deg;F)</big></td>' % (temp, tools.convert(temp, 'c2f')))
+print('<td><b>Speed: %2.2f cm/s (%2.2f kts)&nbsp;&nbsp;&nbsp;</b></td>' % (speed, tools.convert(speed, 'cps2kts')))
+print('<td><b>Direction: %3.0f&deg;T (%s)&nbsp;&nbsp;&nbsp;</b></td>' % (direct, tools.degrees_to_cardinal(direct)))
+print('<td><b>Water temp: %2.1f&deg;C (%2.0f&deg;F)</b></td>' % (temp, tools.convert(temp, 'c2f')))
 print('</tr>')
 
 print('<tr>')
@@ -104,6 +104,8 @@ if domet:
 if dowave:
     print('<td><small>Waves: %2.1fm (%2.1f ft) @ %2.1f sec</small></td>' % (wheight, tools.convert(wheight, 'm2ft'), wperiod))
 print('</tr>')
+
+print('<tr></tr>')  # blank row
 
 print('<tr>')
 print('<td><small>%s - sensor depth: %1im</small></td>' % (kind, sensor))
