@@ -11,19 +11,22 @@ from prettypandas import PrettyPandas
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('buoy', type=str, help='buoy name')
-parser.add_argument('table', type=str, help='table name e.g. "ven"')
+# parser.add_argument('buoy', type=str, help='buoy name')
+# parser.add_argument('table', type=str, help='table name e.g. "ven"')
 parser.add_argument('fname', type=str, help='file name to save to')
 parser.add_argument('dstart', type=str, help='dstart')
 parser.add_argument('dend', type=str, help='dend')
 parser.add_argument('datatype', type=str, help='pic or data')
 args = parser.parse_args()
-buoy = args.buoy
-table = args.table
+# buoy = args.buoy
+# table = args.table
 fname = args.fname
 dstart = args.dstart
 dend = args.dend
 datatype = args.datatype
+
+buoy = fname.split('/')[1][5:6]
+table = fname.split('/')[1][7:10]
 
 # Get the data
 engine = run_daily.setup()

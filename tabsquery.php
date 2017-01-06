@@ -58,12 +58,13 @@ if (count($dates)==2) {
     // if there is not an end date, use start date
     $dend = $dstart;
 }
-$tempfile=tempnam("tmp",$Buoyname . $table);  // full file location
+$tempfile=tempnam("tmp","tabs_".$Buoyname."_".$table."_");  // full file location
 // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
 $tempout=basename($tempfile);  // just file name itself
 $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
-$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+$command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+// $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
 
 chmod($tempaccess, 0644);
 
