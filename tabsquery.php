@@ -33,6 +33,23 @@ $tz=$_GET["tz"];
 
 if (! $units) {$units = 'M';}
 
+// convert from table short name to descriptive name string
+if ($table == 'ven') {
+    $tablename = 'Velocity data';
+}
+elseif ($table == 'met') {
+    $tablename = 'Meteorological data';
+}
+elseif ($table == 'salt') {
+    $tablename = 'Water property data';
+}
+elseif ($table == 'eng') {
+    $tablename = 'System data';
+}
+elseif ($table == 'wave') {
+    $tablename = 'Wave data';
+}
+
 # Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
 die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" ); }
@@ -173,12 +190,12 @@ print "<option value='E'>English</option>\n</select>\n";
 
 // Change table (variable file)
 print "<Select Name=table>\n";
-print "<OPTION SELECTED value='$table'>Data type</option>\n";
-print "<option value='ven'>Velocity</option>\n";
-print "<option value='met'>Meteorological</option>\n";
-print "<option value='eng'>System</option>\n";
-print "<option value='salt'>Water property</option>\n";
-print "<option value='wave'>Wave</option>\n</select>\n";
+print "<OPTION SELECTED value='$table'>$tablename</option>\n";
+print "<option value='ven'>Velocity data</option>\n";
+print "<option value='met'>Meteorological data</option>\n";
+print "<option value='eng'>System data</option>\n";
+print "<option value='salt'>Water property data</option>\n";
+print "<option value='wave'>Wave data</option>\n</select>\n";
 
 
 // Change buoy
