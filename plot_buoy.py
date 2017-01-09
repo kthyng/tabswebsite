@@ -206,6 +206,9 @@ def add_xlabels(ax, df, fig):
     ax.text(0.98, -0.25, df.index.strftime("%Y")[-1],
             transform=ax.transAxes, rotation=30)
 
+    # put in GMT as time zone
+    ax.text(1.05, -0.25, '[UTC]', transform=ax.transAxes, rotation=30)
+
     # tighten only x axis
     plt.autoscale(enable=True, axis='x', tight=True)
 
@@ -216,7 +219,7 @@ def add_xlabels(ax, df, fig):
     # text at bottom
     # right hand side
     text = 'Oceanography and GERG at Texas A&M University\n' \
-           + datetime.utcnow().strftime('%a %b %d, %Y %H:%M GMT')
+           + datetime.utcnow().strftime('%a %b %d, %Y %H:%M UTC')
     fig.text(0.95, 0.035, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='right', verticalalignment='top')
     # left hand side

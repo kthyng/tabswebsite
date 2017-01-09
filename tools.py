@@ -36,7 +36,7 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
-def read(dataname, buoy=None, which=None):
+def read(dataname, buoy=None, which=None, units='M'):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.
@@ -90,10 +90,26 @@ def read(dataname, buoy=None, which=None):
     df.idx = date2num(df.index.to_pydatetime())  # in units of days
     df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
 
+    if units == 'E':
+        units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
+        conversions = ['cps2kts', 'mps2kts', 'c2f', 'mb2hg', 'm2ft']
+        new_units = ['[kts]', '[kts]', '[deg F]', '[inHg]', '[ft]']
+        # import pdb; pdb.set_trace()
+        for newunit, unit, conversion in zip(new_units, units_to_change, conversions):
+
+            # the columns with these keys need to be converted
+            cols_to_change = [col for col in df.columns if unit in col]
+
+            # convert all columns that need converting for unit
+            for col in cols_to_change:
+                df[col] = convert(df[col], conversion)
+                newname = col.replace(unit, newunit)
+                df.rename(columns={col: newname}, inplace=True)
+
     return df
 
 
 def present(df):
     '''Present dataframe df nicely by printing to screen'''
 
-    print(PrettyPandas(df).render())
+    print(PrettyPandas(df, precision=3).render())

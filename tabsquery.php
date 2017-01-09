@@ -30,6 +30,7 @@ $table=$_GET["table"];
 $datepicker=$_GET["datepicker"];
 $datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
+$units = $_GET["units"];
 
 if (! $units) {$units = 'M';}
 
@@ -68,7 +69,7 @@ if ($datepicker == "recent") {
     $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
     passthru($command);
     // command to show table
-    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'"');
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'"');
 
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
@@ -91,8 +92,8 @@ else{
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
-    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'"');
-    // $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$Buoyname.'" "'.$table.'" "'.$tempfile.'" "'.$dstart.'" "'.$dend.'" "'.$datatype.'"');
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'"');
+    // $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'"');
 
     chmod($tempaccess, 0644);
 
@@ -220,7 +221,7 @@ print "<option value='W'>W</option>\n";
 print "<option value='X'>X</option>\n</select>\n";
 
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
-print "<input NAME=table TYPE=hidden value=$table>\n";
+// print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
 
