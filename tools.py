@@ -63,9 +63,9 @@ def read(dataname, buoy=None, which=None, units='M'):
             df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
             df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
             # dictionary for rounding decimal places
-            rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
-                      'WaterT [deg C]': 1, 'Dir [deg T]': 0}
-        elif which == 'eng':
+            rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2, 'Dir [deg T]': 0}
+            # rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
+            #           'WaterT [deg C]': 1, 'Dir [deg T]': 0}        elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
             rdict = {}
 
@@ -73,16 +73,19 @@ def read(dataname, buoy=None, which=None, units='M'):
             names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
             df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
-            rdict = {'East [m/s]': 2, 'North [m/s]': 2, 'AtmPr [MB]': 1,
-                      'Speed [m/s]': 2, 'Dir from [deg T]': 0}
+            rdict = {'Speed [m/s]': 2, 'Dir from [deg T]': 0}
+            # rdict = {'East [m/s]': 2, 'North [m/s]': 2, 'AtmPr [MB]': 1,
+            #           'Speed [m/s]': 2, 'Dir from [deg T]': 0}
 
         elif which == 'salt':
             names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
-            rdict = {'Temp [deg C]': 1}
+            rdict = {}
+            # rdict = {'Temp [deg C]': 1}
 
         elif which == 'wave':
             names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
-            rdict = {'WaveHeight [m]': 2, 'MeanPeriod [s]': 0, 'PeakPeriod [s]': 0}
+            rdict = {}
+            # rdict = {'WaveHeight [m]': 2, 'MeanPeriod [s]': 0, 'PeakPeriod [s]': 0}
 
         # if which == 'sum':  # add onto read in from ven if sum
         #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
