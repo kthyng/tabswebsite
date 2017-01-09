@@ -112,23 +112,23 @@ print <<<_HTML_
 <TD><B>Select Buoy:</B> (* inactive)</TD>
 <TD><SELECT name="Buoyname" id="json-one">
 <OPTION SELECTED value="$buoy">$buoy
-<OPTION value="A">A*
 <OPTION value="B">B
-<OPTION value="C">C*
 <OPTION value="D">D
-<OPTION value="E">E*
 <OPTION value="F">F
-<OPTION value="G">G*
-<OPTION value="H">H*
 <OPTION value="J">J
 <OPTION value="K">K
 <OPTION value="N">N
-<OPTION value="P">P*
 <OPTION value="R">R
-<OPTION value="S">S*
 <OPTION value="V">V
 <OPTION value="W">W
 <OPTION value="X">X
+<OPTION value="A">A*
+<OPTION value="C">C*
+<OPTION value="E">E*
+<OPTION value="G">G*
+<OPTION value="H">H*
+<OPTION value="P">P*
+<OPTION value="S">S*
 </SELECT>
 </TD></TR>
 
