@@ -30,8 +30,8 @@ dend = args.dend
 datatype = args.datatype
 units = args.units
 
-buoy = fname.split('/')[1][5:6]
-table = fname.split('/')[1][7:10]
+buoy = fname.split('/')[1].split('_')[1]
+table = fname.split('/')[1].split('_')[2]
 
 ## Read in data ##
 # from daily file

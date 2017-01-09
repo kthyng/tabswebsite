@@ -56,25 +56,33 @@ def read(dataname, buoy=None, which=None, units='M'):
         if which == 'ven':# or which == 'sum':
             names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
             df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
+            df['Speed [cm/s]'] = df['Speed [cm/s]'].round(2)
             # Calculate along- and across-shelf
             # along-shelf rotation angle in math angle convention
             theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
             df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
             df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
-
+            # dictionary for rounding decimal places
+            rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
+                      'WaterT [deg C]': 1, 'Dir [deg T]': 0}
         elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
+            rdict = {}
 
         elif which == 'met':
             names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
             df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
+            rdict = {'East [m/s]': 2, 'North [m/s]': 2, 'AtmPr [MB]': 1,
+                      'Speed [m/s]': 2, 'Dir from [deg T]': 0}
 
         elif which == 'salt':
             names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
+            rdict = {'Temp [deg C]': 1}
 
         elif which == 'wave':
             names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
+            rdict = {'WaveHeight [m]': 2, 'MeanPeriod [s]': 0, 'PeakPeriod [s]': 0}
 
         # if which == 'sum':  # add onto read in from ven if sum
         #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
@@ -85,6 +93,8 @@ def read(dataname, buoy=None, which=None, units='M'):
         df = df.drop(['date','time'], axis=1)
         df.columns = names
         df.index.name = 'Dates [UTC]'
+        # import pdb; pdb.set_trace()
+        df = df.round(rdict)
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = date2num(df.index.to_pydatetime())  # in units of days
@@ -94,8 +104,8 @@ def read(dataname, buoy=None, which=None, units='M'):
         units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
         conversions = ['cps2kts', 'mps2kts', 'c2f', 'mb2hg', 'm2ft']
         new_units = ['[kts]', '[kts]', '[deg F]', '[inHg]', '[ft]']
-        # import pdb; pdb.set_trace()
-        for newunit, unit, conversion in zip(new_units, units_to_change, conversions):
+        rints = [2, 2, 1, 2, 1]  # integers for number of decimal places for rounding
+        for rint, newunit, unit, conversion in zip(rints, new_units, units_to_change, conversions):
 
             # the columns with these keys need to be converted
             cols_to_change = [col for col in df.columns if unit in col]
@@ -105,6 +115,7 @@ def read(dataname, buoy=None, which=None, units='M'):
                 df[col] = convert(df[col], conversion)
                 newname = col.replace(unit, newunit)
                 df.rename(columns={col: newname}, inplace=True)
+                df = df.round({newname: rint})
 
     return df
 
@@ -112,4 +123,11 @@ def read(dataname, buoy=None, which=None, units='M'):
 def present(df):
     '''Present dataframe df nicely by printing to screen'''
 
-    print(PrettyPandas(df, precision=3).render())
+    # formatters={'AtmPr [MB]':'{:,.2f}'.format}
+    # myformatter = lambda x: '[%4.1f]' % x
+    # formatters={'AtmPr [MB]': myformatter}
+    # print(PrettyPandas(df, formatters=formatters).render())
+    # twodigits = PrettyPandas.as_unit('', subset=None, precision=None)
+    # formats = PrettyPandas(df).as_unit('', )
+    print(PrettyPandas(df).render())
+    # print(df)
