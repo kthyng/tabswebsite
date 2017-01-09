@@ -135,8 +135,8 @@ print <<<_HTML_
 <TR><TD><br></TD></TR>
 <TR><TD><B>Select Data Type: </B> </TD>
 <TD>
-<input type=radio name="table" value="ven" checked> Velocity Data
-<input type=radio name="table" value="met"> Meteorological Data
+<input type=radio name="table" value="ven" checked>Velocity Data
+<input type=radio name="table" value="met">Meteorological Data
 <input type=radio name="table" value="eng">System Data
 <input type=radio name="table" value="salt">Water Property Data
 <input type=radio name="table" value="wave">Wave Data
