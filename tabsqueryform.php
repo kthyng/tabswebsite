@@ -23,7 +23,7 @@
 		</script>
 
 
-        <!-- <script>
+        <script>
 
         var data = {
             "base" : ["Please choose from above"],
@@ -60,7 +60,25 @@ http://jsfiddle.net/NaUAL/
                         html = [];
                      // create insert html before adding
                      $.each(vals,function(i,val){
-                          html.push('<option>'+val+'</option>')
+                          if (val == "eng"){
+                            valname = "System data"
+                          }
+                          else if (val == "met"){
+                            valname = "Meteorological data"
+                          }
+                          else if (val == "ven"){
+                            valname = "Velocity data"
+                          }
+                          else if (val == "salt"){
+                            valname = "Water property data"
+                          }
+                          else if (val == "wave"){
+                            valname = "Wave data"
+                          }
+                          html.push('<option value=' + val + '>'+valname+'</option>')
+                        // //   html.push('<option>'+val+'</option>')
+                        //   html.push('<input type=radio name="table" value=' + val + ' checked>' + val)
+
                      });
                      // no need to empty the element before adding the new content
                      second.html(html.join());
@@ -68,7 +86,7 @@ http://jsfiddle.net/NaUAL/
 
 
     		});
-    	</script> -->
+    	</script>
 
 	</head>
 
@@ -88,16 +106,6 @@ include("includes/header.html");
 include("includes/navigation.html");
 
 print "<form action=\"tabsquery.php\" method=\"get\">\n";
-
-
-// // Connect to Database
-// if (! $dbh=mysql_connect('tabs1.gerg.tamu.edu','tabsweb','tabs')) {
-// 	die("Can't connect: ".mysql_error());
-// 	}
-//
-// $dbase="tabsdb";
-//
-// mysql_select_db($dbase) or die(mysql_error());
 
 ?>
 
@@ -132,6 +140,7 @@ print <<<_HTML_
 </SELECT>
 </TD></TR>
 
+<!--
 <TR><TD><br></TD></TR>
 <TR><TD><B>Select Data Type: </B> </TD>
 <TD>
@@ -140,19 +149,20 @@ print <<<_HTML_
 <input type=radio name="table" value="eng">System Data
 <input type=radio name="table" value="salt">Water Property Data
 <input type=radio name="table" value="wave">Wave Data
-</TD></TR>
+</TD></TR> -->
 
 <br>
 
 <br />
-<!--<br>
+
+<br>
 
 <TR><TD>
 <B>Select dataset</B>
-<select id="json-two">
+<select id="json-two" name="table">
     <option>Please choose from above</option>
 </select>
-</TR></TD>-->
+</TR></TD>
 
 
 <TR><TD><br></TD></TR>
