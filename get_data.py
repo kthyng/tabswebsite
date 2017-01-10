@@ -13,6 +13,7 @@ import run_daily
 import tools
 import plot_buoy
 import argparse
+from os import path
 
 
 # parse the input arguments
@@ -50,6 +51,8 @@ print('<br><br>')
 if datatype == 'data':
     tools.present(df)  # print data table to screen
 elif datatype == 'pic':
-    fig = plot_buoy.plot(df, buoy, table)
-    fig.savefig(fname + '.pdf')
-    fig.savefig(fname + '.png')
+    # does this get called from the front page or otherwise for "recent" data?
+    if not path.exists(fname + '.png'):
+        fig = plot_buoy.plot(df, buoy, table)
+        fig.savefig(fname + '.pdf')
+        fig.savefig(fname + '.png')
