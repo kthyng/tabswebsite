@@ -41,18 +41,14 @@ def query_setup_recent(engine, buoy):
         lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit ' + str(counter)
         df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
 
-    return df.index[-1]  #.strftime("%Y-%m-%d %H:%M")  # date for last available data
+    return df.index[-1]  # date for last available data
 
 
 def query_setup(engine, buoy, table, dend):
     '''Query mysql database for data, given end date dend from
     query_setup_recent().'''
 
-    # dend = df.index[-1].strftime("%Y-%m-%d")  # date for last available data
-    # dend = df.index[0].strftime("%Y-%m-%d %H:%M")  # datetime for last available data
-
     dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
-    # dstart = (df.index[-1] - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
 
     # get 5 days of data
     # want from beginning of first day but only up until data time on final day
@@ -60,7 +56,6 @@ def query_setup(engine, buoy, table, dend):
     return query
 
 
-# def make_text(df, buoy, table, fname):
 def make_text(df, fname):
     '''Make text file of data'''
 
