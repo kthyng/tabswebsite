@@ -6,6 +6,7 @@ Tests for run_daily.py
 import run_daily
 import tools
 from os import path
+import warnings
 
 
 def test_query_setup_recent():
@@ -27,8 +28,8 @@ def test_query_setup():
 def test_make_text():
     '''Test file writing.'''
 
-    df = tools.read('tests/tabs_V_ven.txt')
-    fname = 'tests/write_tabs_V_ven.txt'
+    df = tools.read('tests/tabs_V_ven')
+    fname = 'tests/write_tabs_V_ven'
     run_daily.make_text(df, fname)
 
     assert open(fname).readlines() == ['Dates [UTC]\tEast [cm/s]\tNorth [cm/s]\tDir [deg T]\tWaterT [deg C]\tTx\tTy\tSpeed [cm/s]\tAcross [cm/s]\tAlong [cm/s]\n',
@@ -55,7 +56,7 @@ def test_overall():
     This checks for files that should be made based on instruments on the buoys.
     Print out if data is not available for existing
     instruments on the buoys at the same time as the ven data.'''
-    import warnings
+
     for buoy in run_daily.buoys:
         for table in run_daily.tables:
             # this checks that it should be available based on instrumentation

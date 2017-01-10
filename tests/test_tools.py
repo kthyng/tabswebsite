@@ -33,7 +33,7 @@ def test_degrees_to_cardinal():
 def test_read_string_ven():
     '''Test reading data from an existing ven file.'''
 
-    df = tools.read('tests/tabs_V_ven.txt')
+    df = tools.read('tests/tabs_V_ven')
     # test column names
     dfcolumns = 'East [cm/s]\tNorth [cm/s]\tDir [deg T]\tWaterT [deg C]\tTx\tTy\tSpeed [cm/s]\tAcross [cm/s]\tAlong [cm/s]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -45,7 +45,7 @@ def test_read_string_ven():
 def test_read_string_ven_changeunits():
     '''Test reading data from an existing ven file and changing to English units.'''
 
-    df = tools.read('tests/tabs_V_ven.txt', units='E')
+    df = tools.read('tests/tabs_V_ven', units='E')
     # test column names
     dfcolumns = 'East [kts]\tNorth [kts]\tDir [deg T]\tWaterT [deg F]\tTx\tTy\tSpeed [kts]\tAcross [kts]\tAlong [kts]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -57,7 +57,7 @@ def test_read_string_ven_changeunits():
 def test_read_string_met():
     '''Test reading data from an existing met file.'''
 
-    df = tools.read('tests/tabs_V_met.txt')
+    df = tools.read('tests/tabs_V_met')
     # test column names
     dfcolumns = 'East [m/s]\tNorth [m/s]\tAirT [deg C]\tAtmPr [MB]\tGust [m/s]\tComp [deg M]\tTx\tTy\tPAR \tRelH [%]\tSpeed [m/s]\tDir from [deg T]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -69,7 +69,7 @@ def test_read_string_met():
 def test_read_string_met_changeunits():
     '''Test reading data from an existing met file and changing to English units.'''
 
-    df = tools.read('tests/tabs_V_met.txt', units='E')
+    df = tools.read('tests/tabs_V_met', units='E')
     # test column names
     dfcolumns = 'East [kts]\tNorth [kts]\tAirT [deg F]\tAtmPr [inHg]\tGust [kts]\tComp [deg M]\tTx\tTy\tPAR \tRelH [%]\tSpeed [kts]\tDir from [deg T]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -82,7 +82,7 @@ def test_read_string_met_changeunits():
 def test_read_string_wave():
     '''Test reading data from an existing wave file.'''
 
-    df = tools.read('tests/tabs_V_wave.txt')
+    df = tools.read('tests/tabs_V_wave')
     # test column names
     dfcolumns = 'WaveHeight [m]\tMeanPeriod [s]\tPeakPeriod [s]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -94,7 +94,7 @@ def test_read_string_wave():
 def test_read_string_wave_changeunits():
     '''Test reading data from an existing wave file and changing to English units.'''
 
-    df = tools.read('tests/tabs_V_wave.txt', units='E')
+    df = tools.read('tests/tabs_V_wave', units='E')
     # test column names
     dfcolumns = 'WaveHeight [ft]\tMeanPeriod [s]\tPeakPeriod [s]'
     assert '\t'.join(df.columns.values) == dfcolumns
@@ -222,7 +222,7 @@ def test_present():
     http://stackoverflow.com/questions/16571150/how-to-capture-stdout-output-from-a-python-function-call
     '''
 
-    df = tools.read('tests/tabs_V_ven.txt')
+    df = tools.read('tests/tabs_V_ven')
     f = io.StringIO()
     with redirect_stdout(f):
         tools.present(df)
