@@ -52,7 +52,23 @@ def test_get_data_from_file_to_pic_units():
 
 
 def test_get_data_from_mysql_to_data():
-    pass
+    '''Test reading in from mysql then printing to table.'''
+
+    fname = 'tests/tabs_V_ven_tmp'
+    datatype = 'data'
+    dstart = '2017-01-01 00:00'
+    dend = '2017-01-01 02:00'
+    # command = 'get_data.py %s --dstart "%s" --dend "%s" %s' % \
+    #           (fname, dstart, dend, datatype)
+    command = 'python get_data.py %s --dstart "%s" --dend "%s" %s' % \
+              (fname, dstart, dend, datatype)
+    out = subprocess.check_output(command, shell=True)
+
+    assert out  # make sure not empty
+    assert isinstance(out, bytes)
+
+    # remove file after checking
+    remove(fname)
 
 
 def test_get_data_from_mysql_to_data_units():

@@ -18,7 +18,7 @@ from os import path
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('fname', type=str, help='file name to save to')
+parser.add_argument('fname', type=str, help='file name for either reading in or for saving to')
 parser.add_argument('--dstart', type=str, help='dstart', default=None)
 parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
@@ -44,7 +44,7 @@ if dstart is None:
 else:
     engine = tools.engine()
     query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
-    df = tools.read([query, engine], buoy, table, units=units)
+    df = tools.read([query, engine], units=units)
     run_daily.make_text(df, fname)
 
 print('<br><br>')
