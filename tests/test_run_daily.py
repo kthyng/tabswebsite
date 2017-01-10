@@ -5,6 +5,7 @@ Tests for run_daily.py
 
 import run_daily
 import tools
+from os import path
 
 
 def test_query_setup_recent():
@@ -36,5 +37,30 @@ def test_make_text():
                                         '2017-01-05 01:00:00\t1.06\t24.70\t161.00\t24.02\t0\t-1\t24.72\t-24.39\t4.06\n',
                                         '2017-01-05 01:30:00\t2.06\t23.59\t170.00\t24.02\t0\t-2\t23.68\t-23.16\t4.92\n']
 
+
+def test_made_ven():
+    '''Check that ven files have been produced for every buoy since that should
+    always be possible.'''
+
+    for buoy in run_daily.buoys:
+        assert path.exists('daily/tabs_' + buoy + '_ven')
+        assert path.exists('daily/tabs_' + buoy + '_ven_low.png')
+        assert path.exists('daily/tabs_' + buoy + '_ven.png')
+        assert path.exists('daily/tabs_' + buoy + '_ven.pdf')
+
+
 def test_overall():
-    pass
+    '''Check that script has produced requested files.
+
+    This checks for files that should be made based on instruments on the buoys.
+    Print out if data is not available for existing
+    instruments on the buoys at the same time as the ven data.'''
+    import warnings
+    for buoy in run_daily.buoys:
+        for table in run_daily.tables:
+            # this checks that it should be available based on instrumentation
+            if buoy in run_daily.avail[table]:
+                fname = 'tabs_' + buoy + '_' + table
+                if not path.exists('daily/' + fname):
+                    message = Warning(fname + ' not available at same time as ven data')
+                    warnings.warn(message)

@@ -9,15 +9,22 @@ import time
 import pandas as pd
 from datetime import timedelta
 import numpy as np
-import csv
+from csv import QUOTE_NONE
 import plot_buoy
-import os
+from os import path
 from matplotlib.pyplot import close
 import tools
 
 
 buoys = ['B','D','F','J','K','N','R','V','W','X']
 tables = ['ven', 'met', 'eng', 'salt', 'wave']
+
+avail = {}
+avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
+avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
+avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
+avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
+avail['wave'] = ['K', 'N', 'V', 'X']
 
 
 def query_setup_recent(engine, buoy):
@@ -59,7 +66,7 @@ def query_setup(engine, buoy, table, dend):
 def make_text(df, fname):
     '''Make text file of data'''
 
-    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar='')
+    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='')
     # with no header:
     # df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 
@@ -67,13 +74,6 @@ def make_text(df, fname):
 if __name__ == "__main__":
 
     engine = tools.engine()
-
-    avail = {}
-    avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
-    avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
-    avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
-    avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
-    avail['wave'] = ['K', 'N', 'V', 'X']
 
     # loop through buoys: query, make text file, make plot
     for buoy in buoys:
@@ -89,15 +89,15 @@ if __name__ == "__main__":
                 try:
                     q = query_setup(engine, buoy, table, dend)
                     df = tools.read([q, engine], buoy, table)
-                    fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
+                    fname = path.join('daily', 'tabs_' + buoy + '_' + table)
                     make_text(df, fname)
                     # import pdb; pdb.set_trace()
                     fig = plot_buoy.plot(df, buoy, table)
-                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
-                    fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
+                    fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
+                    fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
                     # save smaller for hover
                     if table == 'ven':
-                        fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
+                        fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '_low.png'), dpi=60)
                     close(fig)
                 # if data isn't available at the same time as the ven file,
                 # leave as not written
