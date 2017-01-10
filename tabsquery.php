@@ -192,7 +192,7 @@ print "<option value='P'>P*</option>\n";
 print "<option value='S'>S*</option>\n</select>\n";
 
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
-// print "<input NAME=table TYPE=hidden value=$table>\n";
+print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
 

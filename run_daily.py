@@ -7,7 +7,6 @@ Run on a cron job.
 
 import time
 import pandas as pd
-from sqlalchemy import create_engine
 from datetime import timedelta
 import numpy as np
 import csv
@@ -19,14 +18,6 @@ import tools
 
 buoys = ['B','D','F','J','K','N','R','V','W','X']
 tables = ['ven', 'met', 'eng', 'salt', 'wave']
-
-
-def setup():
-    '''Setup database for mysql querying.'''
-
-    engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
-
-    return engine
 
 
 def query_setup_recent(engine, buoy):
@@ -69,7 +60,8 @@ def query_setup(engine, buoy, table, dend):
     return query
 
 
-def make_text(df, buoy, table, fname):
+# def make_text(df, buoy, table, fname):
+def make_text(df, fname):
     '''Make text file of data'''
 
     df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=csv.QUOTE_NONE,  escapechar='')
@@ -79,7 +71,7 @@ def make_text(df, buoy, table, fname):
 
 if __name__ == "__main__":
 
-    engine = setup()
+    engine = tools.engine()
 
     avail = {}
     avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
@@ -103,7 +95,8 @@ if __name__ == "__main__":
                     q = query_setup(engine, buoy, table, dend)
                     df = tools.read([q, engine], buoy, table)
                     fname = os.path.join('daily', 'tabs_' + buoy + '_' + table)
-                    make_text(df, buoy, table, fname)
+                    make_text(df, fname)
+                    # import pdb; pdb.set_trace()
                     fig = plot_buoy.plot(df, buoy, table)
                     fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
                     fig.savefig(os.path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))

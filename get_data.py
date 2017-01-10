@@ -41,10 +41,10 @@ if dstart is None:
 
 # Call to database if needed
 else:
-    engine = run_daily.setup()
+    engine = tools.engine()
     query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
     df = tools.read([query, engine], buoy, table, units=units)
-    run_daily.make_text(df, buoy, table, fname)
+    run_daily.make_text(df, fname)
 
 print('<br><br>')
 if datatype == 'data':

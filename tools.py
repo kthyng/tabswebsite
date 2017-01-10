@@ -8,6 +8,7 @@ import pandas as pd
 from matplotlib.dates import date2num
 import buoy_data
 from prettypandas import PrettyPandas
+from sqlalchemy import create_engine
 
 
 def convert(vin, which):
@@ -36,7 +37,8 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
-def read(dataname, buoy=None, which=None, units='M'):
+# def read(dataname, buoy=None, which=None, units='M'):
+def read(dataname, units='M'):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.
@@ -52,6 +54,8 @@ def read(dataname, buoy=None, which=None, units='M'):
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
+        buoy = query.split(' ')[3].split('_')[1]
+        which = query.split(' ')[3].split('_')[2]
 
         if which == 'ven':# or which == 'sum':
             names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
@@ -65,7 +69,9 @@ def read(dataname, buoy=None, which=None, units='M'):
             # dictionary for rounding decimal places
             rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2, 'Dir [deg T]': 0}
             # rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
-            #           'WaterT [deg C]': 1, 'Dir [deg T]': 0}        elif which == 'eng':
+            #           'WaterT [deg C]': 1, 'Dir [deg T]': 0}
+
+        elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
             rdict = {}
 
@@ -134,3 +140,11 @@ def present(df):
     # formats = PrettyPandas(df).as_unit('', )
     print(PrettyPandas(df).render())
     # print(df)
+
+
+def engine():
+    '''Setup database engine for mysql querying.'''
+
+    engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
+
+    return engine
