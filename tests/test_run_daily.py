@@ -5,7 +5,7 @@ Tests for run_daily.py
 
 import run_daily
 import tools
-from os import path
+from os import path, remove
 import warnings
 
 
@@ -37,6 +37,9 @@ def test_make_text():
                                         '2017-01-05 00:30:00\t0.69\t25.37\t144.00\t24.03\t0\t-1\t25.38\t-25.10\t3.78\n',
                                         '2017-01-05 01:00:00\t1.06\t24.70\t161.00\t24.02\t0\t-1\t24.72\t-24.39\t4.06\n',
                                         '2017-01-05 01:30:00\t2.06\t23.59\t170.00\t24.02\t0\t-2\t23.68\t-23.16\t4.92\n']
+
+    # remove file after checking
+    remove(fname)
 
 
 def test_made_ven():

@@ -103,6 +103,7 @@ def test_get_data_from_mysql_to_pic():
     assert path.exists(fname + '.pdf')
 
     # remove plots after checking for future testing
+    remove(fname)
     remove(fname + '.png')
     remove(fname + '.pdf')
 
