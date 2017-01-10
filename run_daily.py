@@ -5,7 +5,6 @@ Have both use/show 5 days of data if possible, and use the same mysql query.
 Run on a cron job.
 '''
 
-import time
 import pandas as pd
 from datetime import timedelta
 import numpy as np
