@@ -7,6 +7,7 @@ import run_daily
 import tools
 from os import path, remove
 import warnings
+import buoy_data as bd
 
 
 def test_query_setup_recent():
@@ -46,7 +47,7 @@ def test_made_ven():
     '''Check that ven files have been produced for every buoy since that should
     always be possible.'''
 
-    for buoy in run_daily.buoys:
+    for buoy in bd.buoys():
         assert path.exists('daily/tabs_' + buoy + '_ven')
         assert path.exists('daily/tabs_' + buoy + '_ven_low.png')
         assert path.exists('daily/tabs_' + buoy + '_ven.png')
@@ -60,10 +61,10 @@ def test_overall():
     Print out if data is not available for existing
     instruments on the buoys at the same time as the ven data.'''
 
-    for buoy in run_daily.buoys:
-        for table in run_daily.tables:
+    for buoy in bd.buoys():
+        for table in bd.tables():
             # this checks that it should be available based on instrumentation
-            if buoy in run_daily.avail[table]:
+            if buoy in bd.avail(table):
                 fname = 'tabs_' + buoy + '_' + table
                 if not path.exists('daily/' + fname):
                     message = Warning(fname + ' not available at same time as ven data')

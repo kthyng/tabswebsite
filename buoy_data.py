@@ -3,6 +3,31 @@ Info about buoys to read in.
 '''
 
 
+def buoys():
+    '''Return list of buoys.'''
+
+    return ['B','D','F','J','K','N','R','V','W','X']
+
+
+def tables():
+    '''Return list of tables.'''
+
+    return ['ven', 'met', 'eng', 'salt', 'wave']
+
+
+def avail(key):
+    '''Return dictionary of what buoys (value) have data for each table (key).'''
+
+    avail = {}
+    avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
+    avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
+    avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
+    avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
+    avail['wave'] = ['K', 'N', 'V', 'X']
+
+    return avail[key]
+
+
 def angle(buoy):
     '''degree True for across-shelf rotation angle (rotated x axis is offshore)'''
     angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,

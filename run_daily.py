@@ -13,17 +13,18 @@ import plot_buoy
 from os import path
 from matplotlib.pyplot import close
 import tools
+import buoy_data as bd
 
 
-buoys = ['B','D','F','J','K','N','R','V','W','X']
-tables = ['ven', 'met', 'eng', 'salt', 'wave']
-
-avail = {}
-avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
-avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
-avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
-avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
-avail['wave'] = ['K', 'N', 'V', 'X']
+# buoys = ['B','D','F','J','K','N','R','V','W','X']
+# tables = ['ven', 'met', 'eng', 'salt', 'wave']
+#
+# avail = {}
+# avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
+# avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
+# avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
+# avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
+# avail['wave'] = ['K', 'N', 'V', 'X']
 
 
 def query_setup_recent(engine, buoy):
@@ -75,14 +76,14 @@ if __name__ == "__main__":
     engine = tools.engine()
 
     # loop through buoys: query, make text file, make plot
-    for buoy in buoys:
-        for table in tables:  # loop through tables for each buoy
+    for buoy in bd.buoys():
+        for table in bd.tables():  # loop through tables for each buoy
 
             if table == 'ven':
                 # find end date of recent legitimate data
                 dend = query_setup_recent(engine, buoy)
 
-            if not buoy in avail[table]:
+            if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
                 try:
