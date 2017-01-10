@@ -13,9 +13,6 @@ $degt="&#176;T";
 $PageTitle="TABS Buoy Database Query page";
 include("includes/header.html");
 include("includes/navigation.html");
-#include("DB.php");
-
-
 
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=http://tabs1.gerg.tamu.edu/tglo/tabsqueryform.php\">";
@@ -64,7 +61,6 @@ die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
     $tempaccess = "daily/tabs_".$Buoyname."_".$table;
-    // keep options on the side
     // header
     $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
     passthru($command);
@@ -93,7 +89,6 @@ else{
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
     $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'"');
-    // $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'"');
 
     chmod($tempaccess, 0644);
 
@@ -134,7 +129,6 @@ elseif ($datatype=="pic"){
     if ($datatype=="pic"){
         if (file_exists($tempaccess.".png")){
         	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";}
-            // print "<a href=tmp/".$tempout.".pdf> <img src=tmp/".$tempout.".png></A>\n";}
         }
 	print "</TD></TR></TABLE>\n";
 // }
@@ -144,10 +138,8 @@ print "<TR><TD valign=top width=120 align=left>";
 print "</td>";
 print "<td>";
 print "<br> &nbsp;\n";
-// print "<br><FORM Action=$PHP_SELF method=\"GET\">\n";
 print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
 
-// print "<input NAME=buoy TYPE=hidden value=$buoylet>\n";
 print "<font face=\"Helvetica\" size=-1>\n";
 print "<Select Name=tz>\n";
 print "<option value=''>Time Zone</Option>\n";
