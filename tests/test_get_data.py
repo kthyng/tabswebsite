@@ -58,8 +58,6 @@ def test_get_data_from_mysql_to_data():
     datatype = 'data'
     dstart = '2017-01-01 00:00'
     dend = '2017-01-01 02:00'
-    # command = 'get_data.py %s --dstart "%s" --dend "%s" %s' % \
-    #           (fname, dstart, dend, datatype)
     command = 'python get_data.py %s --dstart "%s" --dend "%s" %s' % \
               (fname, dstart, dend, datatype)
     out = subprocess.check_output(command, shell=True)
@@ -72,11 +70,41 @@ def test_get_data_from_mysql_to_data():
 
 
 def test_get_data_from_mysql_to_data_units():
-    pass
+    '''Test reading in from mysql then printing to table with
+    units changed to English.'''
+
+    fname = 'tests/tabs_V_ven_tmp'
+    datatype = 'data'
+    dstart = '2017-01-01 00:00'
+    dend = '2017-01-01 02:00'
+    command = 'python get_data.py %s --dstart "%s" --dend "%s" %s --units "E"' % \
+              (fname, dstart, dend, datatype)
+    out = subprocess.check_output(command, shell=True)
+
+    assert out  # make sure not empty
+    assert isinstance(out, bytes)
+
+    # remove file after checking
+    remove(fname)
 
 
 def test_get_data_from_mysql_to_pic():
-    pass
+    '''Test reading in from mysql then printing to image.'''
+
+    fname = 'tests/tabs_V_ven_tmp'
+    datatype = 'pic'
+    dstart = '2017-01-01 00:00'
+    dend = '2017-01-01 02:00'
+    command = 'python get_data.py %s --dstart "%s" --dend "%s" %s' % \
+              (fname, dstart, dend, datatype)
+    out = subprocess.check_output(command, shell=True)
+
+    assert path.exists(fname + '.png')
+    assert path.exists(fname + '.pdf')
+
+    # remove plots after checking for future testing
+    remove(fname + '.png')
+    remove(fname + '.pdf')
 
 
 def test_get_data_from_mysql_to_pic_units():
