@@ -11,6 +11,12 @@ import re
 
 base = 'http://localhost/tabswebsite/tabsquery.php?'
 
+# test dates
+dates = {'B': '2015-01-01', 'D': '2017-01-08', 'F': '2017-01-08',
+         'J': '2017-01-08', 'K': '2017-01-08', 'N': '2015-01-01',
+         'R': '2017-01-08', 'V': '2017-01-08', 'W': '2015-01-01',
+         'X': '2014-08-26'}
+
 def test_recent_image():
     '''Test for all parts of call (ven) to "recent" showing up on tabsquery page.
 
@@ -60,10 +66,34 @@ def test_recent_table():
 
 
 def test_active_image():
-    '''Test that can query a particular date for all buoys for image.'''
-    pass
+    '''Test that can query some date for all buoys for image of ven.'''
+
+    table = 'ven'
+    for buoy in bd.buoys():
+
+        query = "Buoyname=" + buoy + "&table=" + table + "&Datatype=pic&datepicker=" + dates[buoy]
+        # read in website
+        out = requests.get(base + query)
+        # parse website
+        soup = BeautifulSoup(out.text, 'lxml')
+        # test for download link
+        assert soup.findAll('a', string='download')
+        # test for image
+        assert soup.findAll('a', href=re.compile("tmp/tabs_" + buoy + "_" + table + "_.*pdf"))
 
 
 def test_active_table():
     '''Test that can query a particular date for all buoys for all available tables.'''
-    pass
+
+    table = 'ven'
+    for buoy in bd.buoys():
+
+        query = "Buoyname=" + buoy + "&table=" + table + "&Datatype=data&datepicker=" + dates[buoy]
+        # read in website
+        out = requests.get(base + query)
+        # parse website
+        soup = BeautifulSoup(out.text, 'lxml')
+        # test for download link
+        assert soup.findAll('a', string='download')
+        # test for data table
+        assert soup.findAll('table', id=re.compile("T_*"))
