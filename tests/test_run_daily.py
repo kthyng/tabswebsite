@@ -52,6 +52,7 @@ def test_made_ven():
         assert path.exists('daily/tabs_' + buoy + '_ven_low.png')
         assert path.exists('daily/tabs_' + buoy + '_ven.png')
         assert path.exists('daily/tabs_' + buoy + '_ven.pdf')
+        assert path.exists('daily/tabs_' + buoy + '_ven_header')
 
 
 def test_overall():

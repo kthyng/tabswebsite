@@ -14,17 +14,7 @@ from os import path
 from matplotlib.pyplot import close
 import tools
 import buoy_data as bd
-
-
-# buoys = ['B','D','F','J','K','N','R','V','W','X']
-# tables = ['ven', 'met', 'eng', 'salt', 'wave']
-#
-# avail = {}
-# avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
-# avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
-# avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
-# avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
-# avail['wave'] = ['K', 'N', 'V', 'X']
+import buoy_header as bh
 
 
 def query_setup_recent(engine, buoy):
@@ -82,16 +72,19 @@ if __name__ == "__main__":
             if table == 'ven':
                 # find end date of recent legitimate data
                 dend = query_setup_recent(engine, buoy)
+                q = query_setup(engine, buoy, table, dend)
+                ind = tools.read_ind([q, engine])  # calculate indices from ven table
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
                 try:
                     q = query_setup(engine, buoy, table, dend)
-                    df = tools.read([q, engine], buoy, table)
+                    df = tools.read([q, engine], ind=ind)
                     fname = path.join('daily', 'tabs_' + buoy + '_' + table)
+                    # write daily data file
                     make_text(df, fname)
-                    # import pdb; pdb.set_trace()
+                    # make and save plots
                     fig = plot_buoy.plot(df, buoy, table)
                     fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
                     fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
@@ -103,3 +96,7 @@ if __name__ == "__main__":
                 # leave as not written
                 except:
                     pass
+
+    for buoy in bd.buoys():  # loop through buoys separately for buoy headers
+        # write header
+        bh.make(buoy)

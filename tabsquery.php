@@ -61,9 +61,9 @@ die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" ); }
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
     $tempaccess = "daily/tabs_".$Buoyname."_".$table;
-    // header
-    $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
-    passthru($command);
+    // // header
+    // $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
+    // passthru($command);
     // command to show table
     $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'"');
 
@@ -103,6 +103,11 @@ if ($datatype=="data"){
 elseif ($datatype=="pic"){
     $newdatatype="data";
     $newdatatypename="table";
+}
+
+// show header file contents for "recent" data, above table
+if ($datepicker=="recent") {
+    echo file_get_contents( "daily/tabs_".$Buoyname."_".$table."_header" );
 }
 
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
