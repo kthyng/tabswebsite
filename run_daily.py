@@ -73,14 +73,14 @@ if __name__ == "__main__":
                 # find end date of recent legitimate data
                 dend = query_setup_recent(engine, buoy)
                 q = query_setup(engine, buoy, table, dend)
-                ind = tools.read_ind([q, engine])  # calculate indices from ven table
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
                 try:
+                    # import pdb; pdb.set_trace()
                     q = query_setup(engine, buoy, table, dend)
-                    df = tools.read([q, engine], ind=ind)
+                    df = tools.read([q, engine])
                     fname = path.join('daily', 'tabs_' + buoy + '_' + table)
                     # write daily data file
                     make_text(df, fname)

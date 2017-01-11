@@ -70,7 +70,7 @@ def make(buoy):
     d = bd.depth(buoy)
 
     head = []
-    head.append('<table>')
+    head.append('<table id=header>')  # id is for test_tabsquery.py
     # this is to buffer the left side
     head.append("<TR><TD valign=top width=120 align=left rowspan=9>")
     head.append("</td></tr>")

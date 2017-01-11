@@ -37,15 +37,7 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
-def read_ind(dataname):
-    '''Read from mysql but just to get indices for reading in recent data.'''
-    query = dataname[0]; engine = dataname[1]
-    df = pd.read_sql_query(query, engine, index_col=['obs_time'])
-    return df['tx']==-99  # bad rows in ven table
-
-
-# def read(dataname, buoy=None, which=None, units='M'):
-def read(dataname, units='M', ind=None):
+def read(dataname, units='M'):
     '''Load in data already saved into /tmp file by tabsquery.php
 
     Time is in UTC.
@@ -61,12 +53,12 @@ def read(dataname, units='M', ind=None):
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
-        if ind is not None:
-            df.drop(df.index[ind], inplace=True)
         buoy = query.split(' ')[3].split('_')[1]
         which = query.split(' ')[3].split('_')[2]
 
         if which == 'ven':# or which == 'sum':
+            ind = df['tx']==-99
+            df.drop(df.index[ind], inplace=True)  # drop bad rows
             names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
             df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             df['Speed [cm/s]'] = df['Speed [cm/s]'].round(2)
