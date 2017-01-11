@@ -107,7 +107,7 @@ elseif ($datatype=="pic"){
 
 // show header file contents for "recent" data, above table
 if ($datepicker=="recent") {
-    echo file_get_contents( "daily/tabs_".$Buoyname."_".$table."_header" );
+    echo file_get_contents( "daily/tabs_".$Buoyname."_header" );
 }
 
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
@@ -189,7 +189,7 @@ print "<option value='P'>P*</option>\n";
 print "<option value='S'>S*</option>\n</select>\n";
 
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
-print "<input NAME=table TYPE=hidden value=$table>\n";
+// print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
 

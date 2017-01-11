@@ -121,7 +121,7 @@ def make(buoy):
 
     head.append('</table>')
 
-    fname = 'daily/tabs_' + buoy + '_ven_header'
+    fname = 'daily/tabs_' + buoy + '_header'
     f = open(fname, 'w')
     for headline in head:
         f.write('%s' % (headline))
