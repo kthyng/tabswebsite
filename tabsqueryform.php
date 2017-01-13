@@ -51,8 +51,10 @@ print "<form action=\"tabsquery.php\" method=\"get\">\n";
 
 print <<<_HTML_
 <BR>
-<TABLE border=0>
-<TR>
+
+<TABLE border=0 width=100%>
+<TR><TD width=120 align=left rowspan=20></td>
+
 <TD><B>Select Buoy:</B> (* inactive)</TD>
 <TD><SELECT name="Buoyname" id="json-one">
 <OPTION SELECTED value="$buoy">$buoy
@@ -75,17 +77,6 @@ print <<<_HTML_
 <OPTION value="S">S*
 </SELECT>
 </TD>
-
-<!--
-<TR><TD><br></TD></TR>
-<TR><TD><B>Select Data Type: </B> </TD>
-<TD>
-<input type=radio name="table" value="ven" checked>Velocity Data
-<input type=radio name="table" value="met">Meteorological Data
-<input type=radio name="table" value="eng">System Data
-<input type=radio name="table" value="salt">Water Property Data
-<input type=radio name="table" value="wave">Wave Data
-</TD></TR> -->
 
 
 <TD>
