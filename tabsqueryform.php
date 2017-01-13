@@ -74,7 +74,7 @@ print <<<_HTML_
 <OPTION value="P">P*
 <OPTION value="S">S*
 </SELECT>
-</TD></TR>
+</TD>
 
 <!--
 <TR><TD><br></TD></TR>
@@ -87,18 +87,14 @@ print <<<_HTML_
 <input type=radio name="table" value="wave">Wave Data
 </TD></TR> -->
 
-<br>
 
-<br />
-
-<br>
-
-<TR><TD>
-<B>Select dataset</B>
+<TD>
+<B>... then select dataset</B>
 <select id="json-two" name="table">
-    <option>Please choose from above</option>
+    <option>available data</option>
 </select>
-</TR></TD>
+</TD>
+</tr>
 
 
 <TR><TD><br></TD></TR>
@@ -106,6 +102,25 @@ print <<<_HTML_
 <TD>
 <input type="text" value="Click here" id="datepicker" name="datepicker"/>
 </TD>
+
+<TR><TD><br></TD></TR>
+<TR><TD><B>Timezone:</B> </TD>
+<td>
+<Select Name=tz>
+<option value='UTC'>UTC</Option>
+<option value='central'>US/Central</option>
+/select>
+</td><br>
+
+<TR><TD><br></TD></TR>
+<TR><TD><B>Units:</B> </TD>
+<td><Select Name=units>
+<option value='M'>Metric</Option>
+<option value='E'>English</option>
+</select>
+</td>
+
+
 
 <TR><TD><br></TD></TR>
 <br>
