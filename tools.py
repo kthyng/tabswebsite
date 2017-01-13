@@ -37,10 +37,10 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
-def read(dataname, units='M'):
+def read(dataname, units='M', tz='UTC'):
     '''Load in data already saved into /tmp file by tabsquery.php
 
-    Time is in UTC.
+    Time from database is in UTC.
 
     if dataname is a string, it is a file location. If it is a list with two
     entries, they give the query string and the mysql engine.
@@ -126,6 +126,18 @@ def read(dataname, units='M'):
                 newname = col.replace(unit, newunit)
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
+
+    if tz == 'central':  # time zone
+        # need to first establish a time zone (which it is already in) to change it
+        df = df.tz_localize('UTC')  # timezone is UTC
+        df.index = df.index.tz_convert('US/Central')
+        # tail = df.tail(1)  # last entry in file
+        # dt1 = tail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
+        # dt2 = tail.index.tz_convert('US/Central').strftime("%Y-%m-%d %H:%M %Z")[0]
+        df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
+        # df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0])
+
+
 
     return df
 

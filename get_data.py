@@ -23,6 +23,7 @@ parser.add_argument('--dstart', type=str, help='dstart', default=None)
 parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
+parser.add_argument('--tz', type=str, help='time zone', default='UTC')
 args = parser.parse_args()
 
 fname = args.fname
@@ -30,6 +31,7 @@ dstart = args.dstart
 dend = args.dend
 datatype = args.datatype
 units = args.units
+tz = args.tz
 
 buoy = fname.split('/')[1].split('_')[1]
 table = fname.split('/')[1].split('_')[2]
@@ -38,13 +40,13 @@ table = fname.split('/')[1].split('_')[2]
 # from daily file
 if dstart is None:
 
-    df = tools.read(fname, units=units)
+    df = tools.read(fname, units=units, tz=tz)
 
 # Call to database if needed
 else:
     engine = tools.engine()
     query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
-    df = tools.read([query, engine], units=units)
+    df = tools.read([query, engine], units=units, tz=tz)
     run_daily.make_text(df, fname)
 
 print('<br><br>')

@@ -77,7 +77,7 @@ if ($datepicker == "recent") {
     // $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
     // passthru($command);
     // command to show table
-    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'"');
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
 
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
@@ -100,7 +100,7 @@ else{
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
-    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'"');
+    $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
 
     chmod($tempaccess, 0644);
 

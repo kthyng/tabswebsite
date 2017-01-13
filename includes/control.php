@@ -30,7 +30,7 @@ print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
 print "<Select Name=tz>\n";
 print "<option value=''>Time Zone</Option>\n";
 print "<option value='UTC'>UTC</Option>\n";
-print "<option value='STN'>Station Local</option>\n</select></td><br>\n";
+print "<option value='central'>US/Central</option>\n</select></td><br>\n";
 if (($table != "eng") and ($datatype != "pic")) {
 print "<td><Select Name=units>\n";
 print "<option value=''>Units</Option>\n";
