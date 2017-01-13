@@ -16,7 +16,7 @@ print "<Select Name=tz>\n";
 print "<option value=''>Time Zone</Option>\n";
 print "<option value='UTC'>UTC</Option>\n";
 print "<option value='STN'>Station Local</option>\n</select><br>\n";
-if ($table != "eng") {
+if (($table != "eng") and ($datatype != "pic")) {
 print "<Select Name=units>\n";
 print "<option value=''>Units</Option>\n";
 print "<option value='M'>Metric</Option>\n";

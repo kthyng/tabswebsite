@@ -1,4 +1,9 @@
 
+<head>
+    <script src="js/dynamic_dropdown.js"></script>
+</head>
+
+
 <?php
 
 umask(0022);
@@ -30,6 +35,7 @@ $tz=$_GET["tz"];
 $units = $_GET["units"];
 
 if (! $units) {$units = 'M';}
+if (! $tz) {$tz = 'UTC';}
 
 // convert from table short name to descriptive name string
 if ($table == 'ven') {
@@ -50,17 +56,17 @@ elseif ($table == 'wave') {
 
 # Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
-    include("includes/control.html");  // show bottom control options
+    include("includes/control.php");  // show bottom control options
     die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" );
 }
 # Salt instrument availability
 if ($table == "salt" && ! preg_match('/B|D|F|J|K|N|R|V|W|X/',$Buoyname) ) {
-    include("includes/control.html");  // show bottom control options
+    include("includes/control.php");  // show bottom control options
     die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" );
 }
 # Wave instrument availability
 if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
-    include("includes/control.html");  // show bottom control options
+    include("includes/control.php");  // show bottom control options
     die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" );
 }
 
@@ -146,7 +152,7 @@ if ($datepicker=="recent") {
 // }
 
 // show bottom control options
-include("includes/control.html");
+include("includes/control.php");
 
 
 
