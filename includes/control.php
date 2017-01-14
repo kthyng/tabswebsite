@@ -27,15 +27,17 @@ print "<td>";
 // print "<br> &nbsp;\n";
 print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
 
-print "<Select Name=tz>\n";
-print "<option value=''>Time Zone</Option>\n";
-print "<option value='UTC'>UTC</Option>\n";
-print "<option value='central'>US/Central</option>\n</select></td><br>\n";
-if (($table != "eng") and ($datatype != "pic")) {
-print "<td><Select Name=units>\n";
-print "<option value=''>Units</Option>\n";
-print "<option value='M'>Metric</Option>\n";
-print "<option value='E'>English</option>\n</select></td>\n";
+if (($datatype == "data")) {
+    print "<Select Name=tz>\n";
+    print "<option value=''>Time Zone</Option>\n";
+    print "<option value='UTC'>UTC</Option>\n";
+    print "<option value='central'>US/Central</option>\n</select></td><br>\n";
+}
+if (($table != "eng") and ($datatype == "data")) {
+    print "<td><Select Name=units>\n";
+    print "<option value=''>Units</Option>\n";
+    print "<option value='M'>Metric</Option>\n";
+    print "<option value='E'>English</option>\n</select></td>\n";
 }
 
 // Change buoy
