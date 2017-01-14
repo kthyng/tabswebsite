@@ -121,7 +121,7 @@ print <<<_HTML_
 <input type=radio name="Datatype" value="data">Data Table
 </TD></TR>
 <TR><TD><br></TD></TR>
-<input type=hidden  name="tz" value="UTC">
+<!-- <input type=hidden  name="tz" value="UTC"> -->
 <input type=hidden  name="stage" value="TRUE">
 <TR><TD>
 <input type=reset name="Reset" Value="Reset Fields">
