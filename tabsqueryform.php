@@ -80,7 +80,7 @@ print <<<_HTML_
 
 
 <TD>
-<B>... then select dataset</B>
+<B>... then select dataset&nbsp;</B>
 <select id="json-two" name="table">
     <option>available data</option>
 </select>
@@ -94,24 +94,6 @@ print <<<_HTML_
 <input type="text" value="Click here" id="datepicker" name="datepicker"/>
 </TD>
 
-<TR><TD><br></TD></TR>
-<TR><TD><B>Timezone:</B> </TD>
-<td>
-<Select Name="tz">
-<option value='UTC'>UTC</Option>
-<option value='central'>US/Central</option>
-</select>
-</td><br>
-
-<TR><TD><br></TD></TR>
-<TR><TD><B>Units:</B> </TD>
-<td><Select Name="units">
-<option value='M'>Metric</Option>
-<option value='E'>English</option>
-</select>
-</td>
-
-
 
 <TR><TD><br></TD></TR>
 <br>
@@ -121,6 +103,27 @@ print <<<_HTML_
 <input type=radio name="Datatype" value="data">Data Table
 </TD></TR>
 <TR><TD><br></TD></TR>
+
+
+
+<TR>
+<td></td>
+<TD><B>Units:&nbsp;</B>
+<Select Name="units">
+<option value='M'>Metric</Option>
+<option value='E'>English</option>
+</select>
+</td>
+
+<TD><B>Timezone:&nbsp;</B>
+<Select Name="tz">
+<option value='UTC'>UTC</Option>
+<option value='central'>US/Central</option>
+</select>
+</td><br>
+<TR><TD><br></TD></TR>
+
+
 <!-- <input type=hidden  name="tz" value="UTC"> -->
 <input type=hidden  name="stage" value="TRUE">
 <TR><TD>
