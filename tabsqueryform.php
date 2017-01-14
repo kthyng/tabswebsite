@@ -97,15 +97,15 @@ print <<<_HTML_
 <TR><TD><br></TD></TR>
 <TR><TD><B>Timezone:</B> </TD>
 <td>
-<Select Name=tz>
+<Select Name="tz">
 <option value='UTC'>UTC</Option>
 <option value='central'>US/Central</option>
-/select>
+</select>
 </td><br>
 
 <TR><TD><br></TD></TR>
 <TR><TD><B>Units:</B> </TD>
-<td><Select Name=units>
+<td><Select Name="units">
 <option value='M'>Metric</Option>
 <option value='E'>English</option>
 </select>

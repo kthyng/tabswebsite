@@ -82,8 +82,10 @@ if ($datepicker == "recent") {
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
 else{
-    // change format of date from yyyy/m/d to yyyy-m-d
-    $datepicker = str_replace ("/", "-", $datepicker);
+    // change format of date from yyyy/m/d to yyyy-m-d if needed (depends on where this is called from)
+    // if (strpos($datepicker, '/') !== false) {
+    //     $datepicker = str_replace ("/", "-", $datepicker);
+    // }
     // split date range into two dates. if it is just one date, still becomes an array but of length 1
     $dates = explode(" - ", $datepicker);
     // start date is the first date
