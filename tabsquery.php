@@ -132,6 +132,10 @@ if ($datepicker=="recent") {
 	print "</TD><TD valign=top><br>";
 
     print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
+    // note for met and table
+    if ($table == 'met' and $datatype == 'data') {
+        print "<br><i>Note: East and North wind data show direction toward.&nbsp;Direction data show direction from.</i>\n<br>";
+    }
     // if not using recent image, call to database
     // Runs table or image for database
     if ($datepicker!="recent"){
@@ -155,17 +159,6 @@ if ($datepicker=="recent") {
 
 // show bottom control options
 include("includes/control.php");
-
-
-
-print "</TD><TD style=\"text-align:left !important;\">";
-print "<pre>";
-// // Top of data table:
-if ($table == 'met' ) {
-    print "<br><i>Note: East and North wind data show direction toward.&nbsp;Wind Speed and direction data show direction from.</i>\n<br>";
-}
-print "</pre></p>";
-print "</TD></TR></TABLE>";
 
 }
 
