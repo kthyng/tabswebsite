@@ -84,8 +84,10 @@ if __name__ == "__main__":
                     fname = path.join('daily', 'tabs_' + buoy + '_' + table)
                     # write daily data file
                     make_text(df, fname)
+                    # read in model output
+                    dfmodel = tools.read_model(q)
                     # make and save plots
-                    fig = plot_buoy.plot(df, buoy, table)
+                    fig = plot_buoy.plot(df, buoy, table, dfmodel)
                     fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.pdf'))
                     fig.savefig(path.join('daily', 'tabs_' + buoy + '_' + table + '.png'))
                     # save smaller for hover

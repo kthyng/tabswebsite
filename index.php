@@ -43,7 +43,6 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 * This notice MUST stay intact for legal use
 * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
 ***********************************************/
-tooltips[0]=["images/tabs_B_ven.png", {width:"200px", height: "100px";}]
 </script>
 
 </HEAD>

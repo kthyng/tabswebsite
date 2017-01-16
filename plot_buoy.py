@@ -31,6 +31,7 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 cmax = 60  # cm/s, max water arrow value
 wmax = 20  # m/s, max wind arrow value
 lw = 1.5
+c2 = 'cornflowerblue'
 
 
 def shifty(ax, N=0.05):
@@ -44,7 +45,7 @@ def shifty(ax, N=0.05):
     ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
 
 
-def add_currents(ax, df, which, east, north):
+def add_currents(ax, df, which, east, north, df2=None):
     '''Add current arrows to plot
 
     which   'water' or 'wind'
@@ -60,6 +61,10 @@ def add_currents(ax, df, which, east, north):
         width = 0.15
     ax.quiver(df.idx, np.zeros(len(df)), df[east], df[north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1)
+    if df2 is not None:  # 2nd set of arrows
+        ax.quiver(df2.idx, np.zeros(len(df2)), df2[east], df2[north], headaxislength=0,
+                  headlength=0, width=width, units='y', scale_units='y', scale=1,
+                  color=c2)
     if which == 'water':
         varmax = cmax
         label = 'Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
@@ -82,13 +87,15 @@ def add_currents(ax, df, which, east, north):
     axknots.set_ylabel('[knots]')
 
 
-def add_vel(ax, df, buoy, which):
+def add_vel(ax, df, buoy, which, df2=None):
     '''Add along- or across-shelf velocity to plot
 
     which   'Across' or 'Along'
     '''
 
     ax.plot(df.idx, df[which], 'k', lw=lw)
+    if df2 is not None:
+        ax.plot(df2.idx, df2[which], color=c2, lw=lw)
     ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
@@ -122,10 +129,12 @@ def add_vel(ax, df, buoy, which):
         ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, df, key, label1, con, label2):
+def add_var_2units(ax1, df, key, label1, con, label2, df2=None):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
+    if df2 is not None:
+        ax1.plot(df2.idx, df2[key], lw=lw, color=c2, linestyle='-')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     shifty(ax1)
@@ -136,10 +145,12 @@ def add_var_2units(ax1, df, key, label1, con, label2):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_var(ax, df, var, varlabel):
+def add_var(ax, df, var, varlabel, df2=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
+    if df2 is not None:
+        ax.plot(df2.idx, df2[var], lw=lw, color=c2, linestyle='-')
     ax.set_ylabel(varlabel)
     shifty(ax)
 
@@ -249,10 +260,11 @@ def setup(buoy, nsubplots):
     return fig, axes
 
 
-def plot(df, buoy, which):
+def plot(df, buoy, which, df2=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
+    Optional df2. If given, also plot on each axis.
     '''
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
@@ -263,10 +275,10 @@ def plot(df, buoy, which):
     fig, axes = setup(buoy, nsubplots=nsubplots)
 
     if which == 'ven':
-        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
-        add_vel(axes[1], df, buoy, 'Across [cm/s]')
-        add_vel(axes[2], df, buoy, 'Along [cm/s]')
-        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]')
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]', df2)
+        add_vel(axes[1], df, buoy, 'Across [cm/s]', df2)
+        add_vel(axes[2], df, buoy, 'Along [cm/s]', df2)
+        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]', df2)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]')
         # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
@@ -275,14 +287,14 @@ def plot(df, buoy, which):
         add_var(axes[2], df, 'Nping', 'Ping Cnt')
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2)
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Temperature [˚ C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[inHg]')
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]')
-        add_var(axes[1], df, 'Salinity', 'Salinity')
+        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]', df2)
+        add_var(axes[1], df, 'Salinity', 'Salinity', df2)
         add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]')
     elif which == 'wave':
         add_var(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]')

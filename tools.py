@@ -6,9 +6,10 @@ Useful functions
 import numpy as np
 import pandas as pd
 from matplotlib.dates import date2num
-import buoy_data
+import buoy_data as bd
 from prettypandas import PrettyPandas
 from sqlalchemy import create_engine
+import xarray as xr
 
 
 def convert(vin, which):
@@ -64,7 +65,7 @@ def read(dataname, units='M', tz='UTC'):
             df['Speed [cm/s]'] = df['Speed [cm/s]'].round(2)
             # Calculate along- and across-shelf
             # along-shelf rotation angle in math angle convention
-            theta = np.deg2rad(-(buoy_data.angle(buoy)-90))  # convert from compass to math angle
+            theta = np.deg2rad(-(bd.angle(buoy)-90))  # convert from compass to math angle
             df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
             df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
             # dictionary for rounding decimal places
@@ -138,6 +139,62 @@ def read(dataname, units='M', tz='UTC'):
         # df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0])
 
 
+
+    return df
+
+
+def read_model(q):
+    '''Read in model output based on data query q.'''
+
+    buoy = query.split(' ')[3].split('_')[1]
+    which = query.split(' ')[3].split('_')[2]
+    dstart = query.split(' ')[7]  # start date (beginning of day)
+    dend = query.split(' ')[9]  # end date and time
+    loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
+    # d = netCDF.Dataset(loc)
+    d = xr.open_dataset(loc)
+    # Initialize model dataframe with times
+    df = pd.DataFrame(index=d.ocean_time)
+    # CHANGE TO
+    # df = pd.DataFrame(index=d[dstart:dend].ocean_time)
+
+    if which == 'ven':
+        # model output needed for image
+        cols = ['u', 'v', 'temp']
+        for col in cols:
+            df[col] = ds[col].sel(time=slice(dstart, dend))
+
+        # convert from m/s to cm/s
+        df['u']*=100; df['v']*=100
+
+        # change names to match data
+        df.columns = ['East [cm/s]', 'North [cm/s]', 'WaterT [deg C]']
+
+        # also calculate along- and across-shelf velocity
+        theta = np.deg2rad(-(bd.angle(buoy)-90))  # convert from compass to math angle
+        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
+        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+
+    elif which == 'salt':
+        # model output needed for image
+        cols = ['temp', 'salt']
+        for col in cols:
+            df[col] = ds[col].sel(time=slice(dstart, dend))
+
+        # change names to match data
+        df.columns = ['Temp [deg C]', 'Salinity']
+
+    elif which == 'met':
+        # model output needed for image
+        cols = ['Uwind', 'Vwind']
+        for col in cols:
+            df[col] = ds[col].sel(time=slice(dstart, dend))
+
+        # change names to match data
+        df.columns = ['East [m/s]', 'North [m/s]']
+
+    # can't use datetime index directly unfortunately here, so can't use pandas later either
+    df.idx = date2num(df.index.to_pydatetime())  # in units of days
 
     return df
 
