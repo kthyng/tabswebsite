@@ -102,6 +102,7 @@ else{
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
 
+    # set up command for later use
     $command = escapeshellcmd('/anaconda/bin/python get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
 
     chmod($tempaccess, 0644);
