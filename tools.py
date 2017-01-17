@@ -143,6 +143,13 @@ def read(dataname, units='M', tz='UTC'):
     return df
 
 
+def rot2d(x, y, ang):
+    '''rotate vectors by geometric angle. For model.'''
+    xr = x*np.cos(ang) - y*np.sin(ang)
+    yr = x*np.sin(ang) + y*np.cos(ang)
+    return xr, yr
+
+
 def read_model(query):
     '''Read in model output based on data query q.'''
 
@@ -160,19 +167,20 @@ def read_model(query):
     if which == 'ven':
         # model output needed for image
         j, i = bd.model(buoy, 'u')  # get model indices
-        df['u'] = ds['u'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_u=j, xi_u=i)
+        along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                                    .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
         j, i = bd.model(buoy, 'v')  # get model indices
-        df['v'] = ds['v'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_v=j, xi_v=i)
+        across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                                      .isel(s_rho=-1, eta_v=j, xi_v=i)*100
         j, i = bd.model(buoy, 'rho')  # get model indices
-        df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
-        # convert from m/s to cm/s
-        df['u']*=100; df['v']*=100
+        # rotate from curvilinear to cartesian
+        anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+        df['East [cm/s]'], df['North [cm/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
-        # change names to match data
-        df.columns = ['East [cm/s]', 'North [cm/s]', 'WaterT [deg C]']
-
-        # also calculate along- and across-shelf velocity
+        # Project along- and across-shelf velocity rather than use from model
+        # so that angle matches buoy
         theta = np.deg2rad(-(bd.angle(buoy)-90))  # convert from compass to math angle
         df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
         df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
@@ -194,6 +202,10 @@ def read_model(query):
 
         # change names to match data
         df.columns = ['East [m/s]', 'North [m/s]']
+
+        # rotate from curvilinear to cartesian
+        anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+        df['East [m/s]'], df['North [m/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     df.idx = date2num(df.index.to_pydatetime())  # in units of days
