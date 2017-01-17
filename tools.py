@@ -153,16 +153,12 @@ def read_model(query):
 
     loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
-    # d = netCDF.Dataset(loc)
     ds = xr.open_dataset(loc)
     # Initialize model dataframe with times
-    # df = pd.DataFrame(index=d.ocean_time)
-    # CHANGE TO
     df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
     if which == 'ven':
         # model output needed for image
-        # cols = ['u', 'v', 'temp']
         j, i = bd.model(buoy, 'u')  # get model indices
         df['u'] = ds['u'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_u=j, xi_u=i)
         j, i = bd.model(buoy, 'v')  # get model indices
@@ -183,18 +179,18 @@ def read_model(query):
 
     elif which == 'salt':
         # model output needed for image
-        cols = ['temp', 'salt']
-        for col in cols:
-            df[col] = ds[col].sel(time=slice(dstart, dend))
+        j, i = bd.model(buoy, 'rho')  # get model indices
+        df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
         # change names to match data
         df.columns = ['Temp [deg C]', 'Salinity']
 
     elif which == 'met':
         # model output needed for image
-        cols = ['Uwind', 'Vwind']
-        for col in cols:
-            df[col] = ds[col].sel(time=slice(dstart, dend))
+        j, i = bd.model(buoy, 'rho')  # get model indices
+        df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+        df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
         # change names to match data
         df.columns = ['East [m/s]', 'North [m/s]']
