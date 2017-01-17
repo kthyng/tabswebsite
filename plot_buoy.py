@@ -275,7 +275,7 @@ def plot(df, buoy, which, df2=None):
     fig, axes = setup(buoy, nsubplots=nsubplots)
 
     if which == 'ven':
-        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]', df2)
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
         add_vel(axes[1], df, buoy, 'Across [cm/s]', df2)
         add_vel(axes[2], df, buoy, 'Along [cm/s]', df2)
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]', df2)
@@ -287,7 +287,7 @@ def plot(df, buoy, which, df2=None):
         add_var(axes[2], df, 'Nping', 'Ping Cnt')
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2)
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Temperature [˚ C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[inHg]')
