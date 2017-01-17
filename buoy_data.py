@@ -79,7 +79,9 @@ def model(buoy, grid):
     '''Give model indices closest to buoy on relevant numerical grid.
 
     Both buoy and grid must be strings.
-    grid: 'u', 'v', or 'rho'. '''
+    grid: 'u', 'v',or 'rho'
+    j/lat, i/lon.
+    '''
 
     rho = {'B': [103, 344], 'D': [71, 226], 'F': [100, 310], 'J': [100, 114],
            'K': [3, 135], 'N': [33, 284], 'R': [163, 384], 'V': [20, 376],

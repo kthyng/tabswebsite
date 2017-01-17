@@ -143,26 +143,32 @@ def read(dataname, units='M', tz='UTC'):
     return df
 
 
-def read_model(q):
+def read_model(query):
     '''Read in model output based on data query q.'''
 
     buoy = query.split(' ')[3].split('_')[1]
     which = query.split(' ')[3].split('_')[2]
-    dstart = query.split(' ')[7]  # start date (beginning of day)
-    dend = query.split(' ')[9]  # end date and time
-    loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
+    dstart = query.split('"')[1]  # start date (beginning of day)
+    dend = query.split('"')[3]  # end date and time
+
+    loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
+    # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
     # d = netCDF.Dataset(loc)
-    d = xr.open_dataset(loc)
+    ds = xr.open_dataset(loc)
     # Initialize model dataframe with times
-    df = pd.DataFrame(index=d.ocean_time)
+    # df = pd.DataFrame(index=d.ocean_time)
     # CHANGE TO
-    # df = pd.DataFrame(index=d[dstart:dend].ocean_time)
+    df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
     if which == 'ven':
         # model output needed for image
-        cols = ['u', 'v', 'temp']
-        for col in cols:
-            df[col] = ds[col].sel(time=slice(dstart, dend))
+        # cols = ['u', 'v', 'temp']
+        j, i = bd.model(buoy, 'u')  # get model indices
+        df['u'] = ds['u'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_u=j, xi_u=i)
+        j, i = bd.model(buoy, 'v')  # get model indices
+        df['v'] = ds['v'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_v=j, xi_v=i)
+        j, i = bd.model(buoy, 'rho')  # get model indices
+        df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
         # convert from m/s to cm/s
         df['u']*=100; df['v']*=100
