@@ -87,7 +87,7 @@ def add_currents(ax, df, which, east, north, df2=None):
     axknots.set_ylabel('[knots]')
 
 
-def add_vel(ax, df, buoy, which, df2=None):
+def add_vel(ax, df, buoy, which, df2=None, df3=None):
     '''Add along- or across-shelf velocity to plot
 
     which   'Across' or 'Along'
@@ -96,6 +96,8 @@ def add_vel(ax, df, buoy, which, df2=None):
     ax.plot(df.idx, df[which], 'k', lw=lw)
     if df2 is not None:
         ax.plot(df2.idx, df2[which], color=c2, lw=lw)
+    if df3 is not None:
+        ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
     ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
@@ -129,12 +131,14 @@ def add_vel(ax, df, buoy, which, df2=None):
         ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, df, key, label1, con, label2, df2=None):
+def add_var_2units(ax1, df, key, label1, con, label2, df2=None, df3=None):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     if df2 is not None:
         ax1.plot(df2.idx, df2[key], lw=lw, color=c2, linestyle='-')
+    if df3 is not None:
+        ax1.plot(df3.idx, df3[key], lw=lw, color=c2, linestyle='--')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     shifty(ax1)
@@ -145,12 +149,14 @@ def add_var_2units(ax1, df, key, label1, con, label2, df2=None):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_var(ax, df, var, varlabel, df2=None):
+def add_var(ax, df, var, varlabel, df2=None, df3=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
     if df2 is not None:
         ax.plot(df2.idx, df2[var], lw=lw, color=c2, linestyle='-')
+    if df3 is not None:
+        ax.plot(df3.idx, df3[var], lw=lw, color=c2, linestyle='--')
     ax.set_ylabel(varlabel)
     shifty(ax)
 
@@ -260,7 +266,7 @@ def setup(buoy, nsubplots):
     return fig, axes
 
 
-def plot(df, buoy, which, df2=None):
+def plot(df, buoy, which, df2=None, df3=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
@@ -276,9 +282,9 @@ def plot(df, buoy, which, df2=None):
 
     if which == 'ven':
         add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
-        add_vel(axes[1], df, buoy, 'Across [cm/s]', df2)
-        add_vel(axes[2], df, buoy, 'Along [cm/s]', df2)
-        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]', df2)
+        add_vel(axes[1], df, buoy, 'Across [cm/s]', df2, df3)
+        add_vel(axes[2], df, buoy, 'Along [cm/s]', df2, df3)
+        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]', df2, df3)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]')
         # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
@@ -293,8 +299,8 @@ def plot(df, buoy, which, df2=None):
             'mb2hg', '[inHg]')
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]', df2)
-        add_var(axes[1], df, 'Salinity', 'Salinity', df2)
+        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]', df2, df3)
+        add_var(axes[1], df, 'Salinity', 'Salinity', df2, df3)
         add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]')
     elif which == 'wave':
         add_var(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]')

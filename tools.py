@@ -150,7 +150,7 @@ def rot2d(x, y, ang):
     return xr, yr
 
 
-def read_model(query):
+def read_model(query, timing='recent'):
     '''Read in model output based on data query q.'''
 
     buoy = query.split(' ')[3].split('_')[1]
@@ -158,7 +158,10 @@ def read_model(query):
     dstart = query.split('"')[1]  # start date (beginning of day)
     dend = query.split('"')[3]  # end date and time
 
-    loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
+    if timing == 'recent':
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
+    elif timing == 'forecast':
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_latest.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
     ds = xr.open_dataset(loc)
     # Initialize model dataframe with times
@@ -168,10 +171,10 @@ def read_model(query):
         # model output needed for image
         j, i = bd.model(buoy, 'u')  # get model indices
         along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                                    .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
+                       .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
         j, i = bd.model(buoy, 'v')  # get model indices
         across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                                      .isel(s_rho=-1, eta_v=j, xi_v=i)*100
+                        .isel(s_rho=-1, eta_v=j, xi_v=i)*100
         j, i = bd.model(buoy, 'rho')  # get model indices
         df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
