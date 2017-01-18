@@ -89,7 +89,7 @@ echo "<table border=0 bgcolor=\"#f8f8f8\">";
 // exec($command, $output);
 // var_dump($output);
 
-$blet=array("B","D","F","J","K","N","R","V","W","X");
+$blet=array("B","D","F","J","K","R","V","W","X");
 $bidx=0;
 foreach ($blet as $f) {
 	$venfile="daily/tabs_".$f."_ven";

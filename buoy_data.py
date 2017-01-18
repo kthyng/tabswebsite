@@ -3,10 +3,14 @@ Info about buoys to read in.
 '''
 
 
-def buoys():
+def buoys(kind='active'):
     '''Return list of buoys.'''
 
-    return ['B','D','F','J','K','N','R','V','W','X']
+    if kind == 'active':
+        return ['B','D','F','J','K','R','V','W','X']
+    elif kind == 'inactive':
+        # FILL IN
+        return []
 
 
 def tables():

@@ -18,11 +18,10 @@ var ddimgtooltip={
 		tooltips[2]=["daily/tabs_F_ven_low.png", "", {width:'auto', height: 'auto'}]
 		tooltips[3]=["daily/tabs_J_ven_low.png", "", {width:'auto', height: 'auto'}]
 		tooltips[4]=["daily/tabs_K_ven_low.png", "", {width:'auto', height: 'auto'}]
-		tooltips[5]=["daily/tabs_N_ven_low.png", "", {width:'auto', height: 'auto'}]
-		tooltips[6]=["daily/tabs_R_ven_low.png", "", {width:'auto', height: 'auto'}]
-		tooltips[7]=["daily/tabs_V_ven_low.png", "", {width:'auto', height: 'auto'}]
-		tooltips[8]=["daily/tabs_W_ven_low.png", "", {width:'auto', height: 'auto'}]
-		tooltips[9]=["daily/tabs_X_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[5]=["daily/tabs_R_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[6]=["daily/tabs_V_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[7]=["daily/tabs_W_ven_low.png", "", {width:'auto', height: 'auto'}]
+		tooltips[8]=["daily/tabs_X_ven_low.png", "", {width:'auto', height: 'auto'}]
 
 
 

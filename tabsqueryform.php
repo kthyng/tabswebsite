@@ -63,7 +63,6 @@ print <<<_HTML_
 <OPTION value="F">F
 <OPTION value="J">J
 <OPTION value="K">K
-<OPTION value="N">N
 <OPTION value="R">R
 <OPTION value="V">V
 <OPTION value="W">W
@@ -73,6 +72,7 @@ print <<<_HTML_
 <OPTION value="E">E*
 <OPTION value="G">G*
 <OPTION value="H">H*
+<OPTION value="N">N*
 <OPTION value="P">P*
 <OPTION value="S">S*
 </SELECT>
