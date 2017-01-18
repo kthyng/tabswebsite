@@ -124,6 +124,9 @@ def add_vel(ax, df, buoy, which, df2=None, df3=None):
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
+        # legend for inputs
+        ax.text(0.65, 0.04, 'data', color='k', fontsize=10, transform=ax.transAxes)
+        ax.text(0.75, 0.04, 'model (-- forecast)', color=c2, fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
