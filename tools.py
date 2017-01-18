@@ -107,9 +107,9 @@ def read(dataname, units='M', tz='UTC'):
         # import pdb; pdb.set_trace()
         df = df.round(rdict)
 
-    # can't use datetime index directly unfortunately here, so can't use pandas later either
-    df.idx = date2num(df.index.to_pydatetime())  # in units of days
-    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+    # # can't use datetime index directly unfortunately here, so can't use pandas later either
+    # df.idx = date2num(df.index.to_pydatetime())  # in units of days
+    # df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
 
     if units == 'E':
         units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
@@ -164,54 +164,58 @@ def read_model(query, timing='recent'):
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_latest.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
     ds = xr.open_dataset(loc)
-    # Initialize model dataframe with times
-    df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
+    # only do this if dend is less than or equal to the first date in the model output
+    if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data):
+        df = None
+    else:
+        # Initialize model dataframe with times
+        df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
-    if which == 'ven':
-        # model output needed for image
-        j, i = bd.model(buoy, 'u')  # get model indices
-        along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                       .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
-        j, i = bd.model(buoy, 'v')  # get model indices
-        across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                        .isel(s_rho=-1, eta_v=j, xi_v=i)*100
-        j, i = bd.model(buoy, 'rho')  # get model indices
-        df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        if which == 'ven':
+            # model output needed for image
+            j, i = bd.model(buoy, 'u')  # get model indices
+            along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                           .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
+            j, i = bd.model(buoy, 'v')  # get model indices
+            across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                            .isel(s_rho=-1, eta_v=j, xi_v=i)*100
+            j, i = bd.model(buoy, 'rho')  # get model indices
+            df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
-        # rotate from curvilinear to cartesian
-        anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
-        df['East [cm/s]'], df['North [cm/s]'] = rot2d(along, across, anglev)  # approximately to east, north
+            # rotate from curvilinear to cartesian
+            anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+            df['East [cm/s]'], df['North [cm/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
-        # Project along- and across-shelf velocity rather than use from model
-        # so that angle matches buoy
-        theta = np.deg2rad(-(bd.angle(buoy)-90))  # convert from compass to math angle
-        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
-        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+            # Project along- and across-shelf velocity rather than use from model
+            # so that angle matches buoy
+            theta = np.deg2rad(-(bd.angle(buoy)-90))  # convert from compass to math angle
+            df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
+            df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
-    elif which == 'salt':
-        # model output needed for image
-        j, i = bd.model(buoy, 'rho')  # get model indices
-        df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-        df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        elif which == 'salt':
+            # model output needed for image
+            j, i = bd.model(buoy, 'rho')  # get model indices
+            df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+            df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
-        # change names to match data
-        df.columns = ['Temp [deg C]', 'Salinity']
+            # change names to match data
+            df.columns = ['Temp [deg C]', 'Salinity']
 
-    # elif which == 'met':
-    #     # model output needed for image
-    #     j, i = bd.model(buoy, 'rho')  # get model indices
-    #     df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-    #     df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-    #
-    #     # change names to match data
-    #     df.columns = ['East [m/s]', 'North [m/s]']
-    #
-    #     # rotate from curvilinear to cartesian
-    #     anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
-    #     df['East [m/s]'], df['North [m/s]'] = rot2d(along, across, anglev)  # approximately to east, north
+        # elif which == 'met':
+        #     # model output needed for image
+        #     j, i = bd.model(buoy, 'rho')  # get model indices
+        #     df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+        #     df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+        #
+        #     # change names to match data
+        #     df.columns = ['East [m/s]', 'North [m/s]']
+        #
+        #     # rotate from curvilinear to cartesian
+        #     anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+        #     df['East [m/s]'], df['North [m/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
-    # can't use datetime index directly unfortunately here, so can't use pandas later either
-    df.idx = date2num(df.index.to_pydatetime())  # in units of days
+        # can't use datetime index directly unfortunately here, so can't use pandas later either
+        df.idx = date2num(df.index.to_pydatetime())  # in units of days
 
     return df
 

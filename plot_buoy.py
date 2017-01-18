@@ -13,6 +13,7 @@ import numpy as np
 import buoy_data
 from datetime import datetime
 import tools
+from matplotlib.dates import date2num
 
 
 mpl.rcParams.update({'font.size': 14})
@@ -280,6 +281,15 @@ def plot(df, buoy, which, df2=None, df3=None):
         nsubplots = 4
     elif which == 'salt' or which == 'wave':
         nsubplots = 3
+
+    if which != 'wave':
+        # fill in missing data at 30 min frequency as nans so not plotted
+        df = df.resample('30T').asfreq()
+
+    # can't use datetime index directly unfortunately here, so can't use pandas later either
+    # idx and dT are deleted by the resample command
+    df.idx = date2num(df.index.to_pydatetime())  # in units of days
+    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
 
     fig, axes = setup(buoy, nsubplots=nsubplots)
 
