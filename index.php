@@ -128,14 +128,16 @@ foreach ($blet as $f) {
             $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
             $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
 
-            // check for if report is more than about 5 days old (ignoring time zones, etc)
+            // check for if report is more than about 3 days old (ignoring time zones, etc)
+            // for some reason even data that is current counts as 4 days old so
+            // looking for 7 days difference for equivalent 3 days old
             $today = new DateTime('now', new DateTimeZone('UTC'));
-            $interval = date_diff($dtUTC, $today);  # difference in days between now and 5 days ago
+            $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
-            if ($intervalstr>5){ // old report
+            if ($intervalstr>7){ // old report
                 $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
             }
-            elseif ($intervalstr<=5) { // bold for recent report
+            elseif ($intervalstr<=7) { // bold for recent report
                 $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
             }
             else {  // missing plot
