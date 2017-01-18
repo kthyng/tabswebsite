@@ -66,7 +66,7 @@ if __name__ == "__main__":
     engine = tools.engine()
 
     # loop through buoys: query, make text file, make plot
-    # buoy = 'D'
+    # buoy = 'X'
     for buoy in bd.buoys():
         for table in bd.tables():  # loop through tables for each buoy
 

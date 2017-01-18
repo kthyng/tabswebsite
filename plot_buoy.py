@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import buoy_data
-from datetime import datetime
+from datetime import datetime, timedelta
 import tools
 from matplotlib.dates import date2num
 
@@ -285,6 +285,15 @@ def plot(df, buoy, which, df2=None, df3=None):
     if which != 'wave':
         # fill in missing data at 30 min frequency as nans so not plotted
         df = df.resample('30T').asfreq()
+    elif which == 'wave':
+        idx = df.index
+        # check for gap over an hour. factor 1e9 due to nanoseconds.
+        ind = (np.diff(idx)/1e9).astype(float) > 3700
+        # if big gap, insert nan
+        addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
+        # reindex dataframe with added entries for nans, and sort back into order
+        df = df.reindex(np.hstack((idx, addidx))).sort_index()
+
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     # idx and dT are deleted by the resample command
