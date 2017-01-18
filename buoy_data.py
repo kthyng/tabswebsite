@@ -10,7 +10,7 @@ def buoys(kind='active'):
         return ['B','D','F','J','K','R','V','W','X']
     elif kind == 'inactive':
         # FILL IN
-        return []
+        return ['A','C','E','G','H','P','S']
 
 
 def tables():
@@ -23,8 +23,8 @@ def avail(key):
     '''Return dictionary of what buoys (value) have data for each table (key).'''
 
     avail = {}
-    avail['ven'] = ['B','D','F','J','K','N','R','V','W','X']
-    avail['eng'] = ['B','D','F','J','K','N','R','V','W','X']
+    avail['ven'] = ['A','B','C','D','E','F','G','H','J','K','N','P','R','S','V','W','X']
+    avail['eng'] = ['A','B','C','D','E','F','G','H','J','K','N','P','R','S','V','W','X']
     avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
     avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
     avail['wave'] = ['K', 'N', 'V', 'X']
@@ -35,7 +35,8 @@ def avail(key):
 def angle(buoy):
     '''degree True for across-shelf rotation angle (rotated x axis is offshore)'''
     angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
-             'V': 173, 'W': 173, 'X': 90}
+             'V': 173, 'W': 173, 'X': 90, 'A': 140, 'E': 140, 'G': 173, 'H': 140,
+             'P': 200, 'S': 173}
     return angle[buoy]
 
 
@@ -45,7 +46,10 @@ def locs(buoy):
             'D': {'lon': ['96', '50.574', 'W'], 'lat': ['27', '56.376', 'N']}, 'F': {'lon': ['94', '14.496', 'W'], 'lat': ['28', '50.550', 'N']},
             'J': {'lon': ['97', '03.042', 'W'], 'lat': ['26', '11.484', 'N']}, 'N': {'lon': ['94', '02.202', 'W'], 'lat': ['27', '53.418', 'N']},
             'R': {'lon': ['93', '38.502', 'W'], 'lat': ['29', '38.100', 'N']}, 'V': {'lon': ['93', '35.838', 'W'], 'lat': ['27', '53.796', 'N']},
-            'W': {'lon': ['96', '00.348', 'W'], 'lat': ['28', '21.042', 'N']}, 'X': {'lon': ['96', '20.298', 'W'], 'lat': ['27', '03.960', 'N']}}
+            'W': {'lon': ['96', '00.348', 'W'], 'lat': ['28', '21.042', 'N']}, 'X': {'lon': ['96', '20.298', 'W'], 'lat': ['27', '03.960', 'N']},
+            'A': {'lon': ['93', '48.700', 'W'], 'lat': ['29', '31.950', 'N']}, 'E': {'lon': ['97', '06.000', 'W'], 'lat': ['27', '20.300', 'N']},
+            'G': {'lon': ['93', '28.000', 'W'], 'lat': ['29', '33.000', 'N']}, 'H': {'lon': ['96', '32.601', 'W'], 'lat': ['27', '52.045', 'N']},
+            'P': {'lon': ['92', '44.190', 'W'], 'lat': ['29', '09.972', 'N']}}
     return locs[buoy]
 
 
