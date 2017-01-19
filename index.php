@@ -149,7 +149,7 @@ foreach ($blet as $f) {
         $buoystr = "<td>Not reporting</td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
     print $buoystr;
     $bidx++;
 }
