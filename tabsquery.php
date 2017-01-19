@@ -12,10 +12,10 @@ $degt="&#176;T";
 $PageTitle="TABS Buoy Database Query page";
 
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
-echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=http://tabs1.gerg.tamu.edu/tglo/tabsqueryform.php\">";
+echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=tabsqueryform.php\">";
 echo "<meta HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">";
 
-	print "<p><b>Database search form is here:</b> <a href=tabsqueryform.php>http://tabs.gerg.tamu.edu/tglo/tabsqueryform.php</a>";
+	print "<p><b>Database search form is here:</b> <a href=tabsqueryform.php>tabsqueryform.php</a>";
 } else {
 
 // bring in data from tabsqueryform.php
@@ -103,9 +103,6 @@ if ($noinstr) {
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
     $tempaccess = "daily/tabs_".$Buoyname."_".$table;
-    // // header
-    // $command = escapeshellcmd('/anaconda/bin/python buoy_header.py "'.$Buoyname.'"');
-    // passthru($command);
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
@@ -116,10 +113,6 @@ if ($datepicker == "recent") {
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
 else{
-    // change format of date from yyyy/m/d to yyyy-m-d if needed (depends on where this is called from)
-    // if (strpos($datepicker, '/') !== false) {
-    //     $datepicker = str_replace ("/", "-", $datepicker);
-    // }
     // split date range into two dates. if it is just one date, still becomes an array but of length 1
     $dates = explode(" - ", $datepicker);
     // start date is the first date
