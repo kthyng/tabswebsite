@@ -11,7 +11,7 @@ print "</td>";
 
 print "<td>";
 // Switch to
-print "Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
+print "Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
 
 print "<TD>Return to <a href=tabsqueryform.php>database query</a></TD>\n";
 print "<TD>Return to <a href=index.php>homepage</a></TR></TD>\n";
@@ -29,14 +29,14 @@ print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
 
 if (($datatype == "data")) {
     print "<Select Name=tz>\n";
-    print "<option value=''>Time Zone</Option>\n";
-    print "<option value='UTC'>UTC</Option>\n";
+    // print "<option value=''>Time Zone</Option>\n";
+    print "<option selected value='UTC'>UTC</Option>\n";
     print "<option value='central'>US/Central</option>\n</select></td><br>\n";
 }
 if (($table != "eng") and ($datatype == "data")) {
     print "<td><Select Name=units>\n";
-    print "<option value=''>Units</Option>\n";
-    print "<option value='M'>Metric</Option>\n";
+    // print "<option value=''>Units</Option>\n";
+    print "<option selected value='M'>Metric</Option>\n";
     print "<option value='E'>English</option>\n</select></td>\n";
 }
 
