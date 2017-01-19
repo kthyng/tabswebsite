@@ -105,9 +105,7 @@ else{
     // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy
-    echo $tempfile;
-    echo $tempout;
-    echo $tempaccess;
+
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 get_data.py "'.$tempaccess.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
