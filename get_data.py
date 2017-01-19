@@ -49,12 +49,13 @@ else:
     df = tools.read([query, engine], units=units, tz=tz)
     run_daily.make_text(df, fname)
 
-print('<br><br>')
 if datatype == 'data':
+    print('<br><br>')
     tools.present(df)  # print data table to screen
 elif datatype == 'pic':
     # does this get called from the front page or otherwise for "recent" data?
     if not path.exists(fname + '.png'):
+        print('<br><br>')
         fig = plot_buoy.plot(df, buoy, table)
         fig.savefig(fname + '.pdf')
         fig.savefig(fname + '.png')

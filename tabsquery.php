@@ -1,9 +1,3 @@
-
-<head>
-    <script src="js/dynamic_dropdown.js"></script>
-</head>
-
-
 <?php
 
 umask(0022);
@@ -16,8 +10,6 @@ $degm="&#176;M";
 $degt="&#176;T";
 
 $PageTitle="TABS Buoy Database Query page";
-include("includes/header.html");
-include("includes/navigation.html");
 
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
 echo "<meta HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;URL=http://tabs1.gerg.tamu.edu/tglo/tabsqueryform.php\">";
@@ -155,6 +147,26 @@ else{
     chmod($tempaccess, 0644);
 
 }
+
+// Account for if download option was chosen here, since data has now been read in.
+if ($datatype == 'download'){
+    passthru($command);
+    if (file_exists($tempaccess)) {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'.$tempaccess.'"');
+        // header('Content-Disposition: attachment; filename="'.basename($tempaccess).'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($tempaccess));
+        readfile($tempaccess);
+        exit;
+    }
+}
+
+include("includes/header.html");
+include("includes/navigation.html");
 
 // show header file contents for "recent" data, above table
 if ($datepicker=="recent") {

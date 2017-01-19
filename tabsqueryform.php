@@ -100,7 +100,8 @@ print <<<_HTML_
 <br>
 <TR><TD><B>Output Format: </B></TD><TD>
 <input type=radio name="Datatype" value="pic" checked>Graphic
-<input type=radio name="Datatype" value="data">Data Table
+<input type=radio name="Datatype" value="data">Data table
+<input type=radio name="Datatype" value="download">Download
 </TD></TR>
 <TR><TD><br></TD></TR>
 
