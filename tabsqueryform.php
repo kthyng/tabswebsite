@@ -110,14 +110,14 @@ print <<<_HTML_
 <td><b>&nbsp;for data table:</b></td>
 <TD>Units:&nbsp;
 <Select Name="units">
-<option value='M'>Metric</Option>
+<option selected value='M'>Metric</Option>
 <option value='E'>English</option>
 </select>
 </td>
 
 <TD>Timezone:&nbsp;
 <Select Name="tz">
-<option value='UTC'>UTC</Option>
+<option selected value='UTC'>UTC</Option>
 <option value='central'>US/Central</option>
 </select>
 </td><br>

@@ -7,8 +7,9 @@ python plot_buoy.py 'ven' '../tmp/Fven7YU0EB'
 python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
 '''
 
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 import numpy as np
 import buoy_data
 from datetime import datetime, timedelta
