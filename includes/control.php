@@ -34,12 +34,18 @@ if (($datatype == "data")) {
     print "<option value='UTC'>UTC</Option>\n";
     print "<option value='central'>US/Central</option>\n</select></td><br>\n";
 }
+else {
+    print "<input NAME=tz TYPE=hidden value=$tz>\n";
+}
 if (($table != "eng") and ($datatype == "data")) {
     print "<td><Select Name=units>\n";
     // print "<option value=''>Units</Option>\n";
     print "<option selected value='$units'>$unitsname</option>\n";
     print "<option value='M'>Metric</Option>\n";
     print "<option value='E'>English</option>\n</select></td>\n";
+}
+else {
+    print "<input NAME=units TYPE=hidden value=$units>\n";
 }
 
 // Change buoy
@@ -50,18 +56,10 @@ print "<option value='D'>D</option>\n";
 print "<option value='F'>F</option>\n";
 print "<option value='J'>J</option>\n";
 print "<option value='K'>K</option>\n";
-print "<option value='N'>N</option>\n";
 print "<option value='R'>R</option>\n";
 print "<option value='V'>V</option>\n";
 print "<option value='W'>W</option>\n";
-print "<option value='X'>X</option>\n";
-print "<option value='A'>A*</option>\n";
-print "<option value='C'>C*</option>\n";
-print "<option value='E'>E*</option>\n";
-print "<option value='G'>G*</option>\n";
-print "<option value='H'>H*</option>\n";
-print "<option value='P'>P*</option>\n";
-print "<option value='S'>S*</option>\n</select></td>\n";
+print "<option value='X'>X</option>\n</select></td>\n";
 
 // Change table (variable file)
 // print "<select id=json-two name=table>\n";
