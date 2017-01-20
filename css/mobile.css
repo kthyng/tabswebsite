@@ -13,6 +13,19 @@ margin: 0px;
 font-size: 12px;
 }
 
+div#tglo{
+    display: none;
+}
+
+div#social{
+    display: none;
+}
+
+div#map{
+margin-left: 0em;
+margin-top : 3em;
+}
+
 div#map iframe{
 max-width:280px;
 float:left;
@@ -24,6 +37,9 @@ font-size: 27px;
 margin-left: 3em;
 }
 
+div#Report{
+    font-size: 0.8em;
+}
 
 div #Buoy
 {
@@ -37,10 +53,6 @@ left :0px;
 }
 
 div#navmenu ul{
---clear: both;
---width: 80%
---max-width: 100%;
---margin-left:10px;
 display:none;
 }
 
@@ -61,7 +73,9 @@ div#gloseal
 {
 	margin-left : .25em;
 	margin-top: -.25em;
+    transform: scale(0.5, 0.5);
 }
+
 div#tglo{
 	 --font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 	 font-family: Frutiger 65, Bold;
@@ -70,21 +84,25 @@ div#tglo{
 	 }
 
 div#title{
+    --font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: bold;
 	margin-top: -1.5em;
-	margin-left: -1em;
-	font-family: Frutiger 65, Bold;
+    margin-right: 1em;
+    font-size: 0.9em;
+    color: #000000;
 	}
 
 div#mobtitle{
-	margin-left: -12em;
-	margin-top: -1.5em;
-	font-family: Frutiger 65, Bold;
-	text-align: left;
+	display: none;
 }
 
 div#gerg{
-	margin-left: 2em;
-	display:none;
+    margin-top: -2em;
+	margin-left: 1em;
+	width: 100px;
+    transform: scale(0.4, 0.4);
+    margin-bottom: -1.5em;
+    overflow: hidden;
 	}
 
 div#text{
@@ -105,13 +123,7 @@ div#custom{
 
 
 
-div#map{
-margin-left: 0em;
-margin-top : -5em;
-
-}
 
 div#footerText{
-margin-bottom: -1em;
 display: none;
 }

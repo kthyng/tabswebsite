@@ -14,25 +14,6 @@ font-size: 12px;
 }
 
 
-
-
-/* div#data table
-{
-position: relative;
-float:left;
-margin-bottom:460px;
-} */
-/* div#data {
-width : auto;
-position: inherit;
-left: 10px;
-float:none;
-bottom:0;
-margin-bottom:460px;
-font-size: 10px;
-margin: 0px auto;
-} */
-
 div#Report{
     font-size: 0.8em;
 }
@@ -59,18 +40,6 @@ div#navmenu ul li a {
 width: 172px;
 }
 
-/* #navmobile ul li a {
-text-align: left;
-text-decoration: none;
-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-padding-left: 1em;
-height: 25px;
-width: 70%;
-display: flex;
-color: #007AFF;
-border: 1px solid #fff;
-}
- */
 
 div#navmobile
 {
@@ -100,6 +69,10 @@ div#tglo{
      margin-right: 1.0em;
 }
 
+div#social{
+
+}
+
 div#title{
     --font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: bold;
@@ -117,6 +90,7 @@ div#mobtitle{
     font-style: italic;
     font-size: 0.8em;
 	margin-top: -1.5em;
+    margin-right: 4em;
     color: #000000;
 }
 
