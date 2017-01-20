@@ -37,6 +37,20 @@ $units = $_GET["units"];
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 
+if ($tz == 'UTC') {
+    $tzname = 'UTC';
+}
+else if ($tz == 'central') {
+    $tzname = 'US/Central';
+}
+
+if ($units == 'M') {
+    $unitsname = 'Metric';
+}
+else if ($units == 'E') {
+    $unitsname = 'English';
+}
+
 // convert from table short name to descriptive name string
 if ($table == 'ven') {
     $tablename = 'Velocity data';
@@ -54,20 +68,44 @@ elseif ($table == 'wave') {
     $tablename = 'Wave data';
 }
 
-# Met instrument availability
+
+// if recent and data table, give ability to switch to recent and image
+if ($datatype=="data"){
+    $newdatatype="pic";
+    $newdatatypename="image";
+}
+elseif ($datatype=="pic"){
+    $newdatatype="data";
+    $newdatatypename="table";
+}
+
+$noinstr = False;  // Flag for if instrument is not available
+// Met instrument availability
 if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
-    include("includes/control.php");  // show bottom control options
-    die( "<h2>No meteorological data available for buoy ".$Buoyname."</h2>\n" );
+    $noinstr = True;
+    $statement = "No meteorological data available for buoy ".$Buoyname;
 }
-# Salt instrument availability
-if ($table == "salt" && ! preg_match('/B|D|F|J|K|N|R|V|W|X/',$Buoyname) ) {
-    include("includes/control.php");  // show bottom control options
-    die( "<h2>No water property data available for buoy ".$Buoyname."</h2>\n" );
+// Salt instrument availability
+else if ($table == "salt" && ! preg_match('/B|D|F|J|K|N|R|V|W|X/',$Buoyname) ) {
+    $noinstr = True;
+    $statement = "No water property data available for buoy ".$Buoyname;
 }
-# Wave instrument availability
-if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
+// Wave instrument availability
+else if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
+    $noinstr = True;
+    $statement = "No wave data available for buoy ".$Buoyname;
+}
+
+if ($noinstr) {
+    print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
+	print "<TR><TD valign=top width=120><font face=helvetica><BR>";
+    print "<table>\n";
+    print "</table>\n";
+	print "</TD><TD valign=top><br>";
+    print "<h2>".$statement."</h2>\n" ;
+    print "</TD></TR></TABLE>\n";
     include("includes/control.php");  // show bottom control options
-    die( "<h2>No wave data available for buoy ".$Buoyname."</h2>\n" );
+    die();
 }
 
 # if being called from front page, show previously-made "recent" image from daily directory
@@ -116,17 +154,6 @@ else{
 
     chmod($tempaccess, 0644);
 
-}
-
-
-// if recent and data table, give ability to switch to recent and image
-if ($datatype=="data"){
-    $newdatatype="pic";
-    $newdatatypename="image";
-}
-elseif ($datatype=="pic"){
-    $newdatatype="data";
-    $newdatatypename="table";
 }
 
 // show header file contents for "recent" data, above table
