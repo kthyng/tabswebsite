@@ -47,6 +47,14 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 </HEAD>
 
+<!-- make a table for whole page that can be centered -->
+<table style="width:100%">
+    <col width="50%">
+    <col width="1600px">
+    <col width="50%">
+    <tr>
+    <td></td>
+    <td>
 
 <!-- include header from separate file -->
 <?php include("includes/header.html");?>
@@ -162,7 +170,7 @@ print "<tr><td></td> <td><a href=tabsqueryform.php>Search TABS database</a></td>
 echo "</table>";
 ?>
 <BR>
-<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; text-decoration: none">&nbsp &nbsp Click for full-screen map </a>
+<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; text-decoration: none">&nbsp; &nbsp; Full-screen map </a>
 <!-- <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a> -->
 </TD>
 </TR>
@@ -175,6 +183,11 @@ echo "</table>";
 
 <!-- include footer from separate file -->
 <?php include("includes/footer.html");?>
+
+</td>
+<td></td>
+</tr>
+</table>
 
 </body>
 </html>
