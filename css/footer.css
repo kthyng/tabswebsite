@@ -27,10 +27,10 @@ position: relative;
 text-align: left;
 text-decoration: none;
 font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-padding-left: 1em;
+padding-left: 4em;
 height: 18px;
 width: 165px;
-display: flex;
+display: inline;
 color: #5856D6;
 }
 

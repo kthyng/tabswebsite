@@ -1,5 +1,5 @@
 div#responsive{
-width: 1500px;
+width: 1600px;
 margin: 0px auto;
 height: 100px;
 background: #FFFFFF;
@@ -8,7 +8,7 @@ font-size: 27px;
 
 div#gloseal
 {
-	margin-left : 3.5em;
+	margin-left : 0.1em;
 	margin-top: -.25em;
     transform: scale(0.8, 0.8);
 }
@@ -75,7 +75,7 @@ display: none;
 
 
 div#map{
-margin-left: 6.4em;
+margin-left: 0.0em;
 margin-top : 0em;
 }
 
@@ -84,7 +84,7 @@ display: none;
 }
 
 div#footerText{
-margin-left: 8em;
+margin-left: 0.1em;
 margin-bottom: -5em;
 }
 

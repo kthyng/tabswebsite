@@ -55,10 +55,10 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <!-- include navigation from separate file -->
 <?php include("includes/navigation.html");?>
 
-
+<table>
 <!-- Map from server-->
 <TR>
-<TD valign=top width=44 rowspan=11>
+<TD valign=top width=815 rowspan=11>
 <div id="map" >
   <iframe width="815" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
@@ -69,14 +69,15 @@ The vectors on the map point toward the direction that the currents or winds are
 last three hours of the available data.<br>
 The date and time at each station indicates the end of the three-hour average.<br>
 </i></font>
-</td>
 </center>
+</td>
 <!-- end map -->
 
 
 <!-- buoy list on right hand side -->
 <TR>
-<TD><div id="blank"><TABLE border=0><TH colspan=2 align=left><font class==bknorm size=2em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD>
+<td></td>
+<!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
 <TD valign=top>
 <div id="Report">
 <b>Most Recent Report</b>
@@ -97,7 +98,7 @@ foreach ($blet as $f) {
     if (file_exists($venfile)) {
 
         $lines=file($venfile);
-    	$l=array_pop($lines);
+    	$l=array_pop($lines);  // grab last line in file
     	if (trim($l)) {
     		$line=trim($l);
             $data = preg_split('/\s+/', $line);  # split by white space or by tab
@@ -135,10 +136,12 @@ foreach ($blet as $f) {
             $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
             if ($intervalstr>7){ // old report
-                $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
+                $buoystr = "<td nowrap valign=top><font class=bksm>$dtTXstr $dtTXtz\n</td>";
+                // $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
             }
             elseif ($intervalstr<=7) { // bold for recent report
-                $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
+                $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtTXstr $dtTXtz\n</b></td>";
+                // $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
             }
             else {  // missing plot
                 $buoystr = "<td>Not reporting</td></tr>";
