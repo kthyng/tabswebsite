@@ -66,9 +66,9 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <table>
 <!-- Map from server-->
 <TR>
-<TD valign=top width=815 rowspan=11>
+<TD valign=top>
 <div id="map" >
-  <iframe width="815" height="485" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
+  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
 <!-- text below map -->
 <center>
@@ -83,21 +83,21 @@ The date and time at each station indicates the end of the three-hour average.<b
 
 
 <!-- buoy list on right hand side -->
-<TR>
+<!-- <TR> -->
 <td></td>
+<TD valign=top colspan=2>
+<table border=0 bgcolor="#f8f8f8">
 <!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
-<TD valign=top>
 <div id="Report">
 <b>Most Recent Report</b>
-
+</div>
 <?php
-echo "<table border=0 bgcolor=\"#f8f8f8\">";
+// echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
 // slow!
 // $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
 // exec($command, $output);
 // var_dump($output);
-
 $blet=array("B","D","F","J","K","R","V","W","X");
 $bidx=0;
 foreach ($blet as $f) {
@@ -144,39 +144,45 @@ foreach ($blet as $f) {
             $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
             if ($intervalstr>7){ // old report
-                $buoystr = "<td nowrap valign=top><font class=bksm>$dtTXstr $dtTXtz\n</td>";
+                $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz\n</div></td>";
                 // $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
             }
             elseif ($intervalstr<=7) { // bold for recent report
-                $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtTXstr $dtTXtz\n</b></td>";
+                $buoystr =  "<td nowrap valign=top><div id=\"Report\"><b>$dtTXstr $dtTXtz\n</div></b></td>";
                 // $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
             }
             else {  // missing plot
-                $buoystr = "<td>Not reporting</td></tr>";
+                $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
             }
             }
     }
     else {
-        $buoystr = "<td>Not reporting</td></tr>";
+        $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><font class=bksm><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></font></TD>\n";
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
     print $buoystr;
     $bidx++;
 }
 print "<tr></tr>";
-print "<tr><td></td> <td><a href=tabsqueryform.php>Search TABS database</a></td></tr>";
+print "<tr><td></td> <td><div id=\"Report\"><a href=tabsqueryform.php>Search TABS database</a></div></td></tr>";
 // print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
-echo "</table>";
+// echo "</table>";
 ?>
-<BR>
-<a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; text-decoration: none">&nbsp; &nbsp; Full-screen map </a>
+<tr><td></td></tr>
+<tr><td></td></tr>
+<tr><td></td></tr>
+<tr><td></td></tr>
+<tr><td></td>
+<td><div id="Report"><a href="http://localhost:5000/static/index.html"  target="_blank" style="text-decoration: none">Fullscreen map</a></div></td>
 <!-- <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a> -->
+</tr>
+</table>
+
 </TD>
 </TR>
 
 </TABLE>
-</div>
 
 <!-- separate text below map from footer -->
 <BR><BR>
