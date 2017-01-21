@@ -48,9 +48,9 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 </HEAD>
 
 <!-- make a table for whole page that can be centered -->
-<table style="width:100%">
+<table style="width:100%">  <!-- whole page table -->
     <col width="50%">
-    <col width="1600px">
+    <col width="auto">
     <col width="50%">
     <tr>
     <td></td>
@@ -63,7 +63,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <!-- include navigation from separate file -->
 <?php include("includes/navigation.html");?>
 
-<table>
+<table>  <!-- map and buoy data table -->
 <!-- Map from server-->
 <TR>
 <TD valign=top>
@@ -84,7 +84,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 
 <!-- buoy list on right hand side -->
 <!-- <TR> -->
-<td></td>
+<!-- <td></td> -->
 <TD valign=top colspan=2>
 <table border=0 bgcolor="#f8f8f8">
 <!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
@@ -193,7 +193,7 @@ print "<tr><td></td> <td><div id=\"Report\"><a href=tabsqueryform.php>Search TAB
 </td>
 <td></td>
 </tr>
-</table>
+</table> <!-- end whole page table -->
 
 </body>
 </html>
