@@ -28,6 +28,15 @@
 
 <body>
 
+<!-- make a table for whole page that can be centered -->
+<table style="width:100%">  <!-- whole page table -->
+    <col width="50%">
+    <col width="auto">
+    <col width="50%">
+    <tr>
+    <td></td>
+    <td>
+
 <?php
 
 $buoy = isset($_GET["buoy"]) ? $_GET["buoy"] : "";
@@ -142,6 +151,13 @@ include("includes/footer.html");
 
 
 ?>
+
+
+</td>
+<td></td>
+</tr>
+</table> <!-- end whole page table -->
+
 
 </body>
 </html>

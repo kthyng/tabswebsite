@@ -185,10 +185,11 @@ print "<tr><td></td> <td><div id=\"database\"><a href=tabsqueryform.php>Search T
 </TABLE>
 
 <!-- separate text below map from footer -->
-<BR><BR>
+<!-- <BR><BR> -->
 
 <!-- include footer from separate file -->
 <?php include("includes/footer.html");?>
+
 
 </td>
 <td></td>
