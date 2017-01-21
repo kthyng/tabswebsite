@@ -95,6 +95,10 @@ div#Report{
     font-size: 1em;
 }
 
+div#database{
+    font-size: 1em;
+}
+
 div#Buoy {
 display: none;
 }
