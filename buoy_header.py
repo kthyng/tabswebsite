@@ -72,8 +72,6 @@ def make(buoy):
     head = []
     head.append('<table id=header>')  # id is for test_tabsquery.py
     # this is to buffer the left side
-    head.append("<TR><TD valign=top width=120 align=left rowspan=9>")
-    head.append("</td></tr>")
     head.append('<tr>')
     head.append('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, loc))
     head.append('<TD colspan=3 style="text-align:right"><b>' + time + '</b> (' + time2 + ')</td>')

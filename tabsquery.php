@@ -1,3 +1,5 @@
+<div id="container">
+
 <?php
 
 umask(0022);
@@ -168,10 +170,7 @@ if ($datepicker=="recent") {
 
 // Show results of query
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
-	print "<TR><TD valign=top width=120><font face=helvetica><BR>";
-    print "<table>\n";
-    print "</table>\n";
-	print "</TD><TD valign=top><br>";
+	print "<TD valign=top><br>";
 
     print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
     // note for met and table
@@ -205,3 +204,4 @@ include("includes/control.php");
 }
 
 ?>
+</div>

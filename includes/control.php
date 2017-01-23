@@ -6,9 +6,7 @@
 print "<br><br>";
 print "<font face=\"Helvetica\" size=-1>\n";
 print "<TABLE width=100%>";
-print "<TR><TD width=120 align=left>";
-print "</td>";
-
+print "<TR>";
 print "<td>";
 // Switch to
 print "Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
@@ -19,9 +17,7 @@ print "</table>\n";
 
 
 print "<TABLE width=70%>";
-print "<TR><TD valign=top width=120 align=left>";
-print "</td>";
-
+print "<TR>";
 print "<td>Update results: </td>";
 print "<td>";
 // print "<br> &nbsp;\n";
