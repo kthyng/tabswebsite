@@ -28,14 +28,7 @@
 
 <body>
 
-<!-- make a table for whole page that can be centered -->
-<table style="width:100%">  <!-- whole page table -->
-    <col width="50%">
-    <col width="auto">
-    <col width="50%">
-    <tr>
-    <td></td>
-    <td>
+<div id="container">
 
 <?php
 
@@ -52,17 +45,12 @@ include("includes/navigation.html");
 
 print "<form action=\"tabsquery.php\" method=\"get\">\n";
 
-?>
-
-
-<?php
-
 
 print <<<_HTML_
 <BR>
 
-<TABLE border=0 width=100%>
-<TR><TD width=120 align=left rowspan=20></td>
+<TABLE border=0>
+<TR>
 
 <TD><B>Select Buoy:</B> (* inactive)</TD>
 <TD><SELECT name="Buoyname" id="json-one">
@@ -130,7 +118,7 @@ print <<<_HTML_
 <option selected value='UTC'>UTC</Option>
 <option value='central'>US/Central</option>
 </select>
-</td><br>
+</td><tr>
 <TR><TD><br></TD></TR>
 
 
@@ -153,11 +141,7 @@ include("includes/footer.html");
 ?>
 
 
-</td>
-<td></td>
-</tr>
-</table> <!-- end whole page table -->
-
+</div>
 
 </body>
 </html>
