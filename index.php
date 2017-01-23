@@ -48,14 +48,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 </HEAD>
 
 
-<!-- make a table for whole page that can be centered -->
-<!-- <table style="width:100%">
-    <col width="50%">
-    <col width="auto">
-    <col width="50%">
-    <tr>
-    <td></td>
-    <td> -->
+<!-- this div centers content dynamically -->
 <div id="container">
 
 <!-- include header from separate file -->
@@ -186,17 +179,10 @@ print "<tr><td></td> <td><div id=\"database\"><a href=tabsqueryform.php>Search T
 
 </TABLE>
 
-<!-- separate text below map from footer -->
-<!-- <BR><BR> -->
-
 <!-- include footer from separate file -->
 <?php include("includes/footer.html");?>
 
 </div>
-<!-- </td>
-<td></td>
-</tr>
-</table>
- -->
+
 </body>
 </html>
