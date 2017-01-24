@@ -11,7 +11,7 @@ overflow: auto;
 }
 
 div#mapcontainer{
-    width: 470px;
+    width:  98%;
     float: left;
   overflow: auto;
 margin-right: 10px;
@@ -27,7 +27,7 @@ margin-top : 0em;
 }
 
 div#map iframe{
-width:470px;
+width: 98%;
 float:left;
 margin: 0px auto;
 overflow: auto;
