@@ -160,7 +160,7 @@ foreach ($blet as $f) {
     $bidx++;
 }
 print "<tr></tr>";
-print "<tr><td></td> <td><div id=\"database\"><a href=tabsqueryform.php>Search TABS database</a></div></td></tr>";
+print "<tr><td></td> <td><div id=\"Report\"><a href=tabsqueryform.php>Search TABS database</a></div></td></tr>";
 // print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
 // echo "</table>";
 ?>

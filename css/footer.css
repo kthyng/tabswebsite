@@ -7,6 +7,8 @@ margin-left: 10em;
 font-size:12px;
 font-weight: bold;
 margin-top: 2em;
+color: #007AFF;
+
 }
 
 #footerText ul {
@@ -41,33 +43,7 @@ color: #5856D6;
 	top: 30	px;
 }
 
-/* #footerText ul li:hover ul {
-visibility: visible;
-} */
-
-/*********************************************************************************/
-
-/* #footerText li:hover{
---background: #09F;
-background:#eee;
-} */
-
-/* #footerText ul li:hover ul li a:hover{
-	background: #CCC;
-	color: #000;
-} */
 
 #footerText a:hover{
 	color: #998031;
 	}
-
-/* #footerText-final a{
-   text-align: left;
-text-decoration: none;
-font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-padding-left: 1em;
-height: 18px;
-width: 152px;
-display: flex;
-color: #5856D6;
-} */

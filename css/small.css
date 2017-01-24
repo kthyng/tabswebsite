@@ -5,98 +5,90 @@ div#container{
 }
 
 div#headercontainer{
-width:750;
+    width:750;
 }
 
 div#mapbuoycontainer{
- width: auto;
-margin-top: 0.5em;
-overflow: auto;
+    width: auto;
+    margin-top: 0.5em;
+    overflow: auto;
 }
 
 div#mapcontainer{
-    /*width: 750;*/
     float: center;
-  overflow: visible;
-/*margin-right: 10px;*/
-width:100%; max-width: 750px;
-max-height: 350px; height: 100%;
+    overflow: visible;
+    width:100%;
+    max-width: 750px;
+    max-height: 350px;
+    height: 100%;
 }
 
 div#buoycontainer{
-float: auto;
-margin-top: 3em;
+    float: auto;
+    margin-top: 3em;
 }
 
 div#map{
-/*margin-left: 0em;
-margin-top : 0em;*/
-position: relative;
+    position: relative;
 }
 
 div#map iframe{
-/*width: 750px;*/
-/*overflow:auto;*/
-/*float:none;*/
-/*margin: 0px auto;*/
-height: 350px;
-/*height: 100%;*/
-background: #FFFFFF;
-width:100%;
-/*height: auto;*/
+    height: 350px;
+    background: #FFFFFF;
+    width:100%;
 }
 
 div#head table{
-width: auto;
-float: left;
---font-size: 0px;
-margin: 0px auto;
+    width: auto;
+    float: left;
+    --font-size: 0px;
+    margin: 0px auto;
 }
 
 
 div#leftmenu{
-width : auto;
-float: left;
-margin: 0px;
-font-size: 12px;
+    width : auto;
+    float: left;
+    margin: 0px;
+    font-size: 12px;
 }
 
 
 div#Report{
-    font-size: 1em;
+    font-size: 1.2em;
 }
 
 
 div#database{
-    font-size: 0.8em;
+    font-size: 1.2em;
 }
 
 
 div#wrapper{
-left :0px;
+    left :0px;
 }
 
 div#navmenu{
-clear: both;
---width: 80%;
-max-width: 100%;
-/*margin-left:10px;*/
-display:flex;
+    clear: both;
+    --width: 80%;
+    max-width: 100%;
+    /*margin-left:10px;*/
+    display:flex;
 }
 
 div#navmenu ul li a {
-width: 172px;
+    width: 172px;
 }
 
 
 div#navmobile
 {
-display: none;
+    display: none;
 }
 
 
 div#footer {
-display: none
+    /*display: none*/
 }
 
 div#gloseal
@@ -150,23 +142,6 @@ div#gerg{
     transform: scale(0.4, 0.4);
     margin-bottom: -1.5em;
 	}
-
-div#text{
---padding-left : 29em;
---top :0;
---margin-top: -3.5em;
---margin-left: -.75em;
---font-size: 1em;
-display: none;
-}
-
-div#data
-{display:none;
-}
-
-div#custom{
-	color: #007AFF;
-}
 
 
 div#footerText{
