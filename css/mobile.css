@@ -5,7 +5,7 @@ div#container{
 }
 
 div#headercontainer{
-width:667px;
+width:700px;
 }
 
 div#mapbuoycontainer{
@@ -24,13 +24,13 @@ max-height: 350px; height: 100%;
 
 div#buoycontainer{
 float: auto;
-margin-top: 5em;
+margin-top: 6em;
 }
 
 div#map{
 margin-left: 0em;
 margin-top : 0em;
-position: relative;
+/*position: relative;*/
 }
 
 div#map iframe{

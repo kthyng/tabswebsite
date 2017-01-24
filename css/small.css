@@ -5,7 +5,7 @@ div#container{
 }
 
 div#headercontainer{
-    width:750;
+    width:800;
 }
 
 div#mapbuoycontainer{
@@ -82,7 +82,7 @@ div#footer {
 
 div#gloseal
 {
-	margin-left : 0.0em;
+	margin-left : -0.3em;
 	--margin-top: -.2em;
     transform: scale(0.6, 0.6);
 }
@@ -93,12 +93,13 @@ div#tglo{
      font-size: 0.7em;
       	margin-top: -0.5em;
          margin-bottom: 0.3em;
-         margin-left: -0.6em;
+         margin-left: -1em;
      color: #8B7844;
-     margin-right: 1.0em;
+     margin-right: 0em;
 }
 
 div#social{
+    margin-left: -0.5em;
 
 }
 
@@ -106,7 +107,7 @@ div#title{
     --font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     font-weight: bold;
 	margin-top: -1.5em;
-    margin-right: 4em;
+    margin-right: 2em;
     font-size: 1.1em;
     color: #000000;
     width: 310px;
@@ -119,7 +120,7 @@ div#mobtitle{
     font-style: italic;
     font-size: 0.8em;
 	margin-top: -1.5em;
-    margin-right: 4em;
+    margin-right: 2em;
     color: #000000;
 }
 
