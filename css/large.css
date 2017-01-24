@@ -32,6 +32,7 @@ margin: 0px auto;
 height: 485px;
 background: #FFFFFF;
 font-size: 27px;
+margin-bottom: -0.5em;
 }
 
 div#gloseal
@@ -94,6 +95,5 @@ div#database{
 
 div#footerText{
 margin-left: 0.1em;
-margin-bottom: -5em;
 width: 1000px;
 }
