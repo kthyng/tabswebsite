@@ -64,15 +64,15 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 
 <div id="map" >
   <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
-</div>
 <!-- text below map -->
 <center>
-<i><font class=bkvsm style="font-size:6pt;">
+<p><i><font class=bkvsm style="font-size:6pt;">
 The vectors on the map point toward the direction that the currents or winds are flowing and represent the average for the
 last three hours of the available data.<br>
 The date and time at each station indicates the end of the three-hour average.<br>
-</i></font>
+</font></i></p>
 </center>
+</div>
 </div>
 <!-- end map -->
 

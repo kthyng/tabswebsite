@@ -1,7 +1,11 @@
 div#container{
     margin-left: auto;
     margin-right: auto;
-    width:750;
+    max-width:750;
+}
+
+div#headercontainer{
+width:750;
 }
 
 div#mapbuoycontainer{
@@ -11,29 +15,35 @@ overflow: auto;
 }
 
 div#mapcontainer{
-    width: 750;
-    float: left;
-  overflow: auto;
-margin-right: 10px;
+    /*width: 750;*/
+    float: center;
+  overflow: visible;
+/*margin-right: 10px;*/
+width:100%; max-width: 750px;
+max-height: 350px; height: 100%;
 }
 
 div#buoycontainer{
 float: auto;
+margin-top: 3em;
 }
 
 div#map{
-margin-left: 0em;
-margin-top : 0em;
+/*margin-left: 0em;
+margin-top : 0em;*/
+position: relative;
 }
 
 div#map iframe{
-width: 750px;
-overflow:auto;
-float:none;
-margin: 0px auto;
+/*width: 750px;*/
+/*overflow:auto;*/
+/*float:none;*/
+/*margin: 0px auto;*/
 height: 350px;
+/*height: 100%;*/
 background: #FFFFFF;
-font-size: 27px;
+width:100%;
+/*height: auto;*/
 }
 
 div#head table{
