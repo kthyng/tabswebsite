@@ -58,10 +58,10 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <!-- include navigation from separate file -->
 <?php include("includes/navigation.html");?>
 
-<table>  <!-- map and buoy data table -->
-<!-- Map from server-->
-<TR>
-<TD valign=top>
+<div id="mapbuoycontainer">
+
+<div id="mapcontainer">
+
 <div id="map" >
   <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
 </div>
@@ -73,19 +73,19 @@ last three hours of the available data.<br>
 The date and time at each station indicates the end of the three-hour average.<br>
 </i></font>
 </center>
-</td>
+</div>
 <!-- end map -->
 
 
 <!-- buoy list on right hand side -->
-<!-- <TR> -->
-<!-- <td></td> -->
-<TD valign=top colspan=2>
-<table border=0 bgcolor="#f8f8f8">
+<div id="buoycontainer">
+<table border=0 bgcolor="#f8f8f8" >
 <!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
+<tr>
+<TD valign=top colspan=2>
 <div id="Report">
 <b>Most Recent Report</b>
-</div>
+</div></td></tr>
 <?php
 // echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
@@ -174,10 +174,8 @@ print "<tr><td></td> <td><div id=\"database\"><a href=tabsqueryform.php>Search T
 </tr>
 </table>
 
-</TD>
-</TR>
-
-</TABLE>
+</div>
+</div>
 
 <!-- include footer from separate file -->
 <?php include("includes/footer.html");?>

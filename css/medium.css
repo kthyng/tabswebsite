@@ -1,7 +1,39 @@
 div#container{
     margin-left: auto;
     margin-right: auto;
-    width:900px;
+    width:930px;
+}
+
+div#mapbuoycontainer{
+ width: auto;
+margin-top: 0.5em;
+overflow: auto;
+}
+
+div#mapcontainer{
+    width: 750;
+    float: left;
+  overflow: auto;
+margin-right: 10px;
+}
+
+div#buoycontainer{
+float: auto;
+}
+
+div#map{
+margin-left: 0em;
+margin-top : 0em;
+}
+
+div#map iframe{
+width: 750px;
+overflow:auto;
+float:none;
+margin: 0px auto;
+height: 350px;
+background: #FFFFFF;
+font-size: 27px;
 }
 
 div#head table{
@@ -29,11 +61,6 @@ div#database{
     font-size: 0.8em;
 }
 
-div #Buoy
-{
-margin-left: 2em;
-margin-bottom: -3em;
-}
 
 div#wrapper{
 left :0px;
@@ -132,24 +159,9 @@ div#custom{
 }
 
 
-
-div#map{
-margin-left: 0em;
-margin-top : 0em;
-}
-
-div#map iframe{
-width: 750px;
-overflow:auto;
-float:none;
-margin: 0px auto;
-height: 350px;
-background: #FFFFFF;
-font-size: 27px;
-}
-
 div#footerText{
 margin-bottom: -4em;
 margin-left: 0em;
 font-size:11px;
+width: 900px;
 }

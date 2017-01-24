@@ -1,9 +1,38 @@
 div#container{
     margin-left: auto;
     margin-right: auto;
-    width:1000px;
+    width:1030px;
 }
 
+div#mapbuoycontainer{
+ width: 1030px;
+margin-top: 1.5em;
+}
+
+div#mapcontainer{
+    width: 815px;
+    float: left;
+  overflow: hidden;
+margin-right: 10px;
+}
+
+div#buoycontainer{
+}
+
+div#map{
+margin-left: 0.0em;
+margin-top : 0em;
+}
+
+div#map iframe{
+width: 815px;
+overflow:auto;
+float:none;
+margin: 0px auto;
+height: 485px;
+background: #FFFFFF;
+font-size: 27px;
+}
 
 div#responsive{
 width: 1600px;
@@ -82,22 +111,6 @@ div#navmobile
 display: none;
 }
 
-
-div#map{
-margin-left: 0.0em;
-margin-top : 0em;
-}
-
-div#map iframe{
-width: 815px;
-overflow:auto;
-float:none;
-margin: 0px auto;
-height: 485px;
-background: #FFFFFF;
-font-size: 27px;
-}
-
 div#Report{
     font-size: 1em;
 }
@@ -106,13 +119,10 @@ div#database{
     font-size: 1em;
 }
 
-div#Buoy {
-display: none;
-}
-
 div#footerText{
 margin-left: 0.1em;
 margin-bottom: -5em;
+width: 1000px;
 }
 
 div#footerPageText{

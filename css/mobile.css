@@ -4,6 +4,39 @@ div#container{
     width:480px;
 }
 
+div#mapbuoycontainer{
+ width: auto;
+margin-top: 0.5em;
+overflow: auto;
+}
+
+div#mapcontainer{
+    width: 400px;
+    float: left;
+  overflow: auto;
+margin-right: 10px;
+}
+
+div#buoycontainer{
+float: auto;
+}
+
+div#map{
+margin-left: 0em;
+margin-top : 0em;
+}
+
+div#map iframe{
+max-width:400px;
+float:left;
+margin: 0px auto;
+overflow: auto;
+height: 200px;
+background: #FFFFFF;
+font-size: 27px;
+margin-left: 0em;
+}
+
 div#head table{
 width: auto;
 float: left;
@@ -24,35 +57,12 @@ div#social{
     display: none;
 }
 
-div#map{
-margin-left: 0em;
-margin-top : 0em;
-}
-
-div#map iframe{
-max-width:400px;
-float:left;
-margin: 0px auto;
-overflow: auto;
-height: 200px;
-background: #FFFFFF;
-font-size: 27px;
-margin-left: 0em;
-}
-
 div#Report{
     font-size: 0.8em;
 }
 
 div#database{
     display: none;
-}
-
-div #Buoy
-{
-margin-left: 2em;
-margin-bottom: -3em;
-font-size: 2px;
 }
 
 div#wrapper{
