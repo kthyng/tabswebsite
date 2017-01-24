@@ -13,7 +13,7 @@ overflow: auto;
 div#mapcontainer{
     width: 750;
     float: left;
-  overflow: auto;
+  overflow: visible;
 margin-right: 10px;
 }
 

@@ -4,9 +4,6 @@ div#container{
     max-width:750;
 }
 
-div#headercontainer{
-    width:750;
-}
 
 div#mapbuoycontainer{
     width: auto;
@@ -29,11 +26,15 @@ div#buoycontainer{
 }
 
 div#map{
-    position: relative;
+    margin-left: 0em;
+    margin-top : 0em;
 }
 
 div#map iframe{
     height: 350px;
+    overflow:auto;
+    float:none;
+    margin: 0px auto;
     background: #FFFFFF;
     width:100%;
 }
