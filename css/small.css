@@ -4,6 +4,9 @@ div#container{
     max-width:750;
 }
 
+div#headercontainer{
+    width:750;
+}
 
 div#mapbuoycontainer{
     width: auto;
@@ -38,22 +41,6 @@ div#map iframe{
     background: #FFFFFF;
     width:100%;
 }
-
-div#head table{
-    width: auto;
-    float: left;
-    --font-size: 0px;
-    margin: 0px auto;
-}
-
-
-div#leftmenu{
-    width : auto;
-    float: left;
-    margin: 0px;
-    font-size: 12px;
-}
-
 
 div#Report{
     font-size: 1.2em;

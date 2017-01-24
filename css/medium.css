@@ -36,22 +36,6 @@ background: #FFFFFF;
 font-size: 27px;
 }
 
-div#head table{
-width: auto;
-float: left;
---font-size: 0px;
-margin: 0px auto;
-}
-
-
-div#leftmenu{
-width : auto;
-float: left;
-margin: 0px;
-font-size: 12px;
-}
-
-
 div#Report{
     font-size: 0.8em;
 }
