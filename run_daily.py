@@ -104,3 +104,24 @@ if __name__ == "__main__":
     for buoy in bd.buoys():  # loop through buoys separately for buoy headers
         # write header
         bh.make(buoy)
+
+    # separate for making currents summaries
+    # use data that was calculated previously in this script
+    dfs = []; buoys = []
+    for buoy in bd.buoys():
+        fname = 'tabs_' + buoy + '_ven'
+        df = tools.read(path.join('daily/', fname))
+        # check if any of dataset is from within the past 5 days before appending
+        if (pd.datetime.now() - df.index[-1]).days < 5:
+            dfs.append(df)
+        else:
+            dfs.append(None)
+        buoys.append(buoy)
+    fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
+    fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
+    fig1.savefig(path.join('daily', 'currents1.pdf'))
+    fig1.savefig(path.join('daily', 'currents1.png'))
+    fig2.savefig(path.join('daily', 'currents2.pdf'))
+    fig2.savefig(path.join('daily', 'currents2.png'))
+    close(fig1)
+    close(fig2)
