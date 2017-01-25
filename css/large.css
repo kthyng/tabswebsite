@@ -10,10 +10,10 @@ margin-top: 1.7em;
 }
 
 div#mapcontainer{
-    width: 815px;
+    width: 810px;
     float: left;
   overflow: hidden;
-margin-right: 10px;
+/*margin-right: 10px;*/
 }
 
 div#buoycontainer{
@@ -25,11 +25,9 @@ margin-top : 0em;
 }
 
 div#map iframe{
-width: 815px;
 overflow:auto;
 float:none;
 margin: 0px auto;
-height: 485px;
 background: #FFFFFF;
 font-size: 27px;
 margin-bottom: -0.5em;

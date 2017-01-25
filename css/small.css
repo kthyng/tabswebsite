@@ -1,7 +1,7 @@
 div#container{
     margin-left: auto;
     margin-right: auto;
-    max-width:750;
+    max-width:800;
 }
 
 div#headercontainer{
@@ -12,14 +12,15 @@ div#mapbuoycontainer{
     width: auto;
     margin-top: 0.1em;
     overflow: auto;
+height: 100%;
 }
 
 div#mapcontainer{
     float: center;
     overflow: visible;
     width:100%;
-    max-width: 750px;
-    max-height: 350px;
+    max-width: 800px;
+    max-height: 450px;
     height: 100%;
 }
 
@@ -31,15 +32,17 @@ div#buoycontainer{
 div#map{
     margin-left: 0em;
     margin-top : 0em;
+    padding-bottom: 56%;
 }
 
 div#map iframe{
-    height: 350px;
+    /*height: 350px;*/
     overflow:auto;
     float:none;
     margin: 0px auto;
     background: #FFFFFF;
     width:100%;
+height:100%;
     margin-bottom: -0.7em;
 }
 
@@ -66,7 +69,7 @@ div#navmenu{
 }
 
 div#navmenu ul li a {
-    width: 172px;
+    width: 184px;
 }
 
 

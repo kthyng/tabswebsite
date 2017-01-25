@@ -63,7 +63,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <div id="mapcontainer">
 
 <div id="map" >
-  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://localhost:5000/static/tabs.html"></iframe>
+  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://localhost:5000/static/tabs.html"></iframe>
 <!-- text below map -->
 <center>
 <p><i><font class=bkvsm style="font-size:6pt;">

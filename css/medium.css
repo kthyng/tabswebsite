@@ -5,36 +5,44 @@ div#container{
 }
 
 div#mapbuoycontainer{
- width: auto;
+ width: 930px;
 margin-top: 0.2em;
-overflow: auto;
+overflow: visible;
+/*height: 100%;*/
 }
 
 div#mapcontainer{
-    width: 750;
+    width: 752px;
+    /*height: 451.2px;*/
+    /*width: 750;*/
     float: left;
-  overflow: visible;
-margin-right: 10px;
+  /*overflow: visible;*/
+/*margin-right: 10px;*/
 }
 
 div#buoycontainer{
-float: auto;
+float: right;
 }
 
 div#map{
 margin-left: 0em;
 margin-top : 0em;
+/*overflow: visible;*/
 }
 
 div#map iframe{
-width: 750px;
-overflow:auto;
 float:none;
 margin: 0px auto;
-height: 350px;
 background: #FFFFFF;
 font-size: 27px;
-margin-bottom: -0.5em;
+margin-bottom: -1.5em;
+-ms-zoom: 0.94;
+-moz-transform: scale(0.94);
+-moz-transform-origin: 0 0;
+-o-transform: scale(0.94);
+-o-transform-origin: 0 0;
+-webkit-transform: scale(0.94);
+-webkit-transform-origin: 0 0;
 }
 
 div#Report{
