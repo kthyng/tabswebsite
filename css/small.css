@@ -37,13 +37,20 @@ div#map{
 
 div#map iframe{
     /*height: 350px;*/
-    overflow:auto;
+    overflow:visible;
     float:none;
     margin: 0px auto;
     background: #FFFFFF;
-    width:100%;
-height:100%;
+    /*width:100%;
+height:100%;*/
     margin-bottom: -0.7em;
+    /*-ms-zoom: 0.94;
+    -moz-transform: scale(0.94);
+    -moz-transform-origin: 0 0;
+    -o-transform: scale(0.94);
+    -o-transform-origin: 0 0;
+    -webkit-transform: scale(0.94);
+    -webkit-transform-origin: 0 0;*/
 }
 
 div#Report{

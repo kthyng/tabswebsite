@@ -36,9 +36,16 @@ margin-top : 0em;
 div#map iframe{
 background: #FFFFFF;
 font-size: 27px;
-width:100%;
-height: 100%;
-margin-bottom: -0.5em;
+/*width:100%;
+height: 100%;*/
+margin-bottom: -4em;
+-ms-zoom: 0.8;
+-moz-transform: scale(0.8);
+-moz-transform-origin: 0 0;
+-o-transform: scale(0.8);
+-o-transform-origin: 0 0;
+-webkit-transform: scale(0.8);
+-webkit-transform-origin: 0 0;
 }
 
 div#social{
