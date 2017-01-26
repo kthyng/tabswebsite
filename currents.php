@@ -10,7 +10,4 @@
 	<a href=daily/currents1.pdf> <img width=48% src=daily/currents1.png></a>
     <a href=daily/currents2.pdf> <img width=48% src=daily/currents2.png></a>
 
-    <!-- include bottom controls from separate file -->
-    <?php include("includes/control.php");?>
-
 </div>
