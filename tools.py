@@ -229,6 +229,7 @@ def present(df):
     # print(PrettyPandas(df, formatters=formatters).render())
     # twodigits = PrettyPandas.as_unit('', subset=None, precision=None)
     # formats = PrettyPandas(df).as_unit('', )
+    print('<br><br>')
     print(PrettyPandas(df).render())
     # print(df)
 

@@ -9,8 +9,7 @@ def buoys(kind='active'):
     if kind == 'active':
         return ['B','D','F','J','K','R','V','W','X']
     elif kind == 'inactive':
-        # FILL IN
-        return ['A','C','E','G','H','P','S']
+        return ['A','C','E','G','H','N','P','S']
 
 
 def tables():
@@ -32,6 +31,40 @@ def avail(key):
     return avail[key]
 
 
+def health(buoy, table):
+    '''Health of instruments.
+
+    1: normal, 2: degraded data, 3: data loss, 4: not functioning,
+    -1: discontinued, -999: not applicable
+    'C': Currents
+    'E': engineering
+    'M': Met
+    'P': water properties
+    'W': wave
+    'T': telemetry
+    '''
+
+    health = {}
+    health['B'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['D'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['F'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['J'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['K'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['R'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['V'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['W'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+    health['X'] = {'C': , 'E': , 'M': , 'P': , 'W': , 'T': }
+
+    health['A'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['C'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['E'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['G'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['H'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['N'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['P'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+    health['S'] = {'C': -1, 'E': -1, 'M': -999, 'P': -999, 'W': -999, 'T': -1}
+
+
 def angle(buoy):
     '''degree True for across-shelf rotation angle (rotated x axis is offshore)'''
     angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
@@ -49,7 +82,8 @@ def locs(buoy):
             'W': {'lon': ['96', '00.348', 'W'], 'lat': ['28', '21.042', 'N']}, 'X': {'lon': ['96', '20.298', 'W'], 'lat': ['27', '03.960', 'N']},
             'A': {'lon': ['93', '48.700', 'W'], 'lat': ['29', '31.950', 'N']}, 'E': {'lon': ['97', '06.000', 'W'], 'lat': ['27', '20.300', 'N']},
             'G': {'lon': ['93', '28.000', 'W'], 'lat': ['29', '33.000', 'N']}, 'H': {'lon': ['96', '32.601', 'W'], 'lat': ['27', '52.045', 'N']},
-            'P': {'lon': ['92', '44.190', 'W'], 'lat': ['29', '09.972', 'N']}}
+            'P': {'lon': ['92', '44.190', 'W'], 'lat': ['29', '09.972', 'N']}, 'C': {'lon': ['94', '45.126', 'W'], 'lat': ['28', '48.549', 'N']},
+            'S': {'lon': ['92', '48.669', 'W'], 'lat': ['28', '26.185', 'N']}}
     return locs[buoy]
 
 
@@ -62,6 +96,16 @@ def kind(buoy):
     return kind[buoy]
 
 
+def lease(buoy):
+    '''lease block of buoy'''
+    lease = {'B': 'GA-252', 'F': 'HI-A69', 'D': 'MA-691',
+            'K': 'PI-745', 'J': 'PS-1126', 'N': 'HI-A595',
+            'R': 'WC-055', 'V': 'HI-A389', 'W': 'BR-492',
+            'X': '', 'A': 'SP-018', 'C': 'GA-320', 'E': 'MU-858', 'S': 'BR-492',
+            'G': 'WC-095', 'L': 'HI-A543', 'M': 'HI-A515', 'P': 'VR-102','H':''}
+    return lease[buoy]
+
+
 def sensor(buoy):
     '''sensor depth in meters'''
     sensor = {'B': 2, 'F': 2, 'D': 2, 'K': 2, 'J': 2, 'N': 2, 'R': 2, 'V': 2,
@@ -72,7 +116,8 @@ def sensor(buoy):
 def depth(buoy):
     '''water depth in meters'''
     depth = {'B': 19, 'F': 24, 'D': 18, 'K': 62, 'J': 20, 'N': 105, 'R': 9,
-             'V': 89, 'W': 21, 'X': 289}
+             'V': 89, 'W': 21, 'X': 289, 'A': 12, 'C': 22, 'E': 27.4,
+             'G': 12.5, 'L': 82.3, 'M': 56.7, 'P': 20.1, 'S': 22, 'H': 0}
     return depth[buoy]
 
 

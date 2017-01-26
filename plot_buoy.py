@@ -11,7 +11,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import buoy_data
+import buoy_data as bd
 from datetime import datetime, timedelta
 import tools
 from matplotlib.dates import date2num
@@ -132,7 +132,7 @@ def add_vel(ax, df, buoy, which, df2=None, df3=None):
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(bd.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
         if df2 is not None:
             # legend for inputs
             ax.text(0.4, 0.04, 'data', color='k', fontsize=10, transform=ax.transAxes)
@@ -141,7 +141,7 @@ def add_vel(ax, df, buoy, which, df2=None, df3=None):
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(buoy_data.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, df2=None, df3=None):
@@ -270,12 +270,12 @@ def setup(nsubplots, buoy=None):
     # title
     if buoy is not None:
         axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' +
-                          buoy_data.locs(buoy)['lat'][0] + '˚' +
-                          buoy_data.locs(buoy)['lat'][1] + '\'' +
-                          buoy_data.locs(buoy)['lat'][2] + '  ' +
-                          buoy_data.locs(buoy)['lon'][0] + '˚' +
-                          buoy_data.locs(buoy)['lon'][1] + '\'' +
-                          buoy_data.locs(buoy)['lon'][2], fontsize=18)
+                          bd.locs(buoy)['lat'][0] + '˚' +
+                          bd.locs(buoy)['lat'][1] + '\'' +
+                          bd.locs(buoy)['lat'][2] + '  ' +
+                          bd.locs(buoy)['lon'][0] + '˚' +
+                          bd.locs(buoy)['lon'][1] + '\'' +
+                          bd.locs(buoy)['lon'][2], fontsize=18)
 
     return fig, axes
 
