@@ -11,6 +11,8 @@ var data = {
     "H": ["ven", "eng", "met"],
     "J": ["ven", "eng", "met", "salt"],
     "K": ["ven", "eng", "met", "salt", "wave"],
+    "L": ["ven", "eng"],
+    "M": ["ven", "eng"],
     "N": ["ven", "eng", "met", "salt", "wave"],
     "P": ["ven", "eng"],
     "R": ["ven", "eng", "salt"],
