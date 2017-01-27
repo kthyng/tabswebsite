@@ -1,3 +1,7 @@
+<head>
+    <title>Current Summary</title>
+</head>
+
 <div id="container">
 
     <!-- include header from separate file -->

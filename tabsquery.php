@@ -1,3 +1,7 @@
+<head>
+    <title>Query Results</title>
+</head>
+
 <div id="container">
 
 <?php
