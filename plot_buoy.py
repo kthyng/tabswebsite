@@ -316,7 +316,7 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
         add_vel(axes[1], df, buoy, 'Across [cm/s]', df2, df3)
         add_vel(axes[2], df, buoy, 'Along [cm/s]', df2, df3)
-        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Temperature [deg C]', 'c2f', '[˚F]', df2, df3)
+        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]', 'c2f', '[˚F]', df2, df3)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]')
         # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
@@ -326,12 +326,12 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
-        add_var_2units(axes[1], df, 'AirT [deg C]', 'Temperature [˚ C]', 'c2f', '[˚F]')
+        add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]', 'c2f', '[˚F]')
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
             'mb2hg', '[inHg]')
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp [deg C]', 'Temperature [˚C]', 'c2f', '[˚F]')
+        add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]', 'c2f', '[˚F]')
         add_var(axes[1], df, 'Salinity', 'Salinity')
         add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]')
     elif which == 'wave':
