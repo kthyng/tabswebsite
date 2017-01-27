@@ -72,6 +72,13 @@ def read(dataname, units='M', tz='UTC'):
             rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2, 'Dir [deg T]': 0}
             # rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
             #           'WaterT [deg C]': 1, 'Dir [deg T]': 0}
+            # import
+            # for key, val in rdict.iter():
+            #     df[key] = '%'
+            #
+            # df['Water depth'][ind] = '%.0f ft  (%.0f m)' % \
+            #                                  (tools.convert(bd.depth(ind), 'm2ft'),
+            #                                   bd.depth(ind))
 
         elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
@@ -105,7 +112,7 @@ def read(dataname, units='M', tz='UTC'):
         df.columns = names
         df.index.name = 'Dates [UTC]'
         # import pdb; pdb.set_trace()
-        df = df.round(rdict)
+        # df = df.round(rdict)
 
     # # can't use datetime index directly unfortunately here, so can't use pandas later either
     # df.idx = date2num(df.index.to_pydatetime())  # in units of days

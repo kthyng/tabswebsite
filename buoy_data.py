@@ -69,9 +69,31 @@ def health(buoy):
     return health[buoy]
 
 
-def deployment():
-    '''Deployment dates as string.'''
+def notes(buoy):
 
+    notes = {}
+    notes['B'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=B&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/3. Batteries failed 2016/12/18.'
+    notes['D'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=D&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2017/01/05. Some telemetry problems.'
+    notes['F'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=F&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/1/30.'
+    notes['J'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=J&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2017/1/5.'
+    notes['K'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=K&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/4.'
+    notes['R'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=R&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2014/8/24.'
+    notes['V'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=V&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/4.'
+    notes['W'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=W&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/5. Stopped reporting 2016/9/23.'
+    notes['X'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=X&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/4.'
+
+    notes['A'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=A&datepicker=1996-01-26 - 1996-02-26&tz=UTC&units=M">Database.</a> Retired 1997/3/25. Data available 1995/8/12 - 1996/2/26.'
+    notes['C'] = 'Retired 1997/3/17. Data available 1995/4/2 - 1996/11/29.'
+    notes['E'] = 'Retired 1996/6/5 (no cell service). Data available 1995/6/1 -  1996/1/16.'
+    notes['G'] = 'Retired 1998/6/15. Data available 1997/3/11 - 1998/6/8.'
+    notes['H'] = ''
+    notes['L'] = 'Retired 1998/10/28. Data available 1997/4/20 - 1998/10/28.'
+    notes['M'] = 'Retired 1999/12/1. Data available 1999/3/2 - 1999/12/1.'
+    notes['N'] = 'Out of Service. Buoy recovered 01/04/2017.'
+    notes['P'] = 'Retired 2000/2/19. Data available 1998/7/22 - 2000/2/19.'
+    notes['S'] = 'Retired 2001/7/26. Data available 1999/2/19 - 2001/7/23.'
+
+    return notes[buoy]
 
 
 def angle(buoy):

@@ -32,8 +32,9 @@
 
 <?php
 
-$buoy = isset($_GET["buoy"]) ? $_GET["buoy"] : "";
+$buoy = isset($_GET["Buoyname"]) ? $_GET["Buoyname"] : "";
 $type = isset($_GET["type"]) ? $_GET["type"] : "";
+$datepicker = isset($_GET["datepicker"]) ? $_GET["datepicker"] : "";
 $time = isset($_GET["time"]) ? $_GET["time"] : "";
 $units = isset($_GET["units"]) ? $_GET["units"] : "";
 
