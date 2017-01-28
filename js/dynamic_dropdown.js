@@ -59,6 +59,6 @@ http://jsfiddle.net/NaUAL/
          // no need to empty the element before adding the new content
          second.html(html.join());
     });
-
+    $("#json-one").change();
 
 });

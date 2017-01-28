@@ -101,7 +101,8 @@ def read(dataname, units='M', tz='UTC'):
         #     df['Salinity'] = df2['Salinity']  # from salt file
         #     df['Temp'] = df2['Temp']  # from salt file
 
-        df = df.drop(['date','time'], axis=1)
+        if 'date' in df.columns:
+            df = df.drop(['date','time'], axis=1)
         df.columns = names
         df.index.name = 'Dates [UTC]'
         # import pdb; pdb.set_trace()

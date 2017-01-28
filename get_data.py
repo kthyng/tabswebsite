@@ -45,7 +45,7 @@ if dstart is None:
 # Call to database if needed
 else:
     engine = tools.engine()
-    query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
+    query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (obs_time BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
     df = tools.read([query, engine], units=units, tz=tz)
     run_daily.make_text(df, fname)
 

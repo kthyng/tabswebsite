@@ -82,10 +82,10 @@ def notes(buoy):
     notes['W'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=W&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/5. Stopped reporting 2016/9/23.'
     notes['X'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=X&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/4.'
 
-    notes['A'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=A&datepicker=1996-01-26 - 1996-02-26&tz=UTC&units=M">Database.</a> Retired 1997/3/25. Data available 1995/8/12 - 1996/2/26.'
-    notes['C'] = 'Retired 1997/3/17. Data available 1995/4/2 - 1996/11/29.'
-    notes['E'] = 'Retired 1996/6/5 (no cell service). Data available 1995/6/1 -  1996/1/16.'
-    notes['G'] = 'Retired 1998/6/15. Data available 1997/3/11 - 1998/6/8.'
+    notes['A'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=A&datepicker=1995-08-12 - 1995-10-08&tz=UTC&units=M">Database.</a> Retired 1997/3/25. Data available 1995/8/12 - 1995/10/8.'
+    notes['C'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=C&datepicker=1995-04-02 - 1996-11-29&tz=UTC&units=M">Database.</a> Retired 1997/3/17. Data available 1995/4/2 - 1996/11/29.'
+    notes['E'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=E&datepicker=1995-06-01 - 1996-1-16&tz=UTC&units=M">Database.</a> Retired 1996/6/5 (no cell service). Data available 1995/6/1-1995/7/20 and 1995/11/2-1996/1/16.'
+    notes['G'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=G&datepicker=1997-03-11 - 1998-6-8&tz=UTC&units=M">Database.</a> Retired 1998/6/15. Data available 1997/3/11 - 1998/6/8.'
     notes['H'] = ''
     notes['L'] = 'Retired 1998/10/28. Data available 1997/4/20 - 1998/10/28.'
     notes['M'] = 'Retired 1999/12/1. Data available 1999/3/2 - 1999/12/1.'
@@ -100,7 +100,7 @@ def angle(buoy):
     '''degree True for across-shelf rotation angle (rotated x axis is offshore)'''
     angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
              'V': 173, 'W': 173, 'X': 90, 'A': 140, 'E': 140, 'G': 173, 'H': 140,
-             'P': 200, 'S': 173, 'M': 155, 'L': 155}
+             'P': 200, 'S': 173, 'M': 155, 'L': 155, 'C': 140}
     return angle[buoy]
 
 
