@@ -70,7 +70,6 @@ def health(buoy):
 
 
 def notes(buoy):
-
     notes = {}
     notes['B'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=B&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/3. Batteries failed 2016/12/18.'
     notes['D'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=D&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2017/01/05. Some telemetry problems.'
@@ -82,16 +81,16 @@ def notes(buoy):
     notes['W'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=W&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/5. Stopped reporting 2016/9/23.'
     notes['X'] = '<a href="http://localhost/tabswebsite/tabsquery.php?Buoyname=X&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M">In Service.</a> Redeployed 2016/8/4.'
 
-    notes['A'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=A&datepicker=1995-08-12 - 1995-10-08&tz=UTC&units=M">Database.</a> Retired 1997/3/25. Data available 1995/8/12 - 1995/10/8.'
-    notes['C'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=C&datepicker=1995-04-02 - 1996-11-29&tz=UTC&units=M">Database.</a> Retired 1997/3/17. Data available 1995/4/2 - 1996/11/29.'
-    notes['E'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=E&datepicker=1995-06-01 - 1996-1-16&tz=UTC&units=M">Database.</a> Retired 1996/6/5 (no cell service). Data available 1995/6/1-1995/7/20 and 1995/11/2-1996/1/16.'
-    notes['G'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=G&datepicker=1997-03-11 - 1998-6-8&tz=UTC&units=M">Database.</a> Retired 1998/6/15. Data available 1997/3/11 - 1998/6/8.'
-    notes['H'] = ''
-    notes['L'] = 'Retired 1998/10/28. Data available 1997/4/20 - 1998/10/28.'
-    notes['M'] = 'Retired 1999/12/1. Data available 1999/3/2 - 1999/12/1.'
-    notes['N'] = 'Out of Service. Buoy recovered 01/04/2017.'
-    notes['P'] = 'Retired 2000/2/19. Data available 1998/7/22 - 2000/2/19.'
-    notes['S'] = 'Retired 2001/7/26. Data available 1999/2/19 - 2001/7/23.'
+    notes['A'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=A&datepicker=1995-08-12+-+1995-10-08&tz=UTC&units=M">Database.</a> Retired 1997/3/25. Data available 1995/8/12 - 1995/10/8.'
+    notes['C'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=C&datepicker=1995-04-02+-+1996-11-29&tz=UTC&units=M">Database.</a> Retired 1997/3/17. Data available 1995/4/2 - 1996/11/29.'
+    notes['E'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=E&datepicker=1995-06-01+-+1996-1-16&tz=UTC&units=M">Database.</a> Retired 1996/6/5 (no cell service). Data available 1995/6/1-1995/7/20 and 1995/11/2-1996/1/16.'
+    notes['G'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=G&datepicker=1997-03-11+-+1998-6-8&tz=UTC&units=M">Database.</a> Retired 1998/6/15. Data available 1997/3/11 - 1998/6/8.'
+    notes['H'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=H&datepicker=1997-06-05+-+2007-08-05&tz=UTC&units=M">Database.</a> Retired. Data available 1997/06/05 - 1998/6/22, 2005/08/27 - 2005/10/14, 2006/8/24 - 2007/8/5.'
+    notes['L'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=L&datepicker=1998-04-20+-+1998-10-28&tz=UTC&units=M">Database.</a> Retired 1998/10/28. Data available 1998/4/20 - 1998/10/28.'
+    notes['M'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=M&datepicker=1999-03-02+-+1999-12-1&tz=UTC&units=M">Database.</a> Retired 1999/12/1. Data available 1999/3/2 - 1999/12/1.'
+    notes['N'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=N&datepicker=2002-01-23+-+2016-11-10&tz=UTC&units=M">Database.</a> Retired 2017/1/4. Data available 2002/01/23 - 2016/11/10.'
+    notes['P'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=P&datepicker=1998-07-22+-+2000-02-19&tz=UTC&units=M">Database.</a> Retired 2000/2/19. Data available 1998/7/22 - 2000/2/19.'
+    notes['S'] = '<a href="http://localhost/tabswebsite/tabsqueryform.php?Buoyname=S&datepicker=1999-02-19+-+2001-07-23&tz=UTC&units=M">Database.</a> Retired 2001/7/26. Data available 1999/2/19 - 2001/7/23.'
 
     return notes[buoy]
 

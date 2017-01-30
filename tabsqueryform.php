@@ -89,7 +89,7 @@ print <<<_HTML_
 <TR><TD><br></TD></TR>
 <TR><TD><B>Select Date: </B> </TD>
 <TD>
-<input type="text" value="Click here" id="datepicker" name="datepicker"/>
+<input type="text" value="$datepicker" id="datepicker" name="datepicker"/>
 </TD>
 
 

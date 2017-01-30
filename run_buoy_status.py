@@ -2,18 +2,10 @@
 Script to make buoy table
 '''
 
-# import argparse
 import tools
 import buoy_data as bd
 import pandas as pd
 
-
-# parse the input arguments
-# parser = argparse.ArgumentParser()
-# parser.add_argument('which', type=str, help='which plot function to use ("ven", "met", "eng", "salt")')
-# parser.add_argument('dataname', type=str, help='datafile name, found in /tmp')
-# args = parser.parse_args()
-# buoy = args.dataname.split('/')[-1][0]
 
 def hover(hover_color="#ffff99"):
     return dict(selector="tr:hover",
