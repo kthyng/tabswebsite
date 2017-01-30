@@ -32,7 +32,7 @@ mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
 
 # constants
 cmax = 60  # cm/s, max water arrow value
-wmax = 20  # m/s, max wind arrow value
+wmax = 15  # m/s, max wind arrow value
 lw = 1.5
 c2 = 'cornflowerblue'
 
@@ -46,6 +46,17 @@ def shifty(ax, N=0.05):
     ylims = ax.get_ylim()
     dy = ylims[1] - ylims[0]
     ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
+
+
+def setymaxrange(ax, ymaxrange):
+    '''Set max allowed range of y if limits are over.'''
+
+    ylim = np.asarray(ax.get_ylim())
+    if ylim[0] < ymaxrange[0]:
+        ylim[0] = ymaxrange[0]
+    if ylim[1] > ymaxrange[1]:
+        ylim[1] = ymaxrange[1]
+    ax.set_ylim(ylim)
 
 
 def add_currents(ax, df, which, east, north, compass=True, df2=None):
@@ -62,17 +73,17 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None):
             width /= 3
     else:
         width = 0.2
-    # # decimate temporally
-    # if df.dT < 5*30:
-    #     ddt = 1
-    # elif df.dT < 7*30:
-    #     ddt = 2
-    # elif df.dT < 11*30:
-    #     ddt = 3
-    # elif df.dT < 15*30:
-    #     ddt = 4
-    # else:
-    #     ddt = 5
+    # decimate temporally
+    if df.dT < 5*30:
+        ddt = 1
+    elif df.dT < 7*30:
+        ddt = 2
+    elif df.dT < 11*30:
+        ddt = 3
+    elif df.dT < 15*30:
+        ddt = 4
+    else:
+        ddt = 5
     ax.quiver(df.idx[::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1)
     if df2 is not None:  # 2nd set of arrows
@@ -102,7 +113,7 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None):
     axknots.set_ylabel('[knots]')
 
 
-def add_vel(ax, df, buoy, which, df2=None, df3=None):
+def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
     '''Add along- or across-shelf velocity to plot
 
     which   'Across' or 'Along'
@@ -119,6 +130,8 @@ def add_vel(ax, df, buoy, which, df2=None, df3=None):
     if df3 is not None:
         ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
     ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax, ymaxrange)
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
     ylim = ax.get_ylim()
@@ -155,7 +168,7 @@ def add_vel(ax, df, buoy, which, df2=None, df3=None):
         ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, df, key, label1, con, label2, df2=None, df3=None):
+def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
@@ -165,6 +178,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, df2=None, df3=None):
         ax1.plot(df3.idx, df3[key], lw=lw, color=c2, linestyle='--')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax1, ymaxrange)
     shifty(ax1)
     # right side units
     ax2 = ax1.twinx()
@@ -173,7 +188,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, df2=None, df3=None):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_var(ax, df, var, varlabel, df2=None, df3=None):
+def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
@@ -182,10 +197,12 @@ def add_var(ax, df, var, varlabel, df2=None, df3=None):
     if df3 is not None:
         ax.plot(df3.idx, df3[var], lw=lw, color=c2, linestyle='--')
     ax.set_ylabel(varlabel)
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax, ymaxrange)
     shifty(ax)
 
 
-def add_2var(ax1, df, var1, label1, var2, label2, sameylim=False):
+def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
     '''2 variables, one on each y axis. same y limits if set True.'''
 
     c1, c2 = '#559349', '#874993'
@@ -193,24 +210,30 @@ def add_2var(ax1, df, var1, label1, var2, label2, sameylim=False):
     ax1.plot(df.idx, df[var1], lw=lw, color=c1, linestyle='-')
     ax1.set_ylabel(label1, color=c1)
     ax1.tick_params(axis='y', colors=c1)
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax1, ymaxrange)
     shifty(ax1)
     # 2nd var
     ax2 = ax1.twinx()
     ax2.plot(df.idx, df[var2], lw=lw, color=c2, linestyle='--')
     ax2.set_ylabel(label2 + ' [--]', color=c2)
     ax2.tick_params(axis='y', colors=c2)
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax2, ymaxrange)
     shifty(ax2)
     if sameylim:
         ylim = ax1.get_ylim()
         ax2.set_ylim(ylim[0], ylim[1])
 
 
-def add_2var_sameplot(ax, df, var1, label1, var2):
+def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
     '''2 variables, one on each y axis. same y limits if set True.'''
 
     ax.plot(df.idx, df[var1], lw=lw, color='k', linestyle='-')
     ax.plot(df.idx, df[var2], lw=lw, color='k', linestyle='--')
     ax.set_ylabel(label1, color='k')
+    if ymaxrange is not None:  # Have max limits for y axis
+        setymaxrange(ax, ymaxrange)
     shifty(ax)
 
 
@@ -345,30 +368,31 @@ def plot(df, buoy, which, df2=None, df3=None):
 
     if which == 'ven':
         add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
-        add_vel(axes[1], df, buoy, 'Across [cm/s]', df2, df3)
-        add_vel(axes[2], df, buoy, 'Along [cm/s]', df2, df3)
-        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]', 'c2f', '[˚F]', df2, df3)
+        add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
+        add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
+        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]',
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
     elif which == 'eng':
-        add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]')
-        # add_var(axes[0], df, 'VBatt2', '')  # there are two of these
-        # add_var(axes[0], df, 'VBatt', 'V$_\mathrm{batt}$')
-        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]')
-        add_var(axes[2], df, 'Nping', 'Ping Cnt')
-        add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty')
+        add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
+        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-20, 0])
+        add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 200])
+        add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
-        add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]', 'c2f', '[˚F]')
+        add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]',
+                       'c2f', '[˚F]', ymaxrange=[-25,40])
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-            'mb2hg', '[inHg]')
-        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]')
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040])
+        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110])
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]', 'c2f', '[˚F]')
-        add_var(axes[1], df, 'Salinity', 'Salinity')
-        add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]')
+        add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
+                       'c2f', '[˚F]', ymaxrange=[10, 32])
+        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36])
+        add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
     elif which == 'wave':
         add_var(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]')
         add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
-        add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]')
+        add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12])
     elif which == 'sum':
         add_currents(axes[0], df, 'water')
         add_vel(axes[1], df, 'Across')

@@ -100,7 +100,7 @@ def angle(buoy):
     '''degree True for across-shelf rotation angle (rotated x axis is offshore)'''
     angle = {'B': 145, 'K': 90, 'D': 140, 'F': 155, 'J': 90, 'N': 155, 'R': 145,
              'V': 173, 'W': 173, 'X': 90, 'A': 140, 'E': 140, 'G': 173, 'H': 140,
-             'P': 200, 'S': 173, 'M': 155, 'L': 155, 'C': 140}
+             'P': 200, 'S': 173, 'M': 155, 'L': 155, 'C': 145}
     return angle[buoy]
 
 
