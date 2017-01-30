@@ -1,9 +1,3 @@
-<head>
-    <title>Query Results</title>
-</head>
-
-<div id="container">
-
 <?php
 
 umask(0022);
@@ -95,13 +89,15 @@ else if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
 }
 
 if ($noinstr) {
-    print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
-	print "<TR><TD valign=top width=120><font face=helvetica><BR>";
-    print "<table>\n";
-    print "</table>\n";
-	print "</TD><TD valign=top><br>";
+    // Repeating header type stuff here because otherwise it needs to be below download
+    print "<head>";
+    print "<title>Query Results</title>";
+    print "</head>";
+
+    print "<div id='container'>";
+    include("includes/header.html");
+    include("includes/navigation.html");
     print "<h2>".$statement."</h2>\n" ;
-    print "</TD></TR></TABLE>\n";
     include("includes/control.php");  // show bottom control options
     die();
 }
@@ -163,6 +159,14 @@ if ($datatype == 'download'){
         exit;
     }
 }
+
+// Have to wait to start page itself until after download logic
+print "<head>";
+print "<title>Query Results</title>";
+print "</head>";
+
+print "<div id='container'>";
+
 
 include("includes/header.html");
 include("includes/navigation.html");
