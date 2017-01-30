@@ -62,10 +62,21 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None):
             width /= 3
     else:
         width = 0.2
-    ax.quiver(df.idx, np.zeros(len(df)), df[east], df[north], headaxislength=0,
+    # # decimate temporally
+    # if df.dT < 5*30:
+    #     ddt = 1
+    # elif df.dT < 7*30:
+    #     ddt = 2
+    # elif df.dT < 11*30:
+    #     ddt = 3
+    # elif df.dT < 15*30:
+    #     ddt = 4
+    # else:
+    #     ddt = 5
+    ax.quiver(df.idx[::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1)
     if df2 is not None:  # 2nd set of arrows
-        ax.quiver(df2.idx, np.zeros(len(df2)), df2[east], df2[north], headaxislength=0,
+        ax.quiver(df2.idx[::ddt], np.zeros(len(df2[::ddt])), df2[::ddt][east], df2[::ddt][north], headaxislength=0,
                   headlength=0, width=width, units='y', scale_units='y', scale=1,
                   color=c2)
     if which == 'water':
