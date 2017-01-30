@@ -38,6 +38,9 @@ $datepicker = isset($_GET["datepicker"]) ? $_GET["datepicker"] : "";
 $tz = isset($_GET["tz"]) ? $_GET["tz"] : "";
 $units = isset($_GET["units"]) ? $_GET["units"] : "";
 
+if (! $units) {$units = 'M';}
+if (! $tz) {$tz = 'UTC';}
+
 if ($tz == 'UTC') {
     $tzname = 'UTC';
 }
