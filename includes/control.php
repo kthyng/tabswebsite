@@ -72,7 +72,7 @@ print "<option value='wave'>Wave data</option>\n</select></td>\n";
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 // print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
-print "<input NAME=datepicker TYPE=hidden value=$datepicker>\n";
+print "<input NAME=datepicker TYPE=hidden value='$datepicker'>\n";
 
 // print "<BR>";
 print "<td><input type=submit  value=Change></td>\n</form>\n";
