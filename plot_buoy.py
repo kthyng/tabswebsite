@@ -61,7 +61,7 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None):
         if which == 'wind':
             width /= 3
     else:
-        width = 0.15
+        width = 0.2
     ax.quiver(df.idx, np.zeros(len(df)), df[east], df[north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1)
     if df2 is not None:  # 2nd set of arrows
@@ -214,6 +214,12 @@ def add_xlabels(ax, df, fig):
         sixthdays = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
         ax.xaxis.set_major_locator(sixthdays)
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
     elif df.dT <=2:  # less than or equal to two days
         # hourly minor ticks
         hours = mpl.dates.HourLocator()
@@ -221,8 +227,22 @@ def add_xlabels(ax, df, fig):
         quarterdays = mpl.dates.HourLocator(byhour=np.arange(0,24,6))
         ax.xaxis.set_major_locator(quarterdays)
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
-    else:
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif df.dT < 12*30:  # less than 12 months
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    else:
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %Y'))
 
     # Year for last entry
     # catch special case of last tick switching over to new year without actual data doing so
@@ -233,11 +253,11 @@ def add_xlabels(ax, df, fig):
     #             transform=ax.transAxes, rotation=30)
     # else:
     # note: I haven't been able to figure out how to update this year in the special case
-    ax.text(0.98, -0.25, df.index.strftime("%Y")[-1],
-            transform=ax.transAxes, rotation=30)
+    # ax.text(0.98, -0.25, df.index.strftime("%Y")[-1],
+    #         transform=ax.transAxes, rotation=30)
 
     # put in GMT as time zone
-    ax.text(1.05, -0.25, '[UTC]', transform=ax.transAxes, rotation=30)
+    ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
 
     # tighten only x axis
     plt.autoscale(enable=True, axis='x', tight=True)

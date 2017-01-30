@@ -49,7 +49,12 @@ def query_setup(engine, buoy, table, dend):
 
     # get 5 days of data
     # want from beginning of first day but only up until data time on final day
-    query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend.strftime("%Y-%m-%d %H:%M") + '") order by obs_time'
+    # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
+    if buoy == 'C':
+        query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend.strftime("%Y-%m-%d %H:%M") + '") order by obs_time'
+    else:
+        query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend.strftime("%Y-%m-%d %H:%M") + '") order by obs_time'
+
     return query
 
 
