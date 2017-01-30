@@ -33,11 +33,24 @@
 <?php
 
 $buoy = isset($_GET["Buoyname"]) ? $_GET["Buoyname"] : "";
-$type = isset($_GET["type"]) ? $_GET["type"] : "";
+// $table = isset($_GET["table"]) ? $_GET["table"] : "";
 $datepicker = isset($_GET["datepicker"]) ? $_GET["datepicker"] : "";
-$time = isset($_GET["time"]) ? $_GET["time"] : "";
+$tz = isset($_GET["tz"]) ? $_GET["tz"] : "";
 $units = isset($_GET["units"]) ? $_GET["units"] : "";
 
+if ($tz == 'UTC') {
+    $tzname = 'UTC';
+}
+else if ($tz == 'central') {
+    $tzname = 'US/Central';
+}
+
+if ($units == 'M') {
+    $unitsname = 'Metric';
+}
+else if ($units == 'E') {
+    $unitsname = 'English';
+}
 
 $PageTitle="TABS Buoy Database Query page";
 
@@ -109,22 +122,23 @@ print <<<_HTML_
 <td><b>&nbsp;for data table:</b></td>
 <TD>Units:&nbsp;
 <Select Name="units">
-<option selected value='M'>Metric</Option>
+<option selected value=$units>$unitsname</Option>
+<option value='M'>Metric</Option>
 <option value='E'>English</option>
 </select>
 </td>
 
 <TD>Timezone:&nbsp;
 <Select Name="tz">
-<option selected value='UTC'>UTC</Option>
+<option selected value=$tz>$tzname</Option>
+<option value='UTC'>UTC</Option>
 <option value='central'>US/Central</option>
 </select>
 </td><tr>
 <TR><TD><br></TD></TR>
 
 
-<!-- <input type=hidden  name="tz" value="UTC"> -->
-<input type=hidden  name="stage" value="TRUE">
+<!-- <input type=hidden  name="stage" value="TRUE"> -->
 <TR><TD>
 <input type=reset name="Reset" Value="Reset Fields">
 </TD><TD>

@@ -11,7 +11,7 @@ print "<td>";
 // Switch to
 print "Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
 
-print "<TD>Go to <a href=tabsqueryform.php>database query</a></TD>\n";
+print "<TD>Go to <a href=tabsqueryform.php?Buoyname=$Buoyname&table=$table&datepicker=".urlencode($datepicker)."&tz=$tz&units=$units>database query</a></TD>\n";
 print "<TD>Go to <a href=index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 
