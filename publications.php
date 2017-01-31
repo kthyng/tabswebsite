@@ -37,19 +37,6 @@
     Guinasso, N. L., Yip, J., Reid, R. O., Bender, L. C., Howard, M., Lee III, L. L., Walpert, J. N., Brooks, D. A., Hetland, R. D., &amp; Martin, R. D. (2001). Observing and Forecasting Coastal Currents: Texas Automated Buoy System (TABS). In OCEANS, 2001. MTS/IEEE Conference and Exhibition (Vol. 2, pp. 1318-1322). IEEE.
     <a href=docs/oceans2001.pdf>pdf</a>
     </li>
-
-
-        <!-- <l>
-        Guinasso, N. L., Yip, J., Reid, R. O., Bender, L. C., Howard, M., Lee, L. L., ... & Martin, R. D. (2001). Observing and Forecasting Coastal Currents: Texas Automated Buoy System (TABS). In OCEANS, 2001. MTS/IEEE Conference and Exhibition (Vol. 2, pp. 1318-1322). IEEE.
-        <a href=docs/TABS_Walpert_oceans2011.pdf>pdf</a>
-        </l>
-
-
-            <l>
-            Guinasso, N. L., Yip, J., Reid, R. O., Bender, L. C., Howard, M., Lee, L. L., ... & Martin, R. D. (2001). Observing and Forecasting Coastal Currents: Texas Automated Buoy System (TABS). In OCEANS, 2001. MTS/IEEE Conference and Exhibition (Vol. 2, pp. 1318-1322). IEEE.
-            <a href=docs/TABS_Descriptive_Paper.pdf>pdf</a>
-            </l> -->
-
     </ul>
 
 </div>

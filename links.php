@@ -27,6 +27,6 @@
     <li> <a href=http://www.tpwd.state.tx.us/landwater/water/environconcerns/hab/ style ="text-decoration:none">Harmful Algal Blooms</a> </li>
     <li> <a href=http://fermi.jhuapl.edu/avhrr/gm/ style ="text-decoration:none">AVHHR Images (John Hopkins)</a> </li>
     <li> <a href=http://www.wavcis.lsu.edu/ style ="text-decoration:none">WAVCIS (LSU)</a> </li>
-    </ul
+    </ul>
 
 </div>

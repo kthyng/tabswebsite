@@ -63,7 +63,7 @@ Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
 <div id="mapcontainer">
 
 <div id="map" >
-  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://localhost:5000/static/tabs.html"></iframe>
+  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://pong.tamu.edu/tabs_map/"></iframe>
 <!-- text below map -->
 <center>
 <p><i><font class=bkvsm style="font-size:6pt;">
@@ -169,7 +169,7 @@ print "<tr></tr>";
 <tr><td></td></tr>
 <tr><td></td></tr>
 <tr><td></td>
-<td><div id="Report"><a href="http://localhost:5000/static/index.html"  target="_blank" style="text-decoration: none">Fullscreen map</a></div></td>
+<td><div id="Report"><a href="http://pong.tamu.edu/tabs_map/"  target="_blank" style="text-decoration: none">Fullscreen map</a></div></td>
 <!-- <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a> -->
 </tr>
 </table>
