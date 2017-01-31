@@ -122,14 +122,15 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
     ax.plot(df.idx, df[which], 'k', lw=lw)
     if df2 is not None:
         ax.plot(df2.idx, df2[which], color=c2, lw=lw)
+    if df3 is not None:
+        ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
+    ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
+    if df2 is not None or df3 is not None:
         # add skill score
         dfnew = pd.concat([df2, df3]).resample('30T').asfreq()  # in case there is a df3
         ind = pd.notnull(df[which]) & pd.notnull(dfnew[which])
         ss = 1 - ((df - dfnew)**2).sum() / (df[ind]**2).sum()
         ax.text(0.8, 0.04, 'skill score: %1.2f' % ss[which], color=c2, fontsize=10, transform=ax.transAxes)
-    if df3 is not None:
-        ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
-    ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax, N=0.1)
@@ -157,7 +158,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(bd.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
-        if df2 is not None:
+        if df2 is not None or df3 is not None:
             # legend for inputs
             ax.text(0.4, 0.04, 'data', color='k', fontsize=10, transform=ax.transAxes)
             ax.text(0.5, 0.04, 'model (-- forecast)', color=c2, fontsize=10, transform=ax.transAxes)

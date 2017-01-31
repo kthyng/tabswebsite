@@ -166,7 +166,10 @@ def read_model(query, timing='recent'):
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
     ds = xr.open_dataset(loc)
     # only do this if dend is less than or equal to the first date in the model output
-    if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data):
+    # check if last data datetime is less than 1st model datetime or
+    # first data date is greater than last model time, so that time periods overlap
+    if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
+        pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data):
         df = None
     else:
         # Initialize model dataframe with times

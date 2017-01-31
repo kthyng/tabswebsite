@@ -73,12 +73,12 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file, make plot
     # buoy = 'X'
     for buoy in bd.buoys():
+        # import pdb; pdb.set_trace()
         for table in bd.tables():  # loop through tables for each buoy
-
             if table == 'ven':
                 # find end date of recent legitimate data
                 dend = query_setup_recent(engine, buoy)
-                q = query_setup(engine, buoy, table, dend)
+                # q = query_setup(engine, buoy, table, dend)
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy

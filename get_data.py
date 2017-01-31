@@ -58,8 +58,8 @@ if datatype == 'data':
     tools.present(df)  # print data table to screen
 elif datatype == 'pic':
     # does this get called from the front page or otherwise for "recent" data?
-    # if not path.exists(fname + '.png'):
-    print('<br><br>')
-    fig = plot_buoy.plot(df, buoy, table)
-    fig.savefig(fname + '.pdf')
-    fig.savefig(fname + '.png')
+    if not path.exists(fname + '.png'):
+        print('<br><br>')
+        fig = plot_buoy.plot(df, buoy, table)
+        fig.savefig(fname + '.pdf')
+        fig.savefig(fname + '.png')
