@@ -20,6 +20,12 @@ var data = {
     "V": ["ven", "eng", "met", "salt", "wave"],
     "W": ["ven", "eng", "salt"],
     "X": ["ven", "eng", "met", "salt", "wave"],
+    "42019": ["ndbc"],
+    "42020": ["ndbc"],
+    "42035": ["ndbc"],
+    "42038": ["ndbc"],
+    "SRST2": ["ndbc"],
+    "PTAT2": ["ndbc"],
 }
 
 $(function() {
@@ -50,6 +56,9 @@ http://jsfiddle.net/NaUAL/
               }
               else if (val == "wave"){
                 valname = "Wave data"
+              }
+              else if (val == "ndbc"){
+                valname = "NDBC data"
               }
               html.push('<option value=' + val + '>'+valname+'</option>')
             // //   html.push('<option>'+val+'</option>')

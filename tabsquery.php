@@ -59,6 +59,9 @@ elseif ($table == 'eng') {
 elseif ($table == 'wave') {
     $tablename = 'Wave data';
 }
+elseif ($table == 'ndbc') {
+    $tablename = 'NDBC data';
+}
 
 
 // if recent and data table, give ability to switch to recent and image
@@ -126,7 +129,12 @@ else{
             // if there is not an end date, use start date
             $dend = $dstart;
     }
-    $tempfile=tempnam("tmp","tabs_".$Buoyname."_".$table."_");  // full file location
+    if ($table != 'ndbc') {
+        $tempfile=tempnam("tmp","tabs_".$Buoyname."_".$table."_");  // full file location
+    }
+    else if ($table == 'ndbc') {
+        $tempfile=tempnam("tmp", $table."_".$Buoyname."_");  // full file location
+    }
     // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "tmp/".$tempout;  // relative path to buoy

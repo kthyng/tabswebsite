@@ -54,8 +54,12 @@ def read(dataname, units='M', tz='UTC'):
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
-        buoy = query.split(' ')[3].split('_')[1]
-        which = query.split(' ')[3].split('_')[2]
+        if 'tabs' in query:
+            buoy = query.split(' ')[3].split('_')[1]
+            which = query.split(' ')[3].split('_')[2]
+        elif 'ndbc' in query:
+            buoy = query.split(' ')[3].split('_')[1]
+            which = query.split(' ')[3].split('_')[0]
 
         if which == 'ven':# or which == 'sum':
             ind = df['tx']==-99
@@ -70,8 +74,6 @@ def read(dataname, units='M', tz='UTC'):
             df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
             # dictionary for rounding decimal places
             rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2, 'Dir [deg T]': 0}
-            # rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2,
-            #           'WaterT [deg C]': 1, 'Dir [deg T]': 0}
 
         elif which == 'eng':
             names = ['VBatt [Oper]', 'SigStr [dB]', 'Comp [deg M]', 'Nping', 'Tx', 'Ty', 'ADCP Volt', 'ADCP Curr', 'VBatt [sleep]']
@@ -82,35 +84,32 @@ def read(dataname, units='M', tz='UTC'):
             df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
             df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
             rdict = {'Speed [m/s]': 2, 'Dir from [deg T]': 0}
-            # rdict = {'East [m/s]': 2, 'North [m/s]': 2, 'AtmPr [MB]': 1,
-            #           'Speed [m/s]': 2, 'Dir from [deg T]': 0}
 
         elif which == 'salt':
             names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
             rdict = {}
-            # rdict = {'Temp [deg C]': 1}
 
         elif which == 'wave':
             names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
             rdict = {}
-            # rdict = {'WaveHeight [m]': 2, 'MeanPeriod [s]': 0, 'PeakPeriod [s]': 0}
 
-        # if which == 'sum':  # add onto read in from ven if sum
-        #     names = ['Date', 'Time', 'Temp', 'Cond', 'Salinity', 'Density', 'SoundVel']
-        #     df2 = pd.read_table(dataname, parse_dates=[[0,1]], delim_whitespace=True, names=names, index_col=0, na_values='-999')
-        #     df['Salinity'] = df2['Salinity']  # from salt file
-        #     df['Temp'] = df2['Temp']  # from salt file
+        elif which == 'ndbc':
+            names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
+            df = df.drop(['station', 'windgust2'], axis=1)
+            rdict = {}
+
+            # angle needs to be in math convention for trig and between 0 and 360
+            # also have to switch wind from direction from to direction to with 180 switch
+            theta = 90 - (df['winddir'] - 180)
+            theta[theta<0] += 360
+            df['East [m/s]'] = df['windspeed']*np.cos(np.deg2rad(theta))
+            df['North [m/s]'] = df['windspeed']*np.sin(np.deg2rad(theta))
 
         if 'date' in df.columns:
             df = df.drop(['date','time'], axis=1)
         df.columns = names
         df.index.name = 'Dates [UTC]'
-        # import pdb; pdb.set_trace()
         df = df.round(rdict)
-
-    # # can't use datetime index directly unfortunately here, so can't use pandas later either
-    # df.idx = date2num(df.index.to_pydatetime())  # in units of days
-    # df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
 
     if units == 'E':
         units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
@@ -133,13 +132,7 @@ def read(dataname, units='M', tz='UTC'):
         # need to first establish a time zone (which it is already in) to change it
         df = df.tz_localize('UTC')  # timezone is UTC
         df.index = df.index.tz_convert('US/Central')
-        # tail = df.tail(1)  # last entry in file
-        # dt1 = tail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
-        # dt2 = tail.index.tz_convert('US/Central').strftime("%Y-%m-%d %H:%M %Z")[0]
         df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
-        # df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0])
-
-
 
     return df
 

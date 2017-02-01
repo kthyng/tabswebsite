@@ -18,7 +18,7 @@
 
     <ul>
     <li><b>Buoyname:</b> B, D, etc</li><br>
-    <li><b>table:</b> ven (water currents, temperature), met (wind direction, temperature), wave (wave properties), salt (water properties, salt, temperature), eng (buoy function properties)</li><br>
+    <li><b>table:</b> ven (water currents, temperature), met (wind direction, temperature), wave (wave properties), salt (water properties, salt, temperature), eng (buoy function properties), ndbc (this is exclusively for NOAA NDBC buoys)</li><br>
     <li><b>datepicker:</b> single date (e.g. 2017/1/23 or 2017-1-23) or date range (e.g. 2017-1-23+-+2017-1-30)</li><br>
     <li><b>Datatype:</b> data (to get a table of data), pic (to get an image), download (to only download the data)</li><br>
     <li><b>units:</b> 'M' (metric, default) or 'E' (English)</li><br>

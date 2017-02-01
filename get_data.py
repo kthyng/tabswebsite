@@ -33,8 +33,12 @@ datatype = args.datatype
 units = args.units
 tz = args.tz
 
-buoy = fname.split('/')[1].split('_')[1]
-table = fname.split('/')[1].split('_')[2]
+if 'tabs' in fname:
+    buoy = fname.split('/')[1].split('_')[1]
+    table = fname.split('/')[1].split('_')[2]
+elif 'ndbc' in fname:
+    buoy = fname.split('/')[1].split('_')[1]
+    table = fname.split('/')[1].split('_')[0]
 
 ## Read in data ##
 # from daily file
@@ -48,13 +52,16 @@ else:
     # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
     if buoy == 'C':
         query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (obs_time BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
+    # NOAA data stations have a different table name
+    elif table == 'ndbc':
+        query = "SELECT * FROM ndbc_" + buoy + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
     else:
         query = "SELECT * FROM tabs_" + buoy + '_' + table + " WHERE (date BETWEEN '" + dstart + "' AND '" + dend + "') order by obs_time"
     df = tools.read([query, engine], units=units, tz=tz)
     run_daily.make_text(df, fname)
 
 if datatype == 'data':
-    print('<br><br>')
+    # print('<br><br>')
     tools.present(df)  # print data table to screen
 elif datatype == 'pic':
     # does this get called from the front page or otherwise for "recent" data?

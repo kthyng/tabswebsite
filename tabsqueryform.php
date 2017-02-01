@@ -81,6 +81,12 @@ print <<<_HTML_
 <OPTION value="V">V
 <OPTION value="W">W
 <OPTION value="X">X
+<OPTION value="42019">42019
+<OPTION value="42020">42020
+<OPTION value="42035">42035
+<OPTION value="42038">42038
+<OPTION value="SRST2">SRST2
+<OPTION value="PTAT2">PTAT2
 <OPTION value="A">A*
 <OPTION value="C">C*
 <OPTION value="E">E*

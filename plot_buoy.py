@@ -56,6 +56,8 @@ def setymaxrange(ax, ymaxrange):
         ylim[0] = ymaxrange[0]
     if ylim[1] > ymaxrange[1]:
         ylim[1] = ymaxrange[1]
+    if ylim[1] < ymaxrange[0]:  # weird case with missing values
+        ylim[1] = ymaxrange[1]
     ax.set_ylim(ylim)
 
 
@@ -324,13 +326,17 @@ def setup(nsubplots, buoy=None):
     fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
     # title
     if buoy is not None:
-        axes[0].set_title('TGLO TABS Buoy ' + buoy + ': ' +
-                          bd.locs(buoy)['lat'][0] + '˚' +
-                          bd.locs(buoy)['lat'][1] + '\'' +
-                          bd.locs(buoy)['lat'][2] + '  ' +
-                          bd.locs(buoy)['lon'][0] + '˚' +
-                          bd.locs(buoy)['lon'][1] + '\'' +
-                          bd.locs(buoy)['lon'][2], fontsize=18)
+        if len(buoy) == 1:
+            title = 'TGLO TABS Buoy ' + buoy + ': ' + bd.locs(buoy)['lat'][0] +\
+                    '˚' + bd.locs(buoy)['lat'][1] + '\'' + bd.locs(buoy)['lat'][2]\
+                    + '  ' + bd.locs(buoy)['lon'][0] + '˚' + bd.locs(buoy)['lon'][1]\
+                    + '\'' + bd.locs(buoy)['lon'][2]
+        else:  # NDBC
+            title = 'NDBC Station ' + buoy + ': ' + bd.locs(buoy)['lat'][0] +\
+                    '˚' + bd.locs(buoy)['lat'][1] + '\'' + bd.locs(buoy)['lat'][2]\
+                    + '  ' + bd.locs(buoy)['lon'][0] + '˚' + bd.locs(buoy)['lon'][1]\
+                    + '\'' + bd.locs(buoy)['lon'][2]
+        axes[0].set_title(title, fontsize=18)
 
     return fig, axes
 
@@ -346,8 +352,10 @@ def plot(df, buoy, which, df2=None, df3=None):
         nsubplots = 4
     elif which == 'salt' or which == 'wave':
         nsubplots = 3
+    elif which == 'ndbc':
+        nsubplots = 5
 
-    if which != 'wave':
+    if which != 'wave' and which !='ndbc':
         # fill in missing data at 30 min frequency as nans so not plotted
         df = df.resample('30T').asfreq()
     elif which == 'wave':
@@ -358,7 +366,10 @@ def plot(df, buoy, which, df2=None, df3=None):
         addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
         # reindex dataframe with added entries for nans, and sort back into order
         df = df.reindex(np.hstack((idx, addidx))).sort_index()
-
+    elif which == 'ndbc':
+        # fill in missing data at 60 min frequency as nans so not plotted
+        base = df.index[0].minute
+        df = df.resample('60T', base=base).asfreq()
 
     # can't use datetime index directly unfortunately here, so can't use pandas later either
     # idx and dT are deleted by the resample command
@@ -391,14 +402,19 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36])
         add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
     elif which == 'wave':
-        add_var(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]')
+        add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
+                       'm2ft', '[ft]', ymaxrange=[0,5])
         add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
         add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12])
-    elif which == 'sum':
-        add_currents(axes[0], df, 'water')
-        add_vel(axes[1], df, 'Across')
-        add_vel(axes[2], df, 'Along')
-        add_var_2units(axes[3], df, 'WaterT', 'Temperature [˚C]', 'c2f', '[˚F]')
+    elif which == 'ndbc':
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
+        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040])
+        add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
+                       'm2ft', '[ft]', ymaxrange=[0,5])
+        add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12])
+        add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
 
     add_xlabels(axes[nsubplots-1], df, fig)
 
