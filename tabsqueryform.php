@@ -84,7 +84,6 @@ print <<<_HTML_
 <OPTION value="42019">42019
 <OPTION value="42020">42020
 <OPTION value="42035">42035
-<OPTION value="42038">42038
 <OPTION value="SRST2">SRST2
 <OPTION value="PTAT2">PTAT2
 <OPTION value="A">A*
@@ -95,6 +94,12 @@ print <<<_HTML_
 <OPTION value="N">N*
 <OPTION value="P">P*
 <OPTION value="S">S*
+<OPTION value="42001">42001*
+<OPTION value="42002">42002*
+<OPTION value="42007">42007*
+<OPTION value="42036">42036*
+<OPTION value="42039">42039*
+<OPTION value="42040">42040*
 </SELECT>
 </TD>
 

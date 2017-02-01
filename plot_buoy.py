@@ -187,6 +187,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, 
     # right side units
     ax2 = ax1.twinx()
     ax2.set_ylabel(label2)
+    ax2.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     ylim = ax1.get_ylim()
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
