@@ -162,7 +162,7 @@ def read_model(query, timing='recent'):
     if timing == 'recent':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
     elif timing == 'forecast':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_latest.nc'
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_previous_day.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
     ds = xr.open_dataset(loc)
     # only do this if dend is less than or equal to the first date in the model output
