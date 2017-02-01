@@ -96,7 +96,7 @@ def read(dataname, units='M', tz='UTC'):
         elif which == 'ndbc':
             names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
             df = df.drop(['station', 'windgust2'], axis=1)
-            rdict = {}
+            rdict = {'East [m/s]': 2, 'North [m/s]': 2}
 
             # angle needs to be in math convention for trig and between 0 and 360
             # also have to switch wind from direction from to direction to with 180 switch
@@ -147,8 +147,12 @@ def rot2d(x, y, ang):
 def read_model(query, timing='recent'):
     '''Read in model output based on data query q.'''
 
-    buoy = query.split(' ')[3].split('_')[1]
-    which = query.split(' ')[3].split('_')[2]
+    if 'tabs' in query:
+        buoy = query.split(' ')[3].split('_')[1]
+        which = query.split(' ')[3].split('_')[2]
+    elif 'ndbc' in query:
+        buoy = query.split(' ')[3].split('_')[1]
+        which = query.split(' ')[3].split('_')[0]
     dstart = query.split('"')[1]  # start date (beginning of day)
     dend = query.split('"')[3]  # end date and time
 
@@ -197,6 +201,14 @@ def read_model(query, timing='recent'):
 
             # change names to match data
             df.columns = ['Temp [deg C]', 'Salinity']
+
+        elif which == 'ndbc':
+            # model output needed for image
+            j, i = bd.model(buoy, 'rho')  # get model indices
+            df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+
+            # change names to match data
+            df.columns = ['WaterT [deg C]']
 
         # elif which == 'met':
         #     # model output needed for image

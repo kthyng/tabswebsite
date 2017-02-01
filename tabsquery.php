@@ -107,7 +107,12 @@ if ($noinstr) {
 
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
-    $tempaccess = "daily/tabs_".$Buoyname."_".$table;
+    if ($table != 'ndbc') {
+        $tempaccess = "daily/tabs_".$Buoyname."_".$table;
+    }
+    else if ($table == 'ndbc') {
+        $tempaccess = "daily/".$table."_".$Buoyname;
+    }
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
@@ -181,7 +186,12 @@ include("includes/navigation.html");
 
 // show header file contents for "recent" data, above table
 if ($datepicker=="recent") {
-    echo file_get_contents( "daily/tabs_".$Buoyname."_header" );
+    if ($table != 'ndbc') {
+        echo file_get_contents( "daily/tabs_".$Buoyname."_header" );
+    }
+    else if ($table == 'ndbc') {
+        echo file_get_contents( "daily/ndbc_".$Buoyname."_header" );
+    }
 }
 
 // Show results of query

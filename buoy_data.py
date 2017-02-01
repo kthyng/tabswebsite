@@ -7,15 +7,15 @@ def buoys(kind='active'):
     '''Return list of buoys.'''
 
     if kind == 'active':
-        return ['B','D','F','J','K','R','V','W','X']
+        return ['B','D','F','J','K','R','V','W','X','42019','42020','42035','SRST2','PTAT2']
     elif kind == 'inactive':
-        return ['A','C','E','G','H','L','M','N','P','S']
+        return ['A','C','E','G','H','L','M','N','P','S','42001','42002','42007','42036','42039','42040']
 
 
 def tables():
     '''Return list of tables.'''
 
-    return ['ven', 'met', 'eng', 'salt', 'wave']
+    return ['ven', 'met', 'eng', 'salt', 'wave', 'ndbc']
 
 
 def avail(key):
@@ -27,6 +27,7 @@ def avail(key):
     avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
     avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
     avail['wave'] = ['K', 'N', 'V', 'X']
+    avail['ndbc'] = ['42019','42020','42035','SRST2','PTAT2']
 
     return avail[key]
 
@@ -133,7 +134,8 @@ def kind(buoy):
     kind = {'B': 'AA3900 DCS', 'F': 'AA3900 DCS', 'D': 'AA3900 DCS',
             'K': 'AA3900 DCS', 'J': 'AA3900 DCS', 'N': 'AA3900 DCS',
             'R': 'AA3900 DCS', 'V': 'AA3900 DCS', 'W': 'AA3900 DCS',
-            'X': 'AA3900 DCS'}
+            'X': 'AA3900 DCS', '42019': '', '42020': '', '42035': '',
+            'SRST2': '', 'PTAT2': ''}
     return kind[buoy]
 
 
@@ -143,7 +145,8 @@ def lease(buoy):
             'K': 'PI-745', 'J': 'PS-1126', 'N': 'HI-A595',
             'R': 'WC-055', 'V': 'HI-A389', 'W': 'BR-492',
             'X': '', 'A': 'SP-018', 'C': 'GA-320', 'E': 'MU-858', 'S': 'BR-492',
-            'G': 'WC-095', 'L': 'HI-A543', 'M': 'HI-A515', 'P': 'VR-102','H':''}
+            'G': 'WC-095', 'L': 'HI-A543', 'M': 'HI-A515', 'P': 'VR-102','H':'',
+            '42019': '', '42020': '', '42035': '', 'SRST2': '', 'PTAT2': ''}
     return lease[buoy]
 
 
@@ -158,14 +161,15 @@ def depth(buoy):
     '''water depth in meters'''
     depth = {'B': 19, 'F': 24, 'D': 18, 'K': 62, 'J': 20, 'N': 105, 'R': 9,
              'V': 89, 'W': 21, 'X': 289, 'A': 12, 'C': 22, 'E': 27.4,
-             'G': 12.5, 'L': 82.3, 'M': 56.7, 'P': 20.1, 'S': 22, 'H': 0}
+             'G': 12.5, 'L': 82.3, 'M': 56.7, 'P': 20.1, 'S': 22, 'H': 0,
+             '42019': 82, '42020': 77, '42035': 16}
     return depth[buoy]
 
 
 def anemometer(buoy):
     '''anemometer height above water in meters'''
     an = {'B': 4, 'K': 4, 'J': 4, 'N': 4, 'V': 4, 'X': 4, 'F': 0, 'D': 0,
-          'R': 0, 'W': 0}
+          'R': 0, 'W': 0, '42019': 5, '42020': 5, '42035': 5, 'SRST2': 14,'PTAT2': 15}
     return an[buoy]
 
 

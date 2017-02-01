@@ -55,7 +55,12 @@ print "<option value='K'>K</option>\n";
 print "<option value='R'>R</option>\n";
 print "<option value='V'>V</option>\n";
 print "<option value='W'>W</option>\n";
-print "<option value='X'>X</option>\n</select></td>\n";
+print "<option value='X'>X</option>\n";
+print "<OPTION value='42019'>42019</option>\n";
+print "<OPTION value='42020'>42020</option>\n";
+print "<OPTION value='42035'>42035</option>\n";
+print "<OPTION value='SRST2'>SRST2</option>\n";
+print "<OPTION value='PTAT2'>PTAT2</option></select></td>\n";
 
 // Change table (variable file)
 // print "<select id=json-two name=table>\n";
