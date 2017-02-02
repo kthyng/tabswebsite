@@ -93,10 +93,18 @@ The date and time at each station indicates the end of the three-hour average.<b
 // $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
 // exec($command, $output);
 // var_dump($output);
-$blet=array("B","D","F","J","K","R","V","W","X");
+$blet=array("B","D","F","J","K","R","V","W","X",'42019','42020','42035','SRST2','PTAT2');
 $bidx=0;
 foreach ($blet as $f) {
-	$venfile="daily/tabs_".$f."_ven";
+    if (strlen($f) == 1) {
+    	$venfile="daily/tabs_".$f."_ven";
+        $table = "ven";
+    }
+    else if (strlen($f) > 1) {
+    	$venfile="daily/ndbc_".$f;
+        $table = "ndbc";
+    }
+
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
     if (file_exists($venfile)) {
 
@@ -111,10 +119,8 @@ foreach ($blet as $f) {
             // tabs datetime in UTC and Texas time (CST/CDT)
             // set up date and time together with UTC timezone (which is what the data is in)
             $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
-            // echo $dtUTC->format('Y-m-d H:i');
             // save formatted string
             // http://php.net/manual/en/datetime.formats.date.php
-            // $dtUTCstr = $dtUTC->format('Y-m-d H:i');
             $dtUTCstr = $dtUTC->format('M d, Y H:i');
             // find time zone abbreviation
             // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
@@ -155,14 +161,15 @@ foreach ($blet as $f) {
         $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=tabsquery.php?Buoyname=$f&table=ven&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
     print $buoystr;
     $bidx++;
+    if ($f == "X") {
+    print "<tr><td><br></td></tr>";  // space between TABS and NDBC buoys
+    }
 }
 print "<tr></tr>";
-// print "<tr><td></td> <td><div id=\"database\"><a href=tabsqueryform.php>Search TABS database</a></div></td></tr>";
-// print "<tr><td></td> <td><a href=tabsqueryform.php><font color='black'>Search TABS database</font></a></td></tr>";
-// echo "</table>";
+
 ?>
 <tr><td></td></tr>
 <tr><td></td></tr>
