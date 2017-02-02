@@ -11,8 +11,8 @@ div#headercontainer{
 div#mapbuoycontainer{
     width: auto;
     margin-top: 0.1em;
-    overflow: auto;
-height: 100%;
+    overflow: visible;
+/*height: 100%;*/  /* messed up footer so it came up to mid-page */
 }
 
 div#mapcontainer{
