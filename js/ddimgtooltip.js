@@ -22,6 +22,11 @@ var ddimgtooltip={
 		tooltips[6]=["daily/tabs_V_ven_low.png", "", {width:'auto', height: 'auto'}]
 		tooltips[7]=["daily/tabs_W_ven_low.png", "", {width:'auto', height: 'auto'}]
 		tooltips[8]=["daily/tabs_X_ven_low.png", "", {width:'auto', height: 'auto'}]
+        tooltips[9]=["daily/ndbc_42019_low.png", "", {width:'auto', height: 'auto'}]
+        tooltips[10]=["daily/ndbc_42020_low.png", "", {width:'auto', height: 'auto'}]
+        tooltips[11]=["daily/ndbc_42035_low.png", "", {width:'auto', height: 'auto'}]
+        tooltips[12]=["daily/ndbc_SRST2_low.png", "", {width:'auto', height: 'auto'}]
+        tooltips[13]=["daily/ndbc_PTAT2_low.png", "", {width:'auto', height: 'auto'}]
 
 
 

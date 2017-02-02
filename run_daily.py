@@ -114,8 +114,7 @@ if __name__ == "__main__":
                     fig.savefig(fname + '.pdf')
                     fig.savefig(fname + '.png')
                     # save smaller for hover
-                    if table == 'ven':
-                        fig.savefig(fname + '_low.png', dpi=60)
+                    fig.savefig(fname + '_low.png', dpi=60)
                     close(fig)
                 # if data isn't available at the same time as the ven file,
                 # leave as not written
