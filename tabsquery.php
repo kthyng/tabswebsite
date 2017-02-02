@@ -95,6 +95,7 @@ if ($noinstr) {
     // Repeating header type stuff here because otherwise it needs to be below download
     print "<head>";
     print "<title>Query Results</title>";
+    include("includes/queryhead.html");
     print "</head>";
 
     print "<div id='container'>";
@@ -176,6 +177,7 @@ if ($datatype == 'download'){
 // Have to wait to start page itself until after download logic
 print "<head>";
 print "<title>Query Results</title>";
+include("includes/queryhead.html");
 print "</head>";
 
 print "<div id='container'>";

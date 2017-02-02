@@ -63,16 +63,8 @@ print "<OPTION value='SRST2'>SRST2</option>\n";
 print "<OPTION value='PTAT2'>PTAT2</option></select></td>\n";
 
 // Change table (variable file)
-// print "<select id=json-two name=table>\n";
-// print "<option selected value='$table'>$table</option>";
-
-print "<td><Select Name=table>\n";
-print "<OPTION SELECTED value='$table'>$tablename</option>\n";
-print "<option value='ven'>Velocity data</option>\n";
-print "<option value='met'>Meteorological data</option>\n";
-print "<option value='eng'>System data</option>\n";
-print "<option value='salt'>Water property data</option>\n";
-print "<option value='wave'>Wave data</option>\n</select></td>\n";
+print "<td><select id=json-two name=table>\n";
+print "<option selected value='$table'>$table</option></select></td>";
 
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 // print "<input NAME=table TYPE=hidden value=$table>\n";
