@@ -1,31 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-        <?php include("includes/queryhead.html");?>
-
-		<!-- <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-		<title>Database Query Form</title>
-        <script
-          src="https://code.jquery.com/jquery-2.2.4.min.js"
-          integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
-          crossorigin="anonymous"></script>
-		<script type="text/javascript" src="js/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="js/daterangepicker.jQuery.js"></script>
-		<link rel="stylesheet" href="css/ui.daterangepicker.css" type="text/css" />
-		<link rel="stylesheet" href="css/redmond/jquery-ui-1.7.1.custom.css" type="text/css" title="ui-theme" /> -->
-        <!-- <script src="http://code.jquery.com/jquery-migrate-1.4.1.js"></script> -->
-		<!-- <script type="text/javascript">
-			$(function(){
-				  $('#datepicker').daterangepicker({
-                    datepickerOptions: {changeMonth: true, changeYear: true,
-                    minDate: new Date(1995, 1, 1), maxDate: 0,
-                    yearRange: "1995:+0"}
-                    });
-			 });
-		</script> -->
-
-    <!-- <script src="js/dynamic_dropdown.js"></script> -->
-
+        <?php include("../includes/queryhead.html");?>
+        <title>Buoy Query Form</title>
 	</head>
 
 <body>
@@ -57,12 +34,12 @@ else if ($units == 'E') {
     $unitsname = 'English';
 }
 
-$PageTitle="TABS Buoy Database Query page";
+// $PageTitle="TABS Buoy Database Query page";
 
-include("includes/header.html");
-include("includes/navigation.html");
+include("../includes/header.html");
+include("../includes/navigation.html");
 
-print "<form action=\"tabsquery.php\" method=\"get\">\n";
+print "<form action=\"/tabswebsite/subpages/tabsquery.php\" method=\"get\">\n";
 
 
 print <<<_HTML_
@@ -154,7 +131,6 @@ print <<<_HTML_
 <TR><TD><br></TD></TR>
 
 
-<!-- <input type=hidden  name="stage" value="TRUE"> -->
 <TR><TD>
 <input type=reset name="Reset" Value="Reset Fields">
 </TD><TD>
@@ -166,7 +142,7 @@ print <<<_HTML_
 
 _HTML_;
 
-include("includes/footer.html");
+include("../includes/footer.html");
 
 
 ?>

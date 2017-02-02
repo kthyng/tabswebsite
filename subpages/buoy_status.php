@@ -7,10 +7,10 @@
     <?php
 
     // include header from separate file
-    include("includes/header.html");
+    include("../includes/header.html");
 
     // include navigation from separate file
-    include("includes/navigation.html");
+    include("../includes/navigation.html");
 
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 run_buoy_status.py');

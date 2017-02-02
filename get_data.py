@@ -34,11 +34,11 @@ units = args.units
 tz = args.tz
 
 if 'tabs' in fname:
-    buoy = fname.split('/')[1].split('_')[1]
-    table = fname.split('/')[1].split('_')[2]
+    buoy = fname.split('/')[-1].split('_')[1]
+    table = fname.split('/')[-1].split('_')[2]
 elif 'ndbc' in fname:
-    buoy = fname.split('/')[1].split('_')[1]
-    table = fname.split('/')[1].split('_')[0]
+    buoy = fname.split('/')[-1].split('_')[1]
+    table = fname.split('/')[-1].split('_')[0]
 
 ## Read in data ##
 # from daily file

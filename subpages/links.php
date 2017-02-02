@@ -5,17 +5,19 @@
 <div id="container">
 
     <!-- include header from separate file -->
-    <?php include("includes/header.html");?>
+    <?php
+    // set_include_path(".:/Library/WebServer/Documents/tabswebsite/includes");
+    include("../includes/header.html");
 
-
-    <!-- include navigation from separate file -->
-    <?php include("includes/navigation.html");?>
+    // include navigation from separate file
+    include("../includes/navigation.html");
+    ?>
 
     <h2>Useful links:</h2>
     <ul>
     <li> NOAA <a href=http://polar.ncep.noaa.gov/waves/viewer.shtml?-multi_1-latest-hs-gmex->wave model</a></li>
-    <li> Vector addition <a href="docs/vector_addition_trajectory_pub_final.xls">trajectory tool</a><!-- <img align=top src="images/icon_sm.png"> -->  </li>
-    <li> <a href="docs/notice_to_mariners_111810.pdf">Notice</a> to mariners </li>
+    <li> Vector addition <a href="/tabswebsite/docs/vector_addition_trajectory_pub_final.xls">trajectory tool</a><!-- <img align=top src="images/icon_sm.png"> -->  </li>
+    <li> <a href="/tabswebsite/docs/notice_to_mariners_111810.pdf">Notice</a> to mariners </li>
     <li> Gulf of Mexico Coastal Ocean Observing System <a href=http://gcoos.tamu.edu/>(GCOOS)</a> Member </li>
     <li> TGLO <a href="http://www.glo.texas.gov/what-we-do/caring-for-the-coast/oil-spills/index.html" >Oil Spill Division</a></a> </li>
     <li> NDBC <a href=http://www.ndbc.noaa.gov>Home</a> and <a href=http://www.ndbc.noaa.gov/maps/WestGulf.shtml>West Gulf</a>  </li>

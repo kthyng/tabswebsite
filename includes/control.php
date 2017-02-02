@@ -9,10 +9,10 @@ print "<TABLE width=100%>";
 print "<TR>";
 print "<td>";
 // Switch to
-print "Switch to <a href=tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
+print "Switch to <a href=/tabswebsite/subpages/tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
 
-print "<TD>Go to <a href=tabsqueryform.php?Buoyname=$Buoyname&table=$table&datepicker=".urlencode($datepicker)."&tz=$tz&units=$units>database query</a></TD>\n";
-print "<TD>Go to <a href=index.php>homepage</a></TR></TD>\n";
+print "<TD>Go to <a href=/tabswebsite/subpages/tabsqueryform.php?Buoyname=$Buoyname&table=$table&datepicker=".urlencode($datepicker)."&tz=$tz&units=$units>database query</a></TD>\n";
+print "<TD>Go to <a href=/tabswebsite/index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 
 
@@ -21,7 +21,7 @@ print "<TR>";
 print "<td>Update results: </td>";
 print "<td>";
 // print "<br> &nbsp;\n";
-print "<br><form action=\"tabsquery.php\" method=\"get\">\n";
+print "<br><form action=\"/tabswebsite/subpages/tabsquery.php\" method=\"get\">\n";
 
 if (($datatype == "data")) {
     print "<Select Name=tz>\n";

@@ -5,11 +5,11 @@
 <div id="container">
 
     <!-- include header from separate file -->
-    <?php include("includes/header.html");?>
+    <?php include("../includes/header.html");?>
 
 
     <!-- include navigation from separate file -->
-    <?php include("includes/navigation.html");?>
+    <?php include("../includes/navigation.html");?>
 
     <?php
 

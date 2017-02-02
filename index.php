@@ -161,7 +161,7 @@ foreach ($blet as $f) {
         $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
     print $buoystr;
     $bidx++;
     if ($f == "X") {

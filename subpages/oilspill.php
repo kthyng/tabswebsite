@@ -5,11 +5,11 @@
 <div id="container">
 
     <!-- include header from separate file -->
-    <?php include("includes/header.html");?>
+    <?php include("../includes/header.html");?>
 
 
     <!-- include navigation from separate file -->
-    <?php include("includes/navigation.html");?>
+    <?php include("../includes/navigation.html");?>
 
     <h2>Oil Spill Data Products</h2>
     <p>Oil spills can be tracked with NOAA's <a href=http://response.restoration.noaa.gov/oil-and-chemical-spills/oil-spills/response-tools/downloading-installing-and-running-gnome.html>GNOME</a> software. In GNOME, model output needs to be in particular form. Several model products in this form are available:</p>
