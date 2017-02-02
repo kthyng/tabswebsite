@@ -118,7 +118,7 @@ def make(buoy):
 
     # html
     head = []
-    head.append('<table id=header>')  # id is for test_tabsquery.py
+    head.append('<table id=header width=750px>')  # id is for test_tabsquery.py
     # this is to buffer the left side
     head.append('<tr>')
     head.append('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, loc))
