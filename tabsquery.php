@@ -93,7 +93,7 @@ else if ($table == "wave" && ! preg_match('/K|N|V|X/',$Buoyname) ) {
 
 if ($noinstr) {
     // Repeating header type stuff here because otherwise it needs to be below download
-    print "<head>";
+    print "<html><head>";
     print "<title>Query Results</title>";
     include("includes/queryhead.html");
     print "</head>";
@@ -175,7 +175,7 @@ if ($datatype == 'download'){
 }
 
 // Have to wait to start page itself until after download logic
-print "<head>";
+print "<html><head>";
 print "<title>Query Results</title>";
 include("includes/queryhead.html");
 print "</head>";
@@ -233,3 +233,4 @@ include("includes/control.php");
 
 ?>
 </div>
+</html>

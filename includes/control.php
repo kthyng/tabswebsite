@@ -66,6 +66,8 @@ print "<OPTION value='PTAT2'>PTAT2</option></select></td>\n";
 print "<td><select id=json-two name=table>\n";
 print "<option selected value='$table'>$table</option></select></td>";
 
+print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepicker'></TD>";
+
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 // print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";

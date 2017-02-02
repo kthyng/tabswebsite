@@ -33,7 +33,7 @@ https://css-tricks.com/dynamic-dropdowns/
 http://jsfiddle.net/NaUAL/
 
     $("#json-one").change(function() {
-
+        valname = "Available data"
         var first = $(this),
             second = $("#json-two"),
             key = first.val(),
