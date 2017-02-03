@@ -7,14 +7,14 @@ import pandas as pd
 import tools
 import os
 
-
+relloc = '../'
 def make(buoy):
     '''Make header'''
 
     if len(buoy) == 1:  # TABS
         # read in vel file
         which = 'ven'
-        fname = 'daily/tabs_' + buoy + '_' + which
+        fname = relloc + 'daily/tabs_' + buoy + '_' + which
         df = tools.read(fname)
         df = df.tz_localize('UTC')  # timezone is UTC
         tail = df.tail(1)
@@ -26,7 +26,7 @@ def make(buoy):
 
         # read in eng file
         which = 'eng'
-        fname = 'daily/tabs_' + buoy + '_' + which
+        fname = relloc + 'daily/tabs_' + buoy + '_' + which
         df = tools.read(fname)
         tail = df.tail(1)
         volt = tail['VBatt [Oper]'].values[0]
@@ -35,7 +35,7 @@ def make(buoy):
 
         # read in met file
         which = 'met'
-        fname = 'daily/tabs_' + buoy + '_' + which
+        fname = relloc + 'daily/tabs_' + buoy + '_' + which
         domet = False
         if os.path.exists(fname):
             domet = True
@@ -49,7 +49,7 @@ def make(buoy):
 
         # read in wave file
         which = 'wave'
-        fname = 'daily/tabs_' + buoy + '_' + which
+        fname = relloc + 'daily/tabs_' + buoy + '_' + which
         dowave = False
         if os.path.exists(fname):
             dowave = True
@@ -74,10 +74,10 @@ def make(buoy):
         dosensor = True
         dodepth = True
         dotemp = True
-        fname = 'daily/tabs_' + buoy + '_header'
+        fname = relloc + 'daily/tabs_' + buoy + '_header'
 
     elif len(buoy) > 1:  # NBDC buoys
-        fname = 'daily/ndbc_' + buoy
+        fname = relloc + 'daily/ndbc_' + buoy
         df = tools.read(fname)
         df = df.tz_localize('UTC')  # timezone is UTC
         tail = df.tail(1)
@@ -113,7 +113,7 @@ def make(buoy):
         domet = True
         dowave = True
         dosensor = False
-        fname = 'daily/ndbc_' + buoy + '_header'
+        fname = relloc + 'daily/ndbc_' + buoy + '_header'
 
 
     # html

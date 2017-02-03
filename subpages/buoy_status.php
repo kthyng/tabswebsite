@@ -13,10 +13,10 @@
     include("../includes/navigation.html");
 
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 run_buoy_status.py');
+        $command = escapeshellcmd('/usr/bin/python3 ../python/run_buoy_status.py');
     }
     else if (php_uname('n') == 'tahoma.local') {
-        $command = escapeshellcmd('/anaconda/bin/python run_buoy_status.py');
+        $command = escapeshellcmd('/anaconda/bin/python ../python/run_buoy_status.py');
     }
 
     print "<br><br>";

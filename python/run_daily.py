@@ -85,7 +85,6 @@ if __name__ == "__main__":
                 if buoy in bd.avail('ven'):  # this condition due to ndbc buoys
                     # find end date of recent legitimate data
                     dend = query_setup_recent(engine, buoy)
-                # q = query_setup(engine, buoy, table, dend)
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
@@ -96,9 +95,9 @@ if __name__ == "__main__":
                     q = query_setup(engine, buoy, table, dend)
                     df = tools.read([q, engine])
                     if table != 'ndbc':
-                        fname = path.join('daily', 'tabs_' + buoy + '_' + table)
+                        fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                     elif table == 'ndbc':
-                        fname = path.join('daily', 'ndbc_' + buoy)
+                        fname = path.join('..', 'daily', 'ndbc_' + buoy)
                     # write daily data file
                     make_text(df, fname)
                     # read in model output
@@ -109,7 +108,6 @@ if __name__ == "__main__":
                         dfmodelrecent = None
                         dfmodelforecast = None
                     # make and save plots
-                    # import pdb; pdb.set_trace()
                     fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast)
                     fig.savefig(fname + '.pdf')
                     fig.savefig(fname + '.png')
@@ -132,7 +130,7 @@ if __name__ == "__main__":
         if len(buoy) > 1:  # don't include NDBC buoys
             continue
         fname = 'tabs_' + buoy + '_ven'
-        df = tools.read(path.join('daily/', fname))
+        df = tools.read(path.join('..', 'daily/', fname))
         # check if any of dataset is from within the past 5 days before appending
         if (pd.datetime.now() - df.index[-1]).days < 5:
             dfs.append(df)
@@ -141,9 +139,9 @@ if __name__ == "__main__":
         buoys.append(buoy)
     fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
     fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
-    fig1.savefig(path.join('daily', 'currents1.pdf'))
-    fig1.savefig(path.join('daily', 'currents1.png'))
-    fig2.savefig(path.join('daily', 'currents2.pdf'))
-    fig2.savefig(path.join('daily', 'currents2.png'))
+    fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
+    fig1.savefig(path.join('..', 'daily', 'currents1.png'))
+    fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
+    fig2.savefig(path.join('..', 'daily', 'currents2.png'))
     close(fig1)
     close(fig2)

@@ -157,7 +157,7 @@ def read_model(query, timing='recent'):
     dend = query.split('"')[3]  # end date and time
 
     if timing == 'recent':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_archives/roms_his_201701.nc'
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/txla_oof/TXLA_ROMS_Forecast_Feature_Collection_best.ncd'
     elif timing == 'forecast':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_previous_day.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
@@ -165,8 +165,12 @@ def read_model(query, timing='recent'):
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
     # first data date is greater than last model time, so that time periods overlap
+    # sometimes called ocean_time and sometimes time
+    if 'time' in ds:  # ocean_time should be repurposed with info from time
+        ds['ocean_time'] = ds['time']
+        ds = ds.swap_dims({'time': 'ocean_time'})
     if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
-        pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data):
+       pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
         df = None
     else:
         # Initialize model dataframe with times

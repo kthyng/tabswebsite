@@ -33,7 +33,7 @@ datatype = args.datatype
 units = args.units
 tz = args.tz
 
-if 'tabs' in fname:
+if 'ndbc' not in fname:
     buoy = fname.split('/')[-1].split('_')[1]
     table = fname.split('/')[-1].split('_')[2]
 elif 'ndbc' in fname:

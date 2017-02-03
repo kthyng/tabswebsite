@@ -112,14 +112,14 @@ if ($datepicker == "recent") {
         $tempaccess = "../daily/tabs_".$Buoyname."_".$table;
     }
     else if ($table == 'ndbc') {
-        $tempaccess = "../daily/".$table."_".$Buoyname;
+        $tempaccess = "../daily/ndbc_".$Buoyname;
     }
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 ../get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
     else if (php_uname('n') == 'tahoma.local') {
-        $command = escapeshellcmd('/anaconda/bin/python ../get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
@@ -139,7 +139,7 @@ else{
         $tempfile=tempnam("../tmp","tabs_".$Buoyname."_".$table."_");  // full file location
     }
     else if ($table == 'ndbc') {
-        $tempfile=tempnam("../tmp", $table."_".$Buoyname."_");  // full file location
+        $tempfile=tempnam("../tmp", "ndbc_".$Buoyname."_");  // full file location
     }
     // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
@@ -147,10 +147,10 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 ../get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
     else if (php_uname('n') == 'tahoma.local') {
-        $command = escapeshellcmd('/anaconda/bin/python ../get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
 
     chmod($tempfile, 0644);

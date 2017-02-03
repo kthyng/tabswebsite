@@ -5,6 +5,7 @@ Script to make buoy table
 import tools
 import buoy_data as bd
 import pandas as pd
+import numpy as np
 
 
 def hover(hover_color="#ffff99"):
@@ -65,7 +66,11 @@ def make_df():
     levels = ['active', 'inactive']
     dfs = []
     for level in levels:
-        df = pd.DataFrame(index=bd.buoys(level))
+        # import pdb; pdb.set_trace()
+        buoys = bd.buoys(level)
+        # ind = np.asarray([len(buoy)>1 for buoy in buoys])
+        buoys = [buoy for buoy in buoys if len(buoy) == 1]
+        df = pd.DataFrame(index=buoys)
         df.index.name = 'Buoy'
 
         kinds = ['C', 'M','T','E','W','P']
