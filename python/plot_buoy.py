@@ -135,6 +135,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
     ax.plot([idxmin, idxmax], [0,0], 'k:')
     if df2 is not None or df3 is not None:
         # add skill score
+        # account for if df2 and df3 overlap
         dfnew = pd.concat([df2, df3]).resample('30T').asfreq()  # in case there is a df3
         ind = pd.notnull(df[which]) & pd.notnull(dfnew[which])
         ss = 1 - ((df - dfnew)**2).sum() / (df[ind]**2).sum()
@@ -382,6 +383,14 @@ def plot(df, buoy, which, df2=None, df3=None):
     # idx and dT are deleted by the resample command
     df.idx = date2num(df.index.to_pydatetime())  # in units of days
     df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+
+    # change length of df3 if df2 overlaps with it
+    if df2 is not None and df3 is not None:
+        if df2.index[-1] > df3.index[0]:
+            stemp = df2.index[-1] + timedelta(minutes=30)
+            df3 = df3[stemp:]
+            df3.idx = date2num(df3.index.to_pydatetime())  # in units of days
+            df3.dT = df3.idx[-1] - df3.idx[0]  # length of dataset in days
 
     fig, axes = setup(nsubplots=nsubplots, buoy=buoy)
 
