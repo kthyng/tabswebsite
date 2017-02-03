@@ -126,7 +126,13 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         ax.plot(df2.idx, df2[which], color=c2, lw=lw)
     if df3 is not None:
         ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
-    ax.plot(df.idx, np.zeros(df.idx.size), 'k:')
+    # import pdb; pdb.set_trace()
+    idxmin = min(df.idx); idxmax = max(df.idx)
+    for dftemp in [df2, df3]:
+        if dftemp is not None:
+            idxmin = min((idxmin, dftemp.idx.min()))
+            idxmax = max((idxmax, dftemp.idx.max()))
+    ax.plot([idxmin, idxmax], [0,0], 'k:')
     if df2 is not None or df3 is not None:
         # add skill score
         dfnew = pd.concat([df2, df3]).resample('30T').asfreq()  # in case there is a df3
@@ -387,8 +393,8 @@ def plot(df, buoy, which, df2=None, df3=None):
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
-        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-20, 0])
-        add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 200])
+        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0])
+        add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210])
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
@@ -416,6 +422,14 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12])
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
+    # use longer dataframe in case data or model are cut short
+    if df2 is not None or df3 is not None:
+        dfm = pd.concat([df2, df3])
+        dfm.idx = date2num(dfm.index.to_pydatetime())  # in units of days
+        dfm.dT = dfm.idx[-1] - dfm.idx[0]  # length of dataset in days
+
+        if dfm.dT > df.dT:
+            df = dfm  # use the longer dataframe for labeling x axis
 
     add_xlabels(axes[nsubplots-1], df, fig)
 
@@ -446,9 +460,13 @@ def currents(dfs, buoys):
         if first:
             add_currents(ax, df, 'water', 'East [cm/s]', 'North [cm/s]', compass=True)
             first = False
-            dfsave = df  # save for using with bottom labeling
         else:
             add_currents(ax, df, 'water', 'East [cm/s]', 'North [cm/s]', compass=False)
+
+        # save a df for labeling the bottom axis if it has at least 4 days of data
+        # otherwise it squishes up the labels a lot
+        if df.dT > 4:
+            dfsave = df  # save for using with bottom labeling
 
     add_xlabels(axes[len(dfs)-1], dfsave, fig)
 
