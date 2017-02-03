@@ -47,12 +47,21 @@ def test_made_ven():
     '''Check that ven files have been produced for every buoy since that should
     always be possible.'''
 
+
     for buoy in bd.buoys():
-        assert path.exists('daily/tabs_' + buoy + '_ven')
-        assert path.exists('daily/tabs_' + buoy + '_ven_low.png')
-        assert path.exists('daily/tabs_' + buoy + '_ven.png')
-        assert path.exists('daily/tabs_' + buoy + '_ven.pdf')
-        assert path.exists('daily/tabs_' + buoy + '_header')
+        if len(buoy) == 1:
+            table = 'ven'
+            fname = '../daily/tabs_' + buoy + '_' + table
+            fnameh = '../daily/tabs_' + buoy
+        elif len(buoy) > 1:
+            table = 'ndbc'
+            fname = '../daily/ndbc_' + buoy
+            fnameh = fname
+        assert path.exists(fname)
+        assert path.exists(fname + '_low.png')
+        assert path.exists(fname + '.png')
+        assert path.exists(fname + '.pdf')
+        assert path.exists(fnameh + '_header')
 
 
 def test_overall():
@@ -66,7 +75,10 @@ def test_overall():
         for table in bd.tables():
             # this checks that it should be available based on instrumentation
             if buoy in bd.avail(table):
-                fname = 'tabs_' + buoy + '_' + table
-                if not path.exists('daily/' + fname):
+                if len(buoy) == 1:
+                    fname = '../daily/tabs_' + buoy + '_' + table
+                elif len(buoy) > 1:
+                    fname = '../daily/ndbc_' + buoy
+                if not path.exists(fname):
                     message = Warning(fname + ' not available at same time as ven data')
                     warnings.warn(message)
