@@ -151,7 +151,7 @@ else{
 
     //  set up command for later use. Different python location on different machines.
     // check for python3 to use if it is there
-    if ('type /anaconda/bin/python3 >/dev/null 2>&1') {
+    if ('command -v /anaconda/bin/python3 >/dev/null 2>&1') {
         $command = escapeshellcmd('/anaconda/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
     else if ('hash /usr/bin/python3 2>/dev/null') {
