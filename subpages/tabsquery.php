@@ -164,7 +164,7 @@ else{
     chmod($tempfile, 0644);
 
 }
-
+echo $command;
 // Account for if download option was chosen here, since data has now been read in.
 if ($datatype == 'download'){
     passthru($command);
