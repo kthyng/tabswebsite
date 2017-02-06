@@ -73,6 +73,10 @@ elseif ($datatype=="pic"){
     $newdatatype="data";
     $newdatatypename="table";
 }
+elseif ($datatype=="download"){
+    $newdatatype="data";
+    $newdatatypename="table";
+}
 
 $noinstr = False;  // Flag for if instrument is not available
 // Met instrument availability
@@ -145,12 +149,13 @@ else{
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "../tmp/".$tempout;  // relative path to buoy
 
-    # set up command for later use. Different python location on different machines.
-    if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    //  set up command for later use. Different python location on different machines.
+    // check for python3 to use if it is there
+    if ('hash /anaconda/bin/python3 2>/dev/null') {
+        $command = escapeshellcmd('/anaconda/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
-    else if (php_uname('n') == 'tahoma.local') {
-        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    else {
+        $command = escapeshellcmd('python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
 
     chmod($tempfile, 0644);
