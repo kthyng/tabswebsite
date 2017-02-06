@@ -154,6 +154,9 @@ else{
     if ('hash /anaconda/bin/python3 2>/dev/null') {
         $command = escapeshellcmd('/anaconda/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
+    else if ('hash python3 2>/dev/null') {
+        $command = escapeshellcmd('python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    }
     else {
         $command = escapeshellcmd('python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
