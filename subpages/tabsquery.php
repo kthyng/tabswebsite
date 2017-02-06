@@ -151,20 +151,22 @@ else{
 
     //  set up command for later use. Different python location on different machines.
     // check for python3 to use if it is there
-    if ('command -v /anaconda/bin/python3 >/dev/null 2>&1') {
-        $command = escapeshellcmd('/anaconda/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
-    }
-    else if ('hash /usr/bin/python3 2>/dev/null') {
-        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
-    }
-    else {
-        $command = escapeshellcmd('python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
-    }
+    // if ('command -v /anaconda/bin/python3 >/dev/null 2>&1') {
+    //     $command = escapeshellcmd('/anaconda/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    // }
+    // else if ('hash /usr/bin/python3 2>/dev/null') {
+    //     $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    // }
+    // else {
+    passthru("export PYTHONPATH=/anaconda/bin; echo $PYTHONPATH;");
+    $command = escapeshellcmd('python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+    // }
 
     chmod($tempfile, 0644);
 
 }
 echo $command;
+echo php_uname('n');
 // Account for if download option was chosen here, since data has now been read in.
 if ($datatype == 'download'){
     passthru($command);
