@@ -160,8 +160,9 @@ else{
     chmod($tempfile, 0644);
 
 }
-echo $command;
-echo php_uname('n');
+echo $tempfile;
+echo $tempout;
+echo $tempaccess;
 // Account for if download option was chosen here, since data has now been read in.
 if ($datatype == 'download'){
     passthru($command);
