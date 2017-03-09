@@ -459,8 +459,14 @@ def currents(dfs, buoys):
             continue
 
         # label buoy plots
-        ax.text(0.97, 0.9, buoy, transform=ax.transAxes,
-                horizontalalignment='center', fontsize=14)
+        if len(dfs) == 5:
+            ax.text(0.95, 0.75, buoy, transform=ax.transAxes,
+                    horizontalalignment='center', fontsize=30, alpha=0.3)
+        elif len(dfs) == 4:
+            ax.text(0.95, 0.8, buoy, transform=ax.transAxes,
+                    horizontalalignment='center', fontsize=30, alpha=0.3)
+        # ax.text(0.97, 0.9, buoy, transform=ax.transAxes,
+        #         horizontalalignment='center', fontsize=14)
 
         # can't use datetime index directly unfortunately here, so can't use pandas later either
         # idx and dT are deleted by the resample command
