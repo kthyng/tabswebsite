@@ -158,7 +158,8 @@ def read_model(query, timing='recent'):
     # import pdb; pdb.set_trace()
     if timing == 'recent':
         # loc = 'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/oof_arhcive_agg'
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/txla_oof/TXLA_ROMS_Forecast_Feature_Collection_best.ncd'
+        # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/txla_oof/TXLA_ROMS_Forecast_Feature_Collection_best.ncd'
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
     elif timing == 'forecast':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_previous_day.nc'
     # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
