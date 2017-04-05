@@ -84,41 +84,48 @@ if __name__ == "__main__":
             if table == 'ven':
                 if buoy in bd.avail('ven'):  # this condition due to ndbc buoys
                     # find end date of recent legitimate data
+                    # thus, the "recent" dates are determined by the ven
+                    # table data but used by all tables
                     dend = query_setup_recent(engine, buoy)
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                try:
-                    # import pdb; pdb.set_trace()
-                    if table == 'ndbc':
-                        dend = query_setup_recent(engine, buoy)
-                    q = query_setup(engine, buoy, table, dend)
-                    df = tools.read([q, engine])
-                    if table != 'ndbc':
-                        fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
-                    elif table == 'ndbc':
-                        fname = path.join('..', 'daily', 'ndbc_' + buoy)
-                    # write daily data file
-                    make_text(df, fname)
-                    # read in model output
-                    if table != 'ndbc':
-                        dfmodelrecent = tools.read_model(q, timing='recent')
-                        dfmodelforecast = tools.read_model(q, timing='forecast')
-                    else:
-                        dfmodelrecent = None
-                        dfmodelforecast = None
-                    # make and save plots
-                    fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast)
-                    fig.savefig(fname + '.pdf')
-                    fig.savefig(fname + '.png')
-                    # save smaller for hover
-                    fig.savefig(fname + '_low.png', dpi=60)
-                    close(fig)
+                # try:
+                if buoy == 'F':
+                    import pdb; pdb.set_trace()
+                if table == 'ndbc':
+                    dend = query_setup_recent(engine, buoy)
+                q = query_setup(engine, buoy, table, dend)
+                df = tools.read([q, engine])
+                # check if data frame is empty, which could happen if this
+                # instrument is not reporting data at the same time as ven
+                if df.empty:
+                    continue
+                if table != 'ndbc':
+                    fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
+                elif table == 'ndbc':
+                    fname = path.join('..', 'daily', 'ndbc_' + buoy)
+                # write daily data file
+                make_text(df, fname)
+                # read in model output
+                if table != 'ndbc':
+                    dfmodelrecent = tools.read_model(q, timing='recent')
+                    dfmodelforecast = tools.read_model(q, timing='forecast')
+                else:
+                    dfmodelrecent = None
+                    dfmodelforecast = None
+                # make and save plots
+                fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast)
+                fig.savefig(fname + '.pdf')
+                fig.savefig(fname + '.png')
+                # save smaller for hover
+                fig.savefig(fname + '_low.png', dpi=60)
+                close(fig)
                 # if data isn't available at the same time as the ven file,
                 # leave as not written
-                except:
-                    pass
+                # except:
+                #     pass
 
     for buoy in bd.buoys():  # loop through buoys separately for buoy headers
         # write header
