@@ -111,7 +111,7 @@ foreach ($blet as $f) {
         $lines=file($venfile);
     	$l=array_pop($lines);  // grab last line in file
     	if (trim($l)) {
-    		$line=trim($l);
+    		$line=trim($l);  # strip white space from beginning and end of string
             $data = preg_split('/\s+/', $line);  # split by white space or by tab
             $datestr=$data[0];
     		$timestr=substr($data[1],0,5);
@@ -133,18 +133,16 @@ foreach ($blet as $f) {
             $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
             $dtTXstr = $dtTX->format('M d, Y H:i');
             $dtTXtz = $dtTX->format('T');
-            # date range for the php call
-            $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
-            $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
-            $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
+            // # date range for the php call
+            // $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
+            // $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
+            // $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
 
             // check for if report is more than about 3 days old (ignoring time zones, etc)
-            // for some reason even data that is current counts as 4 days old so
-            // looking for 7 days difference for equivalent 3 days old
             $today = new DateTime('now', new DateTimeZone('UTC'));
             $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
-            if ($intervalstr>7){ // old report
+            if ($intervalstr>3){ // old report
                 $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz\n</div></td>";
                 // $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
             }

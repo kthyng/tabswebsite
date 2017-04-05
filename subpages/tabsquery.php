@@ -204,11 +204,27 @@ if ($datepicker=="recent") {
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TD valign=top><br>";
 
-    print "<font face=helvetica><b><big>Results of TABS Data query</big></b>(<a href=$tempaccess>download</a>)</font><br>\n";
+    print "<font face=helvetica><b><big>Results of TABS Data query</big></b> (<a href=$tempaccess>download</a>)</font>";
+
+    // Warning about data being out of data if most recent point is more than 3 days old
+    if ($datepicker=="recent") {
+        $lines = file($tempaccess);
+        $lnum = count($lines)-1;  # gives index for last line in file
+        $datestr =  preg_split('/\s+/', $lines[$lnum])[0];  # split by white space or by tab and get first entry (date)
+        $lastdate = new DateTime($datestr, new DateTimeZone('UTC'));  # last date of file (most recent data)
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+        $interval = date_diff($lastdate, $today);  # difference in days between now and most recent data
+        $intervalstr = $interval->format('%R%a days');
+        if ($intervalstr>3){ // old report
+            print "<font color='red'><i>&emsp;&emsp;&emsp;This data is more than 3 days old.</i></font>";
+        }
+    }
+
     // note for met and table
     if ($table == 'met' and $datatype == 'data') {
-        print "<br><i>Note: East and North wind data show direction toward.&nbsp;Direction data show direction from.</i>\n<br>";
+        print "<i><br><br>Note: East and North wind data show direction toward.&nbsp;Direction data show direction from.</i>";
     }
+    print "<br><br>";
     // if not using recent image, call to database
     // Runs table or image for database
     if ($datepicker!="recent"){
@@ -216,7 +232,6 @@ if ($datepicker=="recent") {
         passthru($command);
         // if data is missing from this time period, just say that
         if (filesize($tempfile) == 0){
-            print "<br>";
             print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
         }
     }
