@@ -204,7 +204,7 @@ if ($datepicker=="recent") {
 	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 	print "<TD valign=top><br>";
 
-    print "<font face=helvetica><b><big>Results of TABS Data query</big></b> (<a href=$tempaccess>download</a>)</font>";
+    print "<font face=helvetica><b><big>Results of TABS Data query</big></b> (<a href=$tempaccess>download data</a>)</font>";
 
     // Warning about data being out of data if most recent point is more than 3 days old
     if ($datepicker=="recent") {
