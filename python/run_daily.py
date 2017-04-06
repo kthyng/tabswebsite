@@ -92,8 +92,8 @@ if __name__ == "__main__":
                 continue  # instrument not available for this buoy
             else:
                 # try:
-                if buoy == 'F':
-                    import pdb; pdb.set_trace()
+                # if buoy == 'F':
+                #     import pdb; pdb.set_trace()
                 if table == 'ndbc':
                     dend = query_setup_recent(engine, buoy)
                 q = query_setup(engine, buoy, table, dend)

@@ -131,11 +131,10 @@ print <<<_HTML_
 <TR><TD><br></TD></TR>
 
 
-<TR><TD>
-<input type=reset name="Reset" Value="Reset Fields">
-</TD><TD>
-<input type=submit color='#009933' value="Submit Query">
-</TD></TR>
+<TR>
+<!-- <TD><input type=reset name="Reset" Value="Reset Fields"></TD> -->
+<TD><input type=submit color='#009933' value="Submit Query"></TD>
+</TR>
 </TABLE>
 </form>
 <br><br>
