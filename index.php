@@ -82,10 +82,10 @@ The date and time at each station indicates the end of the three-hour average.<b
 <table border=0 bgcolor="#f8f8f8" >
 <!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
 <tr>
-<TD valign=top colspan=2>
-<div id="Report">
-<b>Most Recent Report</b>
-</div></td></tr>
+<td><b>Recent</b></td>
+<TD valign=top colspan=2><div id="Report"><b><a href="subpages/currents.php">Last data report</a></b></div></td>
+</tr>
+
 <?php
 // echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
