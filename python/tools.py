@@ -217,18 +217,15 @@ def read_model(query, timing='recent'):
             # change names to match data
             df.columns = ['WaterT [deg C]']
 
-        # elif which == 'met':
-        #     # model output needed for image
-        #     j, i = bd.model(buoy, 'rho')  # get model indices
-        #     df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-        #     df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-        #
-        #     # change names to match data
-        #     df.columns = ['East [m/s]', 'North [m/s]']
-        #
-        #     # rotate from curvilinear to cartesian
-        #     anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
-        #     df['East [m/s]'], df['North [m/s]'] = rot2d(along, across, anglev)  # approximately to east, north
+        elif which == 'met':
+            # import pdb; pdb.set_trace()
+            # model output needed for image
+            j, i = bd.model(buoy, 'rho')  # get model indices
+            df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+            df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+
+            # change names to match data
+            df.columns = ['East [m/s]', 'North [m/s]']
 
         # can't use datetime index directly unfortunately here, so can't use pandas later either
         df.idx = date2num(df.index.to_pydatetime())  # in units of days

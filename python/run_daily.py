@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 continue  # instrument not available for this buoy
             else:
                 # try:
-                if buoy == 'B' and table == 'salt':
+                if buoy == 'B' and table == 'met':
                     import pdb; pdb.set_trace()
                 # if table == 'ndbc':
                 dend = query_setup_recent(engine, buoy, table)
@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 if not df.empty:
                     make_text(df, fname)
                 # if there is no data and we don't plot from the model
-                elif df.empty and (table == 'eng' or table == 'wave' or table == 'met'):  # UPDATE
+                elif df.empty and (table == 'eng' or table == 'wave'):
                     continue  # in these cases, there is nothing to plot
                 if table != 'ndbc':
                     # read in recent model output, not tied to when data output was found

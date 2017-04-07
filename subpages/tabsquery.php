@@ -213,11 +213,12 @@ if ($datepicker=="recent") {
         // print "<font color='red'><i>&emsp;At least some of this data is more than 3 days old.</i></font>";
         print "<font color='red'><br><br><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
         // Plots for model output
-        if ($table == 'ven' or $table == 'salt') {
+        if ($table == 'ven' or $table == 'salt' or $table == 'met') {
             print "<font color='red'><i> Model output is shown instead.</i></font>";
             $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
         }
         else {
+            print "<font color='red'><i> Model output might be available for other data types.</i></font>";
             $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         }
     }

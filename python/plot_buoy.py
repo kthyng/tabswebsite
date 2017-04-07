@@ -437,7 +437,7 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210])
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
     elif which == 'met':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]',
                        'c2f', '[˚F]', ymaxrange=[-25,40])
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
