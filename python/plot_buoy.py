@@ -454,7 +454,7 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
         add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12])
     elif which == 'ndbc':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]')
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040])
         add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',

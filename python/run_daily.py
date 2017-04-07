@@ -93,8 +93,8 @@ if __name__ == "__main__":
                 continue  # instrument not available for this buoy
             else:
                 # try:
-                if buoy == 'B' and table == 'met':
-                    import pdb; pdb.set_trace()
+                # if table == 'eng':
+                #     import pdb; pdb.set_trace()
                 # if table == 'ndbc':
                 dend = query_setup_recent(engine, buoy, table)
                 q = query_setup(engine, buoy, table, dend)
@@ -107,32 +107,32 @@ if __name__ == "__main__":
                 # data was available
                 # check if data frame is empty, which could happen if this
                 # instrument is not reporting data at the same time as ven
-                if not df.empty:
-                    make_text(df, fname)
-                # if there is no data and we don't plot from the model
-                elif df.empty and (table == 'eng' or table == 'wave'):
-                    continue  # in these cases, there is nothing to plot
-                if table != 'ndbc':
-                    # read in recent model output, not tied to when data output was found
-                    q = query_setup(engine, buoy, table, pd.datetime.now())
-                    dfmodelrecent = tools.read_model(q, timing='recent')
-                    # read in forecast model output, not tied to when data output was found
-                    q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=7), ndays=7)
-                    dfmodelforecast = tools.read_model(q, timing='forecast')
-                else:
-                    dfmodelrecent = None
-                    dfmodelforecast = None
+                # if not df.empty:
+                make_text(df, fname)  # there is always data to write, but it might be old
+                # # if there is no data and we don't plot from the model
+                # elif df.empty and (table == 'eng' or table == 'wave'):
+                #     continue  # in these cases, there is nothing to plot
+                # if table != 'ndbc':
+                # read in recent model output, not tied to when data output was found
+                q = query_setup(engine, buoy, table, pd.datetime.now())
+                dfmodelrecent = tools.read_model(q, timing='recent')
+                # read in forecast model output, not tied to when data output was found
+                q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=7), ndays=7)
+                dfmodelforecast = tools.read_model(q, timing='forecast')
+                # else:
+                #     dfmodelrecent = None
+                #     dfmodelforecast = None
                 # make and save plots
                 # plot according to the model output since it is fixed to be current
-                if dfmodelrecent.empty or dfmodelrecent is None:  # if not model output for this variable
-                    tlims = None
-                else:
-                    if dfmodelforecast.empty or dfmodelforecast is None:
-                        tlims = [dfmodelrecent.idx[0], dfmodelrecent.idx[-1]]
-                    else:
-                        tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
+                # if dfmodelrecent.empty or dfmodelrecent is None:  # if not model output for this variable
+                #     tlims = None
+                # else:
+                #     if dfmodelforecast.empty or dfmodelforecast is None:
+                #         tlims = [dfmodelrecent.idx[0], dfmodelrecent.idx[-1]]
+                #     else:
+                tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
+                # will plot model output from now if available, otherwise data regardless of how old
                 fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast, tlims)
-                # fig = plot_buoy.plot(dfmodelrecent, buoy, table, dfmodelforecast, df)
                 fig.savefig(fname + '.pdf')
                 fig.savefig(fname + '.png')
                 # save smaller for hover

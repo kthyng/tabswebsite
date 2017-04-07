@@ -213,12 +213,13 @@ def read_model(query, timing='recent'):
             # model output needed for image
             j, i = bd.model(buoy, 'rho')  # get model indices
             df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+            df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+            df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
             # change names to match data
-            df.columns = ['WaterT [deg C]']
+            df.columns = ['WaterT [deg C]', 'East [m/s]', 'North [m/s]']
 
         elif which == 'met':
-            # import pdb; pdb.set_trace()
             # model output needed for image
             j, i = bd.model(buoy, 'rho')  # get model indices
             df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
