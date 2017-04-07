@@ -61,16 +61,31 @@ def setymaxrange(ax, ymaxrange):
     ax.set_ylim(ylim)
 
 
-def add_currents(ax, df, which, east, north, compass=True, df2=None):
+def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, tlims=None):
     '''Add current arrows to plot
 
     which   'water' or 'wind'
     '''
+    color = 'k'  # color of data arrows
+
+    # if data is not within input time range, use model output instead
+    # import pdb; pdb.set_trace()
+    # if df is None and tlims is not None:
+    if tlims is not None:
+        if df.idx[-1] < tlims[0] or df.idx[0] > tlims[-1]:
+            df = pd.concat([df2, df3])  # in case there is a df3
+            df.idx = date2num(df.index.to_pydatetime())  # in units of days
+            df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+            color = c2
 
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
     if df.dT <=2:  # less than or equal to two days
         width = 1.0
+        if which == 'wind':
+            width /= 3
+    elif df.dT <=6:  # less than or equal to 6 days
+        width = 0.5
         if which == 'wind':
             width /= 3
     else:
@@ -87,11 +102,23 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None):
     else:
         ddt = 5
     ax.quiver(df.idx[::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
-              headlength=0, width=width, units='y', scale_units='y', scale=1)
-    if df2 is not None:  # 2nd set of arrows
-        ax.quiver(df2.idx[::ddt], np.zeros(len(df2[::ddt])), df2[::ddt][east], df2[::ddt][north], headaxislength=0,
-                  headlength=0, width=width, units='y', scale_units='y', scale=1,
-                  color=c2)
+              headlength=0, width=width, units='y', scale_units='y', scale=1, color=color)
+
+    # use forecast currents to fill in after data
+    if df3 is not None and not df[df3.index[0]:].equals(df3):
+        if df.index[-1] > df3.index[0]:
+            stemp = df.index[-1] + timedelta(minutes=30)
+            df3 = df3[stemp:]
+            df3.idx = date2num(df3.index.to_pydatetime())  # in units of days
+            df3.dT = df3.idx[-1] - df3.idx[0]  # length of dataset in days
+
+        ax.quiver(df3.idx[::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
+                  headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
+
+    # if df2 is not None:  # 2nd set of arrows
+    #     ax.quiver(df2.idx[::ddt], np.zeros(len(df2[::ddt])), df2[::ddt][east], df2[::ddt][north], headaxislength=0,
+    #               headlength=0, width=width, units='y', scale_units='y', scale=1,
+    #               color=c2)
     if which == 'water':
         varmax = cmax
         label = 'Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
@@ -139,7 +166,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         dfnew = pd.concat([df2, df3]).resample('30T').asfreq()  # in case there is a df3
         ind = pd.notnull(df[which]) & pd.notnull(dfnew[which])
         ss = 1 - ((df - dfnew)**2).sum() / (df[ind]**2).sum()
-        ax.text(0.8, 0.04, 'skill score: %1.2f' % ss[which], color=c2, fontsize=10, transform=ax.transAxes)
+        if not np.isnan(ss[which]):
+            ax.text(0.8, 0.04, 'skill score: %1.2f' % ss[which], color=c2, fontsize=10, transform=ax.transAxes)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax, N=0.1)
@@ -248,7 +276,7 @@ def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
     shifty(ax)
 
 
-def add_xlabels(ax, df, fig):
+def add_xlabels(ax, df, fig, tlims=None):
     '''Add date labels to bottom x axis'''
 
     # varied tick locations and labels for few days
@@ -305,7 +333,10 @@ def add_xlabels(ax, df, fig):
     ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
 
     # tighten only x axis
-    plt.autoscale(enable=True, axis='x', tight=True)
+    if tlims is not None:
+        ax.set_xlim(tlims[0], tlims[1])
+    else:
+        plt.autoscale(enable=True, axis='x', tight=True)
 
     # rotates and right aligns the x labels, and moves the bottom of the
     # axes up to make room for them
@@ -349,7 +380,7 @@ def setup(nsubplots, buoy=None):
     return fig, axes
 
 
-def plot(df, buoy, which, df2=None, df3=None):
+def plot(df, buoy, which, df2=None, df3=None, tlims=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
@@ -395,7 +426,7 @@ def plot(df, buoy, which, df2=None, df3=None):
     fig, axes = setup(nsubplots=nsubplots, buoy=buoy)
 
     if which == 'ven':
-        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]')
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]', df2=df2, df3=df3, tlims=tlims)
         add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]',
@@ -414,8 +445,8 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110])
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32])
-        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36])
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
+        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36], df2=df2, df3=df3)
         add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
@@ -432,7 +463,7 @@ def plot(df, buoy, which, df2=None, df3=None):
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
     # use longer dataframe in case data or model are cut short
-    if df2 is not None or df3 is not None:
+    if df2 is not None or df3 is not None and tlims is not None:
         dfm = pd.concat([df2, df3])
         dfm.idx = date2num(dfm.index.to_pydatetime())  # in units of days
         dfm.dT = dfm.idx[-1] - dfm.idx[0]  # length of dataset in days
@@ -440,7 +471,7 @@ def plot(df, buoy, which, df2=None, df3=None):
         if dfm.dT > df.dT:
             df = dfm  # use the longer dataframe for labeling x axis
 
-    add_xlabels(axes[nsubplots-1], df, fig)
+    add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
 
     return fig
 

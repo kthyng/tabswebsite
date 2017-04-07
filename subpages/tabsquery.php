@@ -190,61 +190,83 @@ print "<div id='container'>";
 include("../includes/header.html");
 include("../includes/navigation.html");
 
-// show header file contents for "recent" data, above table
+// // show header file contents for "recent" data, above table
+// if ($datepicker=="recent") {
+//     if ($table != 'ndbc') {
+//         echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
+//     }
+//     else if ($table == 'ndbc') {
+//         echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
+//     }
+// }
+
+// Warning about data being out of data if most recent point is more than 3 days old
 if ($datepicker=="recent") {
-    if ($table != 'ndbc') {
-        echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
+    $lines = file($tempaccess);
+    $lnum = count($lines)-1;  # gives index for last line in file
+    $datestr =  preg_split('/\s+/', $lines[$lnum])[0];  # split by white space or by tab and get first entry (date)
+    $lastdate = new DateTime($datestr, new DateTimeZone('UTC'));  # last date of file (most recent data)
+    $today = new DateTime('now', new DateTimeZone('UTC'));
+    $interval = date_diff($lastdate, $today);  # difference in days between now and most recent data
+    $intervalstr = $interval->format('%R%a days');
+    if ($intervalstr>3){ // old report
+        // print "<font color='red'><i>&emsp;At least some of this data is more than 3 days old.</i></font>";
+        print "<font color='red'><br><br><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
+        // Plots for model output
+        if ($table == 'ven' or $table == 'salt') {
+            print "<font color='red'><i> Model output is shown instead.</i></font>";
+            $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
+        }
+        else {
+            $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
+        }
     }
-    else if ($table == 'ndbc') {
-        echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
+    else {
+        // show header file contents for "recent" data, above table
+        if ($table != 'ndbc') {
+            echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
+        }
+        else if ($table == 'ndbc') {
+            echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
+        }
     }
 }
 
 // Show results of query
-	print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
-	print "<TD valign=top><br>";
+print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
+print "<TD valign=top><br>";
 
-    print "<font face=helvetica><b><big>Results of TABS Data query</big></b> (<a href=$tempaccess>download data</a>)</font>";
+print "<font face=helvetica><b><big>Results of TABS Data query</big></b></font>";
+if (! $norecentdata and ! $norecentdatabutmodel){
+    print "<font face=helvetica> (<a href=$tempaccess>download data</a>)</font>";
+}
 
-    // Warning about data being out of data if most recent point is more than 3 days old
-    if ($datepicker=="recent") {
-        $lines = file($tempaccess);
-        $lnum = count($lines)-1;  # gives index for last line in file
-        $datestr =  preg_split('/\s+/', $lines[$lnum])[0];  # split by white space or by tab and get first entry (date)
-        $lastdate = new DateTime($datestr, new DateTimeZone('UTC'));  # last date of file (most recent data)
-        $today = new DateTime('now', new DateTimeZone('UTC'));
-        $interval = date_diff($lastdate, $today);  # difference in days between now and most recent data
-        $intervalstr = $interval->format('%R%a days');
-        if ($intervalstr>3){ // old report
-            print "<font color='red'><i>&emsp;&emsp;&emsp;This data is more than 3 days old.</i></font>";
-        }
+// note for met and table
+if ($table == 'met' and $datatype == 'data') {
+    print "<i><br><br>Note: East and North wind data show direction toward.&nbsp;Direction data show direction from.</i>";
+}
+print "<br><br>";
+// if not using recent image, call to database
+// Runs table or image for database
+if ($datepicker!="recent"){
+    // exec($command, $output);
+    // echo $command;
+    passthru($command);
+    // if data is missing from this time period, just say that
+    if (filesize($tempfile) == 0){
+        print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
     }
+}
+elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $norecentdatabutmodel){
+    passthru($command);
+}
 
-    // note for met and table
-    if ($table == 'met' and $datatype == 'data') {
-        print "<i><br><br>Note: East and North wind data show direction toward.&nbsp;Direction data show direction from.</i>";
+if ($datatype=="pic" && !$norecentdata){
+    if (file_exists($tempaccess.".png")){
+    	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
-    print "<br><br>";
-    // if not using recent image, call to database
-    // Runs table or image for database
-    if ($datepicker!="recent"){
-        // exec($command, $output);
-        passthru($command);
-        // if data is missing from this time period, just say that
-        if (filesize($tempfile) == 0){
-            print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
-        }
-    }
-    elseif ($datepicker == "recent" && $datatype == "data"){
-        passthru($command);
-    }
-    if ($datatype=="pic"){
-        if (file_exists($tempaccess.".png")){
-        	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
-        }
-        }
-	print "</TD></TR></TABLE>\n";
-// }
+}
+print "</TD></TR></TABLE>\n";
 
 // show bottom control options
 include("../includes/control.php");

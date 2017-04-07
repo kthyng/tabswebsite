@@ -17,26 +17,27 @@ import buoy_data as bd
 import buoy_header as bh
 
 
-def query_setup_recent(engine, buoy):
+def query_setup_recent(engine, buoy, table):
     '''return most recent datetime object for buoy that has reasonable data.
 
     Condition of data being reasonable is based on ven table tx!=-99.
     '''
 
     # query for last entry
-    if len(buoy) == 1:
-        lastline = 'SELECT * FROM tabs_' + buoy + '_ven order by obs_time DESC limit 1'
-    elif len(buoy) > 1:
+    if table == 'ndbc':
         lastline = 'SELECT * FROM ndbc_' + buoy + ' order by obs_time DESC limit 1'
+    else:
+        lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 1'
+
     # read in query
     df = pd.read_sql_query(lastline, engine, index_col=['obs_time'])
 
-    # check for real data, based on tx value
+    # check for real data, based on tx value - only for ven table
     counter = 1
     # while tx=-99 in the latest database entry, read in more lines from
     # database, 1 by 1, until finding one that has a real value.
     # Return the date time of this entry.
-    if len(buoy) == 1:
+    if table == 'ven':
         while (df.tail(1)['tx'].values[0] == -99):
             counter += 1
             lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit ' + str(counter)
@@ -45,11 +46,11 @@ def query_setup_recent(engine, buoy):
     return df.index[-1]  # date for last available data
 
 
-def query_setup(engine, buoy, table, dend):
+def query_setup(engine, buoy, table, dend, ndays=5):
     '''Query mysql database for data, given end date dend from
     query_setup_recent().'''
 
-    dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")  # 5 days earlier
+    dstart = (dend - timedelta(days=ndays)).strftime("%Y-%m-%d")  # 5 days earlier
 
     # get 5 days of data
     # want from beginning of first day but only up until data time on final day
@@ -81,42 +82,57 @@ if __name__ == "__main__":
     # buoy = '42019'
     for buoy in bd.buoys():
         for table in bd.tables():  # loop through tables for each buoy
-            if table == 'ven':
-                if buoy in bd.avail('ven'):  # this condition due to ndbc buoys
-                    # find end date of recent legitimate data
-                    # thus, the "recent" dates are determined by the ven
-                    # table data but used by all tables
-                    dend = query_setup_recent(engine, buoy)
+            # if table == 'ven':
+            #     if buoy in bd.avail('ven'):  # this condition due to ndbc buoys
+            #         # find end date of recent legitimate data
+            #         # thus, the "recent" dates are determined by the ven
+            #         # table data but used by all tables
+            #         dend = query_setup_recent(engine, buoy)
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
                 # try:
-                # if buoy == 'F':
-                #     import pdb; pdb.set_trace()
-                if table == 'ndbc':
-                    dend = query_setup_recent(engine, buoy)
+                if buoy == 'B' and table == 'salt':
+                    import pdb; pdb.set_trace()
+                # if table == 'ndbc':
+                dend = query_setup_recent(engine, buoy, table)
                 q = query_setup(engine, buoy, table, dend)
                 df = tools.read([q, engine])
-                # check if data frame is empty, which could happen if this
-                # instrument is not reporting data at the same time as ven
-                if df.empty:
-                    continue
                 if table != 'ndbc':
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                 elif table == 'ndbc':
                     fname = path.join('..', 'daily', 'ndbc_' + buoy)
-                # write daily data file
-                make_text(df, fname)
-                # read in model output
+                # write daily data file, for whatever most recent time period
+                # data was available
+                # check if data frame is empty, which could happen if this
+                # instrument is not reporting data at the same time as ven
+                if not df.empty:
+                    make_text(df, fname)
+                # if there is no data and we don't plot from the model
+                elif df.empty and (table == 'eng' or table == 'wave' or table == 'met'):  # UPDATE
+                    continue  # in these cases, there is nothing to plot
                 if table != 'ndbc':
+                    # read in recent model output, not tied to when data output was found
+                    q = query_setup(engine, buoy, table, pd.datetime.now())
                     dfmodelrecent = tools.read_model(q, timing='recent')
+                    # read in forecast model output, not tied to when data output was found
+                    q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=7), ndays=7)
                     dfmodelforecast = tools.read_model(q, timing='forecast')
                 else:
                     dfmodelrecent = None
                     dfmodelforecast = None
                 # make and save plots
-                fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast)
+                # plot according to the model output since it is fixed to be current
+                if dfmodelrecent.empty or dfmodelrecent is None:  # if not model output for this variable
+                    tlims = None
+                else:
+                    if dfmodelforecast.empty or dfmodelforecast is None:
+                        tlims = [dfmodelrecent.idx[0], dfmodelrecent.idx[-1]]
+                    else:
+                        tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
+                fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast, tlims)
+                # fig = plot_buoy.plot(dfmodelrecent, buoy, table, dfmodelforecast, df)
                 fig.savefig(fname + '.pdf')
                 fig.savefig(fname + '.png')
                 # save smaller for hover

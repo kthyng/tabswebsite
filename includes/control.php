@@ -8,9 +8,14 @@ print "<font face=\"Helvetica\" size=-1>\n";
 print "<TABLE width=100%>";
 print "<TR>";
 print "<td>";
-// Switch to
-print "Switch to <a href=/tabswebsite/subpages/tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
 
+// Switch to
+if (! $norecentdata){
+    print "Switch to <a href=/tabswebsite/subpages/tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
+}
+else {
+    print "No table to show</TD>\n";
+}
 print "<TD>Go to <a href=/tabswebsite/subpages/tabsqueryform.php?Buoyname=$Buoyname&table=$table&datepicker=".urlencode($datepicker)."&tz=$tz&units=$units>database query</a></TD>\n";
 print "<TD>Go to <a href=/tabswebsite/index.php>homepage</a></TR></TD>\n";
 print "</table>\n";

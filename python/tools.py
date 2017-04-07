@@ -169,9 +169,9 @@ def read_model(query, timing='recent'):
     # check if last data datetime is less than 1st model datetime or
     # first data date is greater than last model time, so that time periods overlap
     # sometimes called ocean_time and sometimes time
-    if 'time' in ds:  # ocean_time should be repurposed with info from time
-        ds['ocean_time'] = ds['time']
-        ds = ds.swap_dims({'time': 'ocean_time'})
+    # if 'time' in ds:  # ocean_time should be repurposed with info from time
+    #     ds['ocean_time'] = ds['time']
+    #     ds = ds.swap_dims({'time': 'ocean_time'})
     if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
        pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
         df = None
