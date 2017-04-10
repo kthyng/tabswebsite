@@ -37,6 +37,19 @@ lw = 1.5
 c2 = 'cornflowerblue'
 
 
+def df_init(df):
+    '''Return dataframe df with indices idx and time length dT added.
+
+    Can't use datetime index directly unfortunately here, so can't use pandas later either
+    idx and dT are deleted by the resample command
+    '''
+
+    df.idx = date2num(df.index.to_pydatetime())  # in units of days
+    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+
+    return df
+
+
 def shifty(ax, N=0.05):
     '''Shift y limit to give some space to data in plot.
 
@@ -73,9 +86,7 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, t
     # if df is None and tlims is not None:
     if tlims is not None:
         if df.idx[-1] < tlims[0] or df.idx[0] > tlims[-1]:
-            df = pd.concat([df2, df3])  # in case there is a df3
-            df.idx = date2num(df.index.to_pydatetime())  # in units of days
-            df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+            df = df_init(pd.concat([df2, df3]))  # in case there is a df3
             color = c2
 
     # arrows with no heads for lines
@@ -410,10 +421,7 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         base = df.index[0].minute
         df = df.resample('60T', base=base).asfreq()
 
-    # can't use datetime index directly unfortunately here, so can't use pandas later either
-    # idx and dT are deleted by the resample command
-    df.idx = date2num(df.index.to_pydatetime())  # in units of days
-    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+    df = df_init(df)
 
     # change length of df3 if df2 overlaps with it
     if df2 is not None and df3 is not None:
@@ -464,9 +472,7 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
     # use longer dataframe in case data or model are cut short
     if df2 is not None or df3 is not None and tlims is not None:
-        dfm = pd.concat([df2, df3])
-        dfm.idx = date2num(dfm.index.to_pydatetime())  # in units of days
-        dfm.dT = dfm.idx[-1] - dfm.idx[0]  # length of dataset in days
+        dfm = df_init(pd.concat([df2, df3]))
 
         if dfm.dT > df.dT:
             df = dfm  # use the longer dataframe for labeling x axis
@@ -499,10 +505,7 @@ def currents(dfs, buoys):
         # ax.text(0.97, 0.9, buoy, transform=ax.transAxes,
         #         horizontalalignment='center', fontsize=14)
 
-        # can't use datetime index directly unfortunately here, so can't use pandas later either
-        # idx and dT are deleted by the resample command
-        df.idx = date2num(df.index.to_pydatetime())  # in units of days
-        df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+        df = df_init(df)
         if first:
             add_currents(ax, df, 'water', 'East [cm/s]', 'North [cm/s]', compass=True)
             first = False
