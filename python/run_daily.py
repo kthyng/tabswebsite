@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 q = query_setup(engine, buoy, table, pd.datetime.now())
                 dfmodelrecent = tools.read_model(q, timing='recent')
                 # read in forecast model output, not tied to when data output was found
-                q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=7), ndays=7)
+                q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=5), ndays=5)
                 dfmodelforecast = tools.read_model(q, timing='forecast')
                 tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
                 # will plot model output from now if available, otherwise data regardless of how old

@@ -54,11 +54,20 @@ def shifty(ax, N=0.05):
     '''Shift y limit to give some space to data in plot.
 
     N   decimal between 0 and 1 of range of y data to add onto y limits.
+    N=0 is a special case for shifting one y limit so that 0 is included in view.
+    This is used when currents need 0 as a reference.
     '''
 
     ylims = ax.get_ylim()
     dy = ylims[1] - ylims[0]
-    ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
+
+    if N == 0:  # to shift around 0
+        if ylims[0]>=0:
+            ax.set_ylim(-dy*0.05, ylims[1])
+        elif ylims[1]<=0:
+            ax.set_ylim(ylims[0], dy*0.05)
+    else:  # to expand the space at top and bottom of plot
+        ax.set_ylim(ylims[0] - dy*N, ylims[1] + dy*N)
 
 
 def setymaxrange(ax, ymaxrange):
@@ -96,7 +105,27 @@ def add_r2(ax, df, df2, df3, key):
         dfnew = dfnew.reindex_like(df)#.interpolate()
         if dfnew[key].sum():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
-            ax.text(0.8, 0.04, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=10, transform=ax.transAxes)
+            ax.text(0.85, 0.04, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=10, transform=ax.transAxes)
+
+
+def add_rhs(ax1, label, con):
+    '''Add axis to right hand side of subplot.'''
+
+    ax2 = ax1.twinx()
+    ax2.set_ylabel(label)
+    ax2.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for yaxis
+    ylim = ax1.get_ylim()
+    ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
+
+
+def add_legend(ax, df2, df3):
+    '''Add legend for data vs. model.'''
+
+    ax.text(0.4, 0.04, 'data', color='k', fontsize=10, transform=ax.transAxes)
+    if df2 is not None:
+        ax.text(0.5, 0.04, "{}".format("\u2014 hindcast"), color=c2, fontsize=10, transform=ax.transAxes)
+    if df3 is not None:
+        ax.text(0.65, 0.04, '-- forecast', color=c2, fontsize=10, transform=ax.transAxes)
 
 
 def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, tlims=None):
@@ -189,7 +218,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         ax.plot(df2.idx, df2[which], color=c2, lw=lw)
     if df3 is not None:
         ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
-    # import pdb; pdb.set_trace()
+    # add line at zero for reference. First get limits in x direction.
     idxmin = min(df.idx); idxmax = max(df.idx)
     for dftemp in [df2, df3]:
         if dftemp is not None:
@@ -198,37 +227,27 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
     ax.plot([idxmin, idxmax], [0,0], 'k:')
     # add r^2 to subplot
     add_r2(ax, df, df2, df3, which)
-    if ymaxrange is not None:  # Have max limits for y axis
+    # Enforce max limits for y axis in case data is very large or small
+    if ymaxrange is not None:
         setymaxrange(ax, ymaxrange)
+    # give some extra space along top and bottom of subplot
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
-    ylim = ax.get_ylim()
-    # adjust shifty to cover this case too
-    dy = ylim[1] - ylim[0]
-
-    if ylim[0]>=0:
-        # ylim[0] = -2
-        ax.set_ylim(-dy*0.05, ylim[1])
-    elif ylim[1]<=0:
-        # ylim[1] = 2
-        ax.set_ylim(ylim[0], dy*0.05)
+    shifty(ax, N=0)
     if which == 'Across [cm/s]':
         ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
     elif which == 'Along [cm/s]':
         ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    # convert to knots
-    axknots = ax.twinx()
-    axknots.set_ylim(tools.convert(ylim[0], 'cps2kts'), tools.convert(ylim[1], 'cps2kts'))
-    axknots.set_ylabel('[knots]')
+    # convert to knots on rhs
+    add_rhs(ax, '[knots]', 'cps2kts')
+    # axknots = ax.twinx()
+    # axknots.set_ylim(tools.convert(ylim[0], 'cps2kts'), tools.convert(ylim[1], 'cps2kts'))
+    # axknots.set_ylabel('[knots]')
     if which == 'Across [cm/s]':
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(bd.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
-        if df2 is not None or df3 is not None:
-            # legend for inputs
-            ax.text(0.4, 0.04, 'data', color='k', fontsize=10, transform=ax.transAxes)
-            ax.text(0.5, 0.04, 'model (-- forecast)', color=c2, fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
@@ -236,7 +255,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None, tlims=None):
+def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None,
+                   df3=None, tlims=None, dolegend=False):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
@@ -271,15 +291,19 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, 
     shifty(ax1)
     # add r^2 to subplot
     add_r2(ax1, df, df2, df3, key)
+    # add data/model legend
+    if dolegend:
+        add_legend(ax1, df2, df3)
     # right side units
-    ax2 = ax1.twinx()
-    ax2.set_ylabel(label2)
-    ax2.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
-    ylim = ax1.get_ylim()
-    ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
+    add_rhs(ax1, label2, con)
+    # ax2 = ax1.twinx()
+    # ax2.set_ylabel(label2)
+    # ax2.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
+    # ylim = ax1.get_ylim()
+    # ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None):
+def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None, dolegend=False):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
@@ -294,6 +318,9 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None):
     shifty(ax)
     # add r^2 to subplot
     add_r2(ax, df, df2, df3, var)
+    # add data/model legend
+    if dolegend:
+        add_legend(ax, df2, df3)
 
 
 def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
@@ -470,7 +497,8 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
         add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0])
@@ -482,13 +510,15 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
                        'c2f', '[˚F]', ymaxrange=[-25,40], df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
-        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110], df2=df2, df3=df3)
+        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
+                ymaxrange=[0,110], df2=df2, df3=df3, dolegend=True)
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
         add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36], df2=df2, df3=df3)
         # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
-        add_var(axes[2], df, 'Density [kg/m^3]', 'Density [kg$\cdot$ m$^{-3}$]', df2=df2, df3=df3, ymaxrange=[1015, 1036])
+        add_var(axes[2], df, 'Density [kg/m^3]', 'Density [kg$\cdot$ m$^{-3}$]',
+                df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True)
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
