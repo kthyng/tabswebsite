@@ -73,6 +73,31 @@ def setymaxrange(ax, ymaxrange):
         ylim[1] = ymaxrange[1]
     ax.set_ylim(ylim)
 
+def ss(data, model):
+    '''Calculate skill score between data and model.'''
+
+    return 1 - ((data - model)**2).sum() / (data**2).sum()
+
+
+def r2(data, model):
+    '''Calculate r^2 for data and model.'''
+
+    return (np.corrcoef(data, model)**2)[0,1]
+
+
+def add_r2(ax, df, df2, df3, key):
+    '''Make adjustments and add r^2 to subplot.'''
+
+    shifty(ax)  # most functions already have one of these, do another for space
+    if df2 is not None or df3 is not None:
+        # account for if df2 and df3 overlap
+        dfnew = pd.concat([df2, df3]).resample('30T').interpolate()  # in case there is a df3
+        # reindex model dfnew to match data df for calculations
+        dfnew = dfnew.reindex_like(df)#.interpolate()
+        if dfnew[key].sum():
+                # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
+            ax.text(0.8, 0.04, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=10, transform=ax.transAxes)
+
 
 def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, tlims=None):
     '''Add current arrows to plot
@@ -171,14 +196,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
             idxmin = min((idxmin, dftemp.idx.min()))
             idxmax = max((idxmax, dftemp.idx.max()))
     ax.plot([idxmin, idxmax], [0,0], 'k:')
-    if df2 is not None or df3 is not None:
-        # add skill score
-        # account for if df2 and df3 overlap
-        dfnew = pd.concat([df2, df3]).resample('30T').asfreq()  # in case there is a df3
-        ind = pd.notnull(df[which]) & pd.notnull(dfnew[which])
-        ss = 1 - ((df - dfnew)**2).sum() / (df[ind]**2).sum()
-        if not np.isnan(ss[which]):
-            ax.text(0.8, 0.04, 'skill score: %1.2f' % ss[which], color=c2, fontsize=10, transform=ax.transAxes)
+    # add r^2 to subplot
+    add_r2(ax, df, df2, df3, which)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax, N=0.1)
@@ -219,7 +238,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None):
     '''Plot with units on both left and right sides of plot.'''
-    # import pdb; pdb.set_trace()
+
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     if df2 is not None:
         ax1.plot(df2.idx, df2[key], lw=lw, color=c2, linestyle='-')
@@ -230,6 +249,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, 
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
     shifty(ax1)
+    # add r^2 to subplot
+    add_r2(ax1, df, df2, df3, key)
     # right side units
     ax2 = ax1.twinx()
     ax2.set_ylabel(label2)
@@ -250,6 +271,8 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None):
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax)
+    # add r^2 to subplot
+    add_r2(ax, df, df2, df3, var)
 
 
 def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
