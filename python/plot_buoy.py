@@ -236,7 +236,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
         ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
-def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None):
+def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None, tlims=None):
     '''Plot with units on both left and right sides of plot.'''
 
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
@@ -246,6 +246,26 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, 
         ax1.plot(df3.idx, df3[key], lw=lw, color=c2, linestyle='--')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
+    if tlims is not None:  # set y range by signal within tlims (in case data off-screen changing it)
+        ymins = []; ymaxs = []
+        if df2 is not None:
+            ymins.append(df2[key].min())
+            ymaxs.append(df2[key].max())
+        if df3 is not None:
+            ymins.append(df3[key].min())
+            ymaxs.append(df3[key].max())
+        # check if data df is contained in tlims
+        # 1st: if nothing in df is larger than the first tlims value, or
+        # 2nd: if nothing in df is smaller than the last tlims value,
+        # use df to set y range since df is contained in tlims
+        if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
+            # then range also set by df
+            ymins.append(df[key].min())
+            ymaxs.append(df[key].max())
+        if ymins != []:
+            ymin = min(ymins)
+            ymax = max(ymaxs)
+            ax1.set_ylim(ymin, ymax)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
     shifty(ax1)
@@ -268,6 +288,7 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None):
     if df3 is not None:
         ax.plot(df3.idx, df3[var], lw=lw, color=c2, linestyle='--')
     ax.set_ylabel(varlabel)
+    ax.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for y limits
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax)
@@ -449,7 +470,7 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110], df2=df2, df3=df3)
         add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
         add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0])
@@ -458,29 +479,30 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[-25,40], df2=df2, df3=df3)
+                       'c2f', '[˚F]', ymaxrange=[-25,40], df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3)
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110], df2=df2, df3=df3)
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
         add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36], df2=df2, df3=df3)
-        add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
+        # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
+        add_var(axes[2], df, 'Density [kg/m^3]', 'Density [kg$\cdot$ m$^{-3}$]', df2=df2, df3=df3, ymaxrange=[1015, 1036])
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
-                       'm2ft', '[ft]', ymaxrange=[0,5])
+                       'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
         add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
         add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12])
     elif which == 'ndbc':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040])
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], tlims=tlims)
         add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
-                       'm2ft', '[ft]', ymaxrange=[0,5])
+                       'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
         add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12])
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
     # use longer dataframe in case data or model are cut short
     if df2 is not None or df3 is not None and tlims is not None:
         dfm = df_init(pd.concat([df2, df3]))

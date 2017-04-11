@@ -10,6 +10,7 @@ import buoy_data as bd
 from prettypandas import PrettyPandas
 from sqlalchemy import create_engine
 import xarray as xr
+import gsw
 
 
 def convert(vin, which):
@@ -89,6 +90,9 @@ def read(dataname, units='M', tz='UTC'):
             names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
             rdict = {}
 
+            # density is all 0s, so need to overwrite
+            df['density'] = gsw.rho(df['salinity'], df['twater'], np.zeros(len(df)))
+
         elif which == 'wave':
             names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
             rdict = {}
@@ -160,7 +164,7 @@ def read_model(query, timing='recent'):
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc'  # forcing info
     elif timing == 'forecast':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_latest_agg'
+        loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_latest_agg'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
     ds = xr.open_dataset(loc)
     if which == 'met' or which == 'ndbc':  # read in forcing info
@@ -209,6 +213,8 @@ def read_model(query, timing='recent'):
 
             # change names to match data
             df.columns = ['Temp [deg C]', 'Salinity']
+
+            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['Temp [deg C]'], np.zeros(len(df)))
 
         elif which == 'ndbc':
             # model output needed for image
