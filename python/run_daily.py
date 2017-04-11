@@ -70,8 +70,6 @@ def make_text(df, fname):
     '''Make text file of data'''
 
     df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='')
-    # with no header:
-    # df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', header=False, quoting=csv.QUOTE_NONE,  escapechar=' ')
 
 
 if __name__ == "__main__":
@@ -79,23 +77,12 @@ if __name__ == "__main__":
     engine = tools.engine()
 
     # loop through buoys: query, make text file, make plot
-    # buoy = '42019'
     for buoy in bd.buoys():
         for table in bd.tables():  # loop through tables for each buoy
-            # if table == 'ven':
-            #     if buoy in bd.avail('ven'):  # this condition due to ndbc buoys
-            #         # find end date of recent legitimate data
-            #         # thus, the "recent" dates are determined by the ven
-            #         # table data but used by all tables
-            #         dend = query_setup_recent(engine, buoy)
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                # try:
-                # if table == 'eng':
-                #     import pdb; pdb.set_trace()
-                # if table == 'ndbc':
                 dend = query_setup_recent(engine, buoy, table)
                 q = query_setup(engine, buoy, table, dend)
                 df = tools.read([q, engine])
@@ -105,31 +92,13 @@ if __name__ == "__main__":
                     fname = path.join('..', 'daily', 'ndbc_' + buoy)
                 # write daily data file, for whatever most recent time period
                 # data was available
-                # check if data frame is empty, which could happen if this
-                # instrument is not reporting data at the same time as ven
-                # if not df.empty:
                 make_text(df, fname)  # there is always data to write, but it might be old
-                # # if there is no data and we don't plot from the model
-                # elif df.empty and (table == 'eng' or table == 'wave'):
-                #     continue  # in these cases, there is nothing to plot
-                # if table != 'ndbc':
                 # read in recent model output, not tied to when data output was found
                 q = query_setup(engine, buoy, table, pd.datetime.now())
                 dfmodelrecent = tools.read_model(q, timing='recent')
                 # read in forecast model output, not tied to when data output was found
                 q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=7), ndays=7)
                 dfmodelforecast = tools.read_model(q, timing='forecast')
-                # else:
-                #     dfmodelrecent = None
-                #     dfmodelforecast = None
-                # make and save plots
-                # plot according to the model output since it is fixed to be current
-                # if dfmodelrecent.empty or dfmodelrecent is None:  # if not model output for this variable
-                #     tlims = None
-                # else:
-                #     if dfmodelforecast.empty or dfmodelforecast is None:
-                #         tlims = [dfmodelrecent.idx[0], dfmodelrecent.idx[-1]]
-                #     else:
                 tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
                 # will plot model output from now if available, otherwise data regardless of how old
                 fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast, tlims)
@@ -138,10 +107,6 @@ if __name__ == "__main__":
                 # save smaller for hover
                 fig.savefig(fname + '_low.png', dpi=60)
                 close(fig)
-                # if data isn't available at the same time as the ven file,
-                # leave as not written
-                # except:
-                #     pass
 
     for buoy in bd.buoys():  # loop through buoys separately for buoy headers
         # write header

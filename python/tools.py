@@ -157,14 +157,15 @@ def read_model(query, timing='recent'):
     dend = query.split('"')[3]  # end date and time
     # import pdb; pdb.set_trace()
     if timing == 'recent':
-        # loc = 'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/oof_arhcive_agg'
-        # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/txla_oof/TXLA_ROMS_Forecast_Feature_Collection_best.ncd'
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
+        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc'  # forcing info
     elif timing == 'forecast':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_latest_agg'
-        # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_latest/roms_his_f_previous_day.nc'
-    # loc = 'http://copano.tamu.edu:8080/thredds/dodsC/fmrc/oof_archives/out/OOF_Archive_Aggregation_best.ncd'
+        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
     ds = xr.open_dataset(loc)
+    if which == 'met' or which == 'ndbc':  # read in forcing info
+        dsf = xr.open_dataset(locf)
+
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
     # first data date is greater than last model time, so that time periods overlap
@@ -227,6 +228,10 @@ def read_model(query, timing='recent'):
 
             # change names to match data
             df.columns = ['East [m/s]', 'North [m/s]']
+
+            df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
+            df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
+            df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
 
         # can't use datetime index directly unfortunately here, so can't use pandas later either
         df.idx = date2num(df.index.to_pydatetime())  # in units of days

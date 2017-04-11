@@ -219,7 +219,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df2=None, df3=None):
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None, df3=None):
     '''Plot with units on both left and right sides of plot.'''
-
+    # import pdb; pdb.set_trace()
     ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     if df2 is not None:
         ax1.plot(df2.idx, df2[key], lw=lw, color=c2, linestyle='-')
@@ -328,18 +328,6 @@ def add_xlabels(ax, df, fig, tlims=None):
     else:
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %Y'))
 
-    # Year for last entry
-    # catch special case of last tick switching over to new year without actual data doing so
-    # do this if the data is for december only but the final tick label is for january
-    # import pdb; pdb.set_trace()
-    # if (df.index[-1].month == 12) and (ax.get_xticklabels(which='major')[-1].get_text()[:3] == 'Jan'):
-    #     ax.text(0.98, -0.25, datetime.strftime(df.index[-1].year+1, '%Y'),
-    #             transform=ax.transAxes, rotation=30)
-    # else:
-    # note: I haven't been able to figure out how to update this year in the special case
-    # ax.text(0.98, -0.25, df.index.strftime("%Y")[-1],
-    #         transform=ax.transAxes, rotation=30)
-
     # put in GMT as time zone
     ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
 
@@ -447,10 +435,10 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[-25,40])
+                       'c2f', '[˚F]', ymaxrange=[-25,40], df2=df2, df3=df3)
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040])
-        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110])
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3)
+        add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]', ymaxrange=[0,110], df2=df2, df3=df3)
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3)
