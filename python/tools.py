@@ -109,7 +109,11 @@ def read(dataname, units='M', tz='UTC'):
             df['East [m/s]'] = df['windspeed']*np.cos(np.deg2rad(theta))
             df['North [m/s]'] = df['windspeed']*np.sin(np.deg2rad(theta))
 
-            # remove missing values
+            # first remove calculate values (East, North) if associated with nan's
+            ind = (df['windspeed']==-99.0) | (df['winddir']==-99.0)
+            df.loc[ind, 'East [m/s]'] = np.nan
+            df.loc[ind, 'North [m/s]'] = np.nan
+            # remove original missing values
             df.replace('-99.0', np.nan, inplace=True)
 
         if 'date' in df.columns:

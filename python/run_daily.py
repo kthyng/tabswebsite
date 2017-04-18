@@ -83,7 +83,7 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                # if table == 'ndbc':
+                # if table == 'ndbc' and buoy == 'PTAT2':
                 #     import pdb; pdb.set_trace()
                 dend = query_setup_recent(engine, buoy, table)
                 q = query_setup(engine, buoy, table, dend)
