@@ -83,6 +83,8 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
+                # if buoy == 'B' and table == 'salt':
+                #     import pdb; pdb.set_trace()
                 dend = query_setup_recent(engine, buoy, table)
                 q = query_setup(engine, buoy, table, dend)
                 df = tools.read([q, engine])
@@ -99,7 +101,10 @@ if __name__ == "__main__":
                 # read in forecast model output, not tied to when data output was found
                 q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=5), ndays=5)
                 dfmodelforecast = tools.read_model(q, timing='forecast')
-                tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
+                if table == 'wave' or table == 'eng':
+                    tlims = None
+                else:
+                    tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
                 # will plot model output from now if available, otherwise data regardless of how old
                 fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast, tlims)
                 fig.savefig(fname + '.pdf')
