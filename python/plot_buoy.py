@@ -82,6 +82,32 @@ def setymaxrange(ax, ymaxrange):
         ylim[1] = ymaxrange[1]
     ax.set_ylim(ylim)
 
+
+def setylimsintlims(ax, df, df2, df3, key, tlims):
+    '''Adjusts ylimits to only account for plots visible in axes.'''
+
+    if tlims is not None:
+        ymins = []; ymaxs = []
+        if df2 is not None:
+            ymins.append(df2[key].min())
+            ymaxs.append(df2[key].max())
+        if df3 is not None:
+            ymins.append(df3[key].min())
+            ymaxs.append(df3[key].max())
+        # check if data df is contained in tlims
+        # 1st: if nothing in df is larger than the first tlims value, or
+        # 2nd: if nothing in df is smaller than the last tlims value,
+        # use df to set y range since df is contained in tlims
+        if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
+            # then range also set by df
+            ymins.append(df[key].min())
+            ymaxs.append(df[key].max())
+        if ymins != []:
+            ymin = min(ymins)
+            ymax = max(ymaxs)
+            ax.set_ylim(ymin, ymax)
+
+
 def ss(data, model):
     '''Calculate skill score between data and model.'''
 
@@ -136,8 +162,6 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, t
     color = 'k'  # color of data arrows
 
     # if data is not within input time range, use model output instead
-    # import pdb; pdb.set_trace()
-    # if df is None and tlims is not None:
     if tlims is not None:
         if df.idx[-1] < tlims[0] or df.idx[0] > tlims[-1]:
             df = df_init(pd.concat([df2, df3]))  # in case there is a df3
@@ -166,16 +190,25 @@ def add_currents(ax, df, which, east, north, compass=True, df2=None, df3=None, t
         ddt = 4
     else:
         ddt = 5
+
+    # replace
     ax.quiver(df.idx[::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1, color=color)
 
+    # use forecast currents to fill in before data (in case there has been a gap)
+    if df2 is not None and tlims is not None:
+        if (df.idx[0] - tlims[0]) > 3600:  # more than an hour
+            # import pdb; pdb.set_trace()
+            stemp = df.index[0] - timedelta(minutes=30)
+            df4 = df_init(df2[:stemp])
+            ax.quiver(df4.idx[::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
+                      headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
     # use forecast currents to fill in after data
     if df3 is not None and not df[df3.index[0]:].equals(df3):
+        # fill in after data with model
         if df.index[-1] > df3.index[0]:
             stemp = df.index[-1] + timedelta(minutes=30)
-            df3 = df3[stemp:]
-            df3.idx = date2num(df3.index.to_pydatetime())  # in units of days
-            df3.dT = df3.idx[-1] - df3.idx[0]  # length of dataset in days
+            df3 = df_init(df3[stemp:])
 
         ax.quiver(df3.idx[::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
@@ -266,26 +299,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None,
         ax1.plot(df3.idx, df3[key], lw=lw, color=c2, linestyle='--')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
-    if tlims is not None:  # set y range by signal within tlims (in case data off-screen changing it)
-        ymins = []; ymaxs = []
-        if df2 is not None:
-            ymins.append(df2[key].min())
-            ymaxs.append(df2[key].max())
-        if df3 is not None:
-            ymins.append(df3[key].min())
-            ymaxs.append(df3[key].max())
-        # check if data df is contained in tlims
-        # 1st: if nothing in df is larger than the first tlims value, or
-        # 2nd: if nothing in df is smaller than the last tlims value,
-        # use df to set y range since df is contained in tlims
-        if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
-            # then range also set by df
-            ymins.append(df[key].min())
-            ymaxs.append(df[key].max())
-        if ymins != []:
-            ymin = min(ymins)
-            ymax = max(ymaxs)
-            ax1.set_ylim(ymin, ymax)
+    # set y range by signal within tlims (in case data off-screen changing it)
+    setylimsintlims(ax1, df, df2, df3, key, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
     shifty(ax1)
@@ -303,7 +318,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None,
     # ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None, dolegend=False):
+def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None,
+            dolegend=False, tlims=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
     ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
@@ -313,6 +329,8 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None, dolegend=
         ax.plot(df3.idx, df3[var], lw=lw, color=c2, linestyle='--')
     ax.set_ylabel(varlabel)
     ax.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for y limits
+    # set y range by signal within tlims (in case data off-screen changing it)
+    setylimsintlims(ax, df, df2, df3, var, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax)
@@ -501,8 +519,8 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
                        tlims=tlims, dolegend=True)
     elif which == 'eng':
         add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
-        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0])
-        add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210])
+        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0], tlims=tlims)
+        add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210], tlims=tlims)
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
@@ -511,28 +529,30 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
-                ymaxrange=[0,110], df2=df2, df3=df3, dolegend=True)
+                ymaxrange=[0,110], df2=df2, df3=df3, dolegend=True, tlims=tlims)
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
-        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 36], df2=df2, df3=df3)
+        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 37], df2=df2, df3=df3, tlims=tlims)
         # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
-        add_var(axes[2], df, 'Density [kg/m^3]', 'Density [kg$\cdot$ m$^{-3}$]',
-                df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True)
+        add_var(axes[2], df, 'Density [kg/m^3]', 'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
+                df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True, tlims=tlims)
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
-        add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]')
-        add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12])
+        add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]', tlims=tlims)
+        add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12], tlims=tlims)
     elif which == 'ndbc':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], tlims=tlims)
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
+        # import pdb; pdb.set_trace()
         add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
-        add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12])
+        add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12], tlims=tlims)
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
     # use longer dataframe in case data or model are cut short
     if df2 is not None or df3 is not None and tlims is not None:
         dfm = df_init(pd.concat([df2, df3]))
