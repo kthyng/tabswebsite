@@ -117,19 +117,26 @@ def ss(data, model):
 def r2(data, model):
     '''Calculate r^2 for data and model.'''
 
-    return (np.corrcoef(data, model)**2)[0,1]
+    # create a local dataframe so that can calculate correlation while ignoring nan's
+    df = pd.DataFrame(index=data.index, data={'data': data, 'model': model})
+    return df.corr().loc['data','model']
 
 
-def add_r2(ax, df, df2, df3, key):
+def add_r2(ax, df, df2, df3, key, N=0.05):
     '''Make adjustments and add r^2 to subplot.'''
 
-    shifty(ax)  # most functions already have one of these, do another for space
+    shifty(ax, N=N)  # most functions already have one of these, do another for space
     if df2 is not None or df3 is not None:
         # account for if df2 and df3 overlap
-        dfnew = pd.concat([df2, df3]).resample('30T').interpolate()  # in case there is a df3
+        # resample to data frequency and base minute so they match for reindexing
+        # not using infer_freq because want the units to be in minutes like base
+        datafreq = (df.index[1] - df.index[0]).seconds/60.  # pd.infer_freq(df.index)
+        datafreq = str(int(datafreq)) + 'T'  # changing to string
+        database = df.index[0].minute
+        dfnew = pd.concat([df2, df3]).resample(datafreq, base=database).interpolate()  # in case there is a df3
         # reindex model dfnew to match data df for calculations
         dfnew = dfnew.reindex_like(df)#.interpolate()
-        if dfnew[key].sum():
+        if df[key].sum() and dfnew[key].sum():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
             ax.text(0.85, 0.04, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=10, transform=ax.transAxes)
 
@@ -305,7 +312,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df2=None,
         setymaxrange(ax1, ymaxrange)
     shifty(ax1)
     # add r^2 to subplot
-    add_r2(ax1, df, df2, df3, key)
+    add_r2(ax1, df, df2, df3, key, N=0.1)
     # add data/model legend
     if dolegend:
         add_legend(ax1, df2, df3)

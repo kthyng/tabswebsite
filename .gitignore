@@ -2,3 +2,11 @@
 unused
 phphelp.txt
 tmp/*
+.cache
+.ipynb_checkpoints
+__pycache__
+daily
+database/tabsqueryform_old.php
+notes
+*.pyc
+figures
