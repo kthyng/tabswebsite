@@ -109,6 +109,9 @@ def read(dataname, units='M', tz='UTC'):
             df['East [m/s]'] = df['windspeed']*np.cos(np.deg2rad(theta))
             df['North [m/s]'] = df['windspeed']*np.sin(np.deg2rad(theta))
 
+            # remove missing values
+            df.replace('-99.0', np.nan, inplace=True)
+
         if 'date' in df.columns:
             df = df.drop(['date','time'], axis=1)
         df.columns = names
@@ -164,7 +167,7 @@ def read_model(query, timing='recent'):
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc'  # forcing info
     elif timing == 'forecast':
-        loc = 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_latest_agg'
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
     ds = xr.open_dataset(loc)
     if which == 'met' or which == 'ndbc':  # read in forcing info
@@ -225,6 +228,8 @@ def read_model(query, timing='recent'):
 
             # change names to match data
             df.columns = ['WaterT [deg C]', 'East [m/s]', 'North [m/s]']
+
+            df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
 
         elif which == 'met':
             # model output needed for image
