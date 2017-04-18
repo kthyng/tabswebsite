@@ -271,6 +271,6 @@ def present(df):
 def engine():
     '''Setup database engine for mysql querying.'''
 
-    engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
+    engine = create_engine('mysql+mysqlconnector://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
 
     return engine
