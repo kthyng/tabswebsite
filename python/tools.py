@@ -173,9 +173,17 @@ def read_model(query, timing='recent'):
     elif timing == 'forecast':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
-    ds = xr.open_dataset(loc)
+    try:
+        ds = xr.open_dataset(loc)
+    except:
+        loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
+        ds = xr.open_dataset(loc)
     if which == 'met' or which == 'ndbc':  # read in forcing info
-        dsf = xr.open_dataset(locf)
+        try:
+            dsf = xr.open_dataset(locf)
+        except:
+            locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
+            dsf = xr.open_dataset(locf)
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
