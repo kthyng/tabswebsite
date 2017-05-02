@@ -553,10 +553,15 @@ def plot(df, buoy, which, df2=None, df3=None, tlims=None):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
-        # import pdb; pdb.set_trace()
-        add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
-                       'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
-        add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12], tlims=tlims)
+        if buoy == 'PTAT2' or buoy == 'SRST2':
+            axes[2].text(0.35, 0.5, 'No wave instrument', transform=axes[2].transAxes)
+            axes[2].get_yaxis().set_ticks([])
+            axes[3].text(0.35, 0.5, 'No wave instrument', transform=axes[3].transAxes)
+            axes[3].get_yaxis().set_ticks([])
+        else:
+            add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
+                           'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
+            add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12], tlims=tlims)
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)

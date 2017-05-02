@@ -51,7 +51,7 @@ def read(dataname, units='M', tz='UTC'):
     # read method: from a file or from mysql
     if isinstance(dataname, str):
         # columns have already been processed previously and can be inferred
-        df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values='-999')
+        df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values=['-999', '-99.0'])
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
