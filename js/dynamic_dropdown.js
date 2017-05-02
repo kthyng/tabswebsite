@@ -52,19 +52,19 @@ http://jsfiddle.net/NaUAL/
                 valname = "System data"
               }
               else if (val == "met"){
-                valname = "Meteorological data"
+                valname = "Atmospheric conditions"
               }
               else if (val == "ven"){
-                valname = "Velocity data"
+                valname = "Velocities"
               }
               else if (val == "salt"){
-                valname = "Water property data"
+                valname = "Water properties"
               }
               else if (val == "wave"){
-                valname = "Wave data"
+                valname = "Waves"
               }
               else if (val == "ndbc"){
-                valname = "NDBC data"
+                valname = "NDBC buoy"
               }
               html.push('<option value=' + val + '>'+valname+'</option>')
             // //   html.push('<option>'+val+'</option>')
