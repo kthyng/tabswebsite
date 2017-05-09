@@ -9,10 +9,15 @@ print "<TABLE width=100%>";
 print "<TR>";
 print "<td>";
 
-// Switch to
-if (! $norecentdata){
+// Switch to data from pic or pic from data (when data is available)
+if (! $norecentdata and !$norecentdatabutmodel){
     print "Switch to <a href=/tabswebsite/subpages/tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=$newdatatype&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
 }
+// If on data, but no recent data, can switch to pic with model output
+elseif (($norecentdata or $norecentdatabutmodel) and $datatype == "data") {
+    print "Switch to <a href=/tabswebsite/subpages/tabsquery.php?Buoyname=$Buoyname&table=$table&Datatype=pic&tz=$tz&units=$units&datepicker=".urlencode($datepicker).">$newdatatypename</a></TD>\n";
+}
+// If on image, but no recent data, nothing to switch to
 else {
     print "No table to show</TD>\n";
 }
@@ -70,13 +75,6 @@ print "<OPTION value='PTAT2'>PTAT2</option></select></td>\n";
 // Change table (variable file)
 print "<td><select id=json-two name=table>";
 print "<option selected value='$table'>$table</option></select></td>";
-// print <<<_HTML_
-// <TD>
-// <select id="json-two" name="table">
-//     <option>available data</option>
-// </select>
-// </TD>
-// _HTML_;
 
 print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepicker'></TD>";
 
@@ -84,6 +82,8 @@ print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepick
 // print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 // print "<input NAME=datepicker TYPE=hidden value='$datepicker'>\n";
+print "<input NAME=norecentdata TYPE=hidden value=$norecentdata>\n";
+print "<input NAME=norecentdata TYPE=hidden value=$norecentdatabutmodel>\n";
 
 // print "<BR>";
 print "<td><input type=submit  value=Change></td>\n</form>\n";
