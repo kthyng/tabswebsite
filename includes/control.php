@@ -68,8 +68,15 @@ print "<OPTION value='SRST2'>SRST2</option>\n";
 print "<OPTION value='PTAT2'>PTAT2</option></select></td>\n";
 
 // Change table (variable file)
-print "<td><select id=json-two name=table>\n";
+print "<td><select id=json-two name=table>";
 print "<option selected value='$table'>$table</option></select></td>";
+// print <<<_HTML_
+// <TD>
+// <select id="json-two" name="table">
+//     <option>available data</option>
+// </select>
+// </TD>
+// _HTML_;
 
 print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepicker'></TD>";
 

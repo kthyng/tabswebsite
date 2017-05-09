@@ -39,15 +39,42 @@ https://css-tricks.com/dynamic-dropdowns/
 http://jsfiddle.net/NaUAL/
 
     $("#json-one").change(function() {
-        valname = "Available data"
         var first = $(this),
             second = $("#json-two"),
             key = first.val(),
             // instead of the original switch code
             vals = data[key] == undefined ? data.base : data[key],
             html = [];
+        // Include at the top the initial input value if it exists
+        valorig = document.getElementsByName("table")[0].value;
+        if (valorig == "eng"){
+          valnameorig = "System data"
+        }
+        else if (valorig == "met"){
+          valnameorig = "Atmospheric conditions"
+        }
+        else if (valorig == "ven"){
+          valnameorig = "Velocities"
+        }
+        else if (valorig == "salt"){
+          valnameorig = "Water properties"
+        }
+        else if (valorig == "wave"){
+          valnameorig = "Waves"
+        }
+        else if (valorig == "ndbc"){
+          valnameorig = "NDBC buoy"
+        }
+        // only create html if initial table value exists
+        if (valorig){
+            html.push('<option value=' + valorig + '>'+valnameorig+'</option>')
+        }
          // create insert html before adding
          $.each(vals,function(i,val){
+              // skip if already included
+              if (val == valorig){
+                return true
+              }
               if (val == "eng"){
                 valname = "System data"
               }

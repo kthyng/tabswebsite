@@ -12,13 +12,14 @@
 <?php
 
 $buoy = isset($_GET["Buoyname"]) ? $_GET["Buoyname"] : "";
-// $table = isset($_GET["table"]) ? $_GET["table"] : "";
+$table = isset($_GET["table"]) ? $_GET["table"] : "";
 $datepicker = isset($_GET["datepicker"]) ? $_GET["datepicker"] : "";
 $tz = isset($_GET["tz"]) ? $_GET["tz"] : "";
 $units = isset($_GET["units"]) ? $_GET["units"] : "";
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
+// if (! $table) {$table = 'ven';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -86,7 +87,7 @@ print <<<_HTML_
 <TD>
 <B>... then select dataset&nbsp;</B>
 <select id="json-two" name="table">
-    <option>available data</option>
+    <option selected value='$table'>$table</option>
 </select>
 </TD>
 </tr>
