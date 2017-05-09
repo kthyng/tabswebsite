@@ -66,7 +66,8 @@ http://jsfiddle.net/NaUAL/
           valnameorig = "NDBC buoy"
         }
         // only create html if initial table value exists
-        if (valorig){
+        // also only use table variable if it is an option for the buoy
+        if (valorig && $.inArray(valorig, vals) != -1){
             html.push('<option value=' + valorig + '>'+valnameorig+'</option>')
         }
          // create insert html before adding
