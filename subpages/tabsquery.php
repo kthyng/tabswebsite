@@ -263,6 +263,7 @@ if ($datepicker!="recent"){
     // if data is missing from this time period, just say that
     if (filesize($tempfile) == 0){
         print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
+        $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
     }
 }
 elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $norecentdatabutmodel){

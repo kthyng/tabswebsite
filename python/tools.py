@@ -145,7 +145,11 @@ def read(dataname, units='M', tz='UTC'):
         df.index = df.index.tz_convert('US/Central')
         df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
 
-    return df
+    # return None instead of just header if no data for time period
+    if len(df) == 0:
+        return None
+    else:
+        return df
 
 
 def rot2d(x, y, ang):

@@ -6,7 +6,7 @@ and present as table or image.
 example (since dstart and dend are optional)
 run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5' 'data'
 run get_data.py '../tmp/tabs_F_ven_test' 'data'
-run get_data.py '../tmp/ndbc_PTAT2_test' 'data'
+run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
 '''
 
