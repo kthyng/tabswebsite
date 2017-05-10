@@ -25,7 +25,7 @@ $datepicker=$_GET["datepicker"];
 $datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 $units = $_GET["units"];
-// $norecentdata = $_GET["norecentdata"];
+$model = $_GET["model"];
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
@@ -152,10 +152,10 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
     else if (php_uname('n') == 'tahoma.local') {
-        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
 
     chmod($tempfile, 0644);

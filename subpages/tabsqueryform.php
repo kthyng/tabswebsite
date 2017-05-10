@@ -94,6 +94,7 @@ print <<<_HTML_
 
 
 <TR><TD><br></TD></TR>
+
 <TR><TD><B>Select Date: </B> </TD>
 <TD>
 <input type="text" value="$datepicker" id="datepicker" name="datepicker"/>
@@ -129,6 +130,16 @@ print <<<_HTML_
 <option value='central'>US/Central</option>
 </select>
 </td><tr>
+
+
+<TR>
+<td><b>&nbsp;for graphic:</b></td>
+<TD>Include model:&nbsp;
+<input type=radio name="model" value=True checked>Yes
+<input type=radio name="model" value=False>No
+</td>
+</TR>
+
 <TR><TD><br></TD></TR>
 
 

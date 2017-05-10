@@ -11,6 +11,7 @@ from prettypandas import PrettyPandas
 from sqlalchemy import create_engine
 import xarray as xr
 import gsw
+from dateutil.parser import parse
 
 
 def convert(vin, which):
@@ -170,8 +171,10 @@ def read_model(query, timing='recent'):
         which = query.split(' ')[3].split('_')[0]
     dstart = query.split('"')[1]  # start date (beginning of day)
     dend = query.split('"')[3]  # end date and time
-    # import pdb; pdb.set_trace()
-    if timing == 'recent':
+    if timing == 'hindcast':
+        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg'
+        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'  # forcing info
+    elif timing == 'recent':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc'  # forcing info
     elif timing == 'forecast':
@@ -196,8 +199,11 @@ def read_model(query, timing='recent'):
     # if 'time' in ds:  # ocean_time should be repurposed with info from time
     #     ds['ocean_time'] = ds['time']
     #     ds = ds.swap_dims({'time': 'ocean_time'})
-    if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
-       pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
+    # if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
+    #    pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
+    #     df = None
+    if parse(dend) <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
+       parse(dstart) >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
         df = None
     else:
         # Initialize model dataframe with times
