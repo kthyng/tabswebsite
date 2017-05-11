@@ -241,12 +241,11 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # use forecast currents to fill in after data
     if df3 is not None and not df[df3.index[0]:].equals(df3):
         # fill in after data with model
-        if df.index[-1] > df3.index[0]:
+        if df.index[-1] > df3.index[0] and df.index[-1] < df3.index[-1]:
             stemp = df.index[-1] + timedelta(minutes=30)
             df3 = df_init(df3[stemp:])
-
-        ax.quiver(df3.idx[::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
-                  headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
+            ax.quiver(df3.idx[::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
+                      headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
 
     # if df2 is not None:  # 2nd set of arrows
     #     ax.quiver(df2.idx[::ddt], np.zeros(len(df2[::ddt])), df2[::ddt][east], df2[::ddt][north], headaxislength=0,

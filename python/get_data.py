@@ -33,6 +33,8 @@ args = parser.parse_args()
 fname = args.fname
 dstart = args.dstart
 dend = args.dend
+# make it so dend time is at end of the day
+dend += ' 23:00'
 datatype = args.datatype
 units = args.units
 tz = args.tz
@@ -69,7 +71,6 @@ else:
     else:
         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
     df = tools.read([query, engine], units=units, tz=tz)
-    # import pdb; pdb.set_trace()
     if df is not None:  # won't work if data isn't available in this time period
         run_daily.make_text(df, fname)
 
