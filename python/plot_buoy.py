@@ -8,7 +8,7 @@ python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
 '''
 
 import matplotlib as mpl
-mpl.use('Agg')
+# mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import buoy_data as bd
@@ -19,16 +19,6 @@ import pandas as pd
 
 
 mpl.rcParams.update({'font.size': 14})
-mpl.rcParams['font.sans-serif'] = 'Arev Sans, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Helvetica, Avant Garde, sans-serif'
-# mpl.rcParams['mathtext.fontset'] = 'custom'
-# mpl.rcParams['mathtext.cal'] = 'cursive'
-mpl.rcParams['mathtext.rm'] = 'sans'
-mpl.rcParams['mathtext.tt'] = 'monospace'
-mpl.rcParams['mathtext.it'] = 'sans:italic'
-mpl.rcParams['mathtext.bf'] = 'sans:bold'
-mpl.rcParams['mathtext.sf'] = 'sans'
-mpl.rcParams['mathtext.fallback_to_cm'] = 'True'
-
 
 # constants
 cmax = 65  # cm/s, max water arrow value
@@ -559,8 +549,8 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110],
                 df1=df1, df2=df2, df3=df3)
         add_var_2units(axes[3], df, 'WaterT [deg C]',
-                       'Water temperature\n' + r'$\left[^\circ\! \mathrm{C} \right]$',
-                       'c2f', r'$\left[^\circ\! \mathrm{F} \right]$',
+                       'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
