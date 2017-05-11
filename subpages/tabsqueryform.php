@@ -135,8 +135,8 @@ print <<<_HTML_
 <TR>
 <td><b>&nbsp;for graphic:</b></td>
 <TD>Include model:&nbsp;
-<input type=radio name="model" value=True checked>Yes
-<input type=radio name="model" value=False>No
+<input type=radio name="model" value=False checked>No
+<input type=radio name="model" value=True>Yes
 </td>
 </TR>
 

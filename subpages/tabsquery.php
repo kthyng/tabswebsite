@@ -261,9 +261,15 @@ if ($datepicker!="recent"){
     // echo $command;
     passthru($command);
     // if data is missing from this time period, just say that
-    if (filesize($tempfile) == 0){
+    if (filesize($tempfile) == 0 and !file_exists($tempaccess.".png")){
         print "<font face=helvetica color='gray'><b><big>Data is not available for buoy $Buoyname during the selected time period $dstart to $dend</big></b></font><br>\n";
         $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
+    }
+    // if data is missing but model output is available and image has been made
+    else if (filesize($tempfile) == 0 and file_exists($tempaccess.".png")) {
+        print "<font color='red'><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
+        print "<font color='red'><i> Model output is shown instead.</i></font><br><br>";
+        $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
     }
 }
 elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $norecentdatabutmodel){

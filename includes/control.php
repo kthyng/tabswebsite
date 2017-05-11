@@ -81,9 +81,9 @@ print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepick
 // print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
 // print "<input NAME=table TYPE=hidden value=$table>\n";
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
-// print "<input NAME=datepicker TYPE=hidden value='$datepicker'>\n";
-print "<input NAME=norecentdata TYPE=hidden value=$norecentdata>\n";
-print "<input NAME=norecentdata TYPE=hidden value=$norecentdatabutmodel>\n";
+print "<input NAME=model TYPE=hidden value='$model'>\n";
+// print "<input NAME=norecentdata TYPE=hidden value=$norecentdata>\n";
+// print "<input NAME=norecentdata TYPE=hidden value=$norecentdatabutmodel>\n";
 
 // print "<BR>";
 print "<td><input type=submit  value=Change></td>\n</form>\n";

@@ -27,7 +27,7 @@ parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
 parser.add_argument('--tz', type=str, help='time zone', default='UTC')
-parser.add_argument('--model', type=bool, help='plot model output', default=True)
+parser.add_argument('--model', type=str, help='plot model output', default='False')
 args = parser.parse_args()
 
 fname = args.fname
@@ -37,6 +37,11 @@ datatype = args.datatype
 units = args.units
 tz = args.tz
 model = args.model
+# can't figure out how to have variable from php a boolean so sending string
+if model == 'False':
+    model = False
+elif model == 'True':
+    model = True
 
 if 'ndbc' not in fname:
     buoy = fname.split('/')[-1].split('_')[1]
@@ -64,14 +69,20 @@ else:
     else:
         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
     df = tools.read([query, engine], units=units, tz=tz)
-    run_daily.make_text(df, fname)
+    # import pdb; pdb.set_trace()
+    if df is not None:  # won't work if data isn't available in this time period
+        run_daily.make_text(df, fname)
+
 
     ## Read model ##
-    if model:
-        # import pdb; pdb.set_trace()
+    if model and (table == 'ven' or table == 'met' or table == 'salt' or table == 'ndbc'):
         dfmodelhindcast = tools.read_model(query, timing='hindcast')
         dfmodelrecent = tools.read_model(query, timing='recent')
         dfmodelforecast = tools.read_model(query, timing='forecast')
+    else:
+        dfmodelhindcast = None
+        dfmodelrecent = None
+        dfmodelforecast = None
 
 
 

@@ -105,14 +105,15 @@ def setylimsintlims(ax, df, df1, df2, df3, key, tlims):
         if df3 is not None:
             ymins.append(df3[key].min())
             ymaxs.append(df3[key].max())
-        # check if data df is contained in tlims
-        # 1st: if nothing in df is larger than the first tlims value, or
-        # 2nd: if nothing in df is smaller than the last tlims value,
-        # use df to set y range since df is contained in tlims
-        if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
-            # then range also set by df
-            ymins.append(df[key].min())
-            ymaxs.append(df[key].max())
+        if df is not None:
+            # check if data df is contained in tlims
+            # 1st: if nothing in df is larger than the first tlims value, or
+            # 2nd: if nothing in df is smaller than the last tlims value,
+            # use df to set y range since df is contained in tlims
+            if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
+                # then range also set by df
+                ymins.append(df[key].min())
+                ymaxs.append(df[key].max())
         if ymins != []:
             ymin = min(ymins)
             ymax = max(ymaxs)
@@ -136,8 +137,9 @@ def r2(data, model):
 def add_r2(ax, df, df1, df2, df3, key, N=0.05):
     '''Make adjustments and add r^2 to subplot.'''
 
-    shifty(ax, N=N)  # most functions already have one of these, do another for space
-    if df1 is not None or df2 is not None or df3 is not None:
+    shifty(ax, N=N, which='bottom')  # most functions already have one of these, do another for space
+    # note don't do this if df is None or there is no data
+    if df is not None and (df1 is not None or df2 is not None or df3 is not None):
         # account for if df1, df2, and df3 overlap
         # resample to data frequency and base minute so they match for reindexing
         # not using infer_freq because want the units to be in minutes like base
@@ -149,7 +151,7 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
         dfnew = dfnew.reindex_like(df)#.interpolate()
         if df[key].sum() and dfnew[key].sum():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
-            ax.text(0.85, 0.04, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
+            ax.text(0.85, 0.03, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
 
 
 def add_rhs(ax1, label, con):
@@ -162,16 +164,17 @@ def add_rhs(ax1, label, con):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_legend(ax, df1, df2, df3):
+def add_legend(ax, df, df1, df2, df3):
     '''Add legend for data vs. model.'''
 
-    ax.text(0.21, 0.04, 'data', color='k', fontsize=12, transform=ax.transAxes)
+    if df is not None:
+        ax.text(0.21, 0.03, 'data', color='k', fontsize=12, transform=ax.transAxes)
     if df1 is not None:
-        ax.text(0.3, 0.04, "{}".format("\u2014 hindcast"), color=c1, fontsize=12, transform=ax.transAxes)
+        ax.text(0.3, 0.03, "{}".format("\u2014 hindcast"), color=c1, fontsize=12, transform=ax.transAxes)
     if df2 is not None:
-        ax.text(0.48, 0.04, "{}".format("\u2014 nowcast"), color=c2, fontsize=12, transform=ax.transAxes)
+        ax.text(0.48, 0.03, "{}".format("\u2014 nowcast"), color=c2, fontsize=12, transform=ax.transAxes)
     if df3 is not None:
-        ax.text(0.65, 0.04, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
+        ax.text(0.65, 0.03, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
 
 
 def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, df3=None, tlims=None):
@@ -181,6 +184,10 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     '''
     color = 'k'  # color of data arrows
 
+    # if data is None, use model output
+    if df is None:
+        df = df_init(pd.concat([df1, df2, df3]))  # in case there is a df3
+        color = c2
     # if data is not within input time range, use model output instead
     if tlims is not None:
         if df.idx[-1] < tlims[0] or df.idx[0] > tlims[-1]:
@@ -274,7 +281,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     which   'Across' or 'Along'
     '''
 
-    ax.plot(df.idx, df[which], 'k', lw=lw)
+    if df is not None:
+        ax.plot(df.idx, df[which], 'k', lw=lw)
     if df1 is not None:
         ax.plot(df1.idx, df1[which], color=c1, lw=lw)
     if df2 is not None:
@@ -282,8 +290,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     if df3 is not None:
         ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
     # add line at zero for reference. First get limits in x direction.
-    idxmin = min(df.idx); idxmax = max(df.idx)
-    for dftemp in [df1, df2, df3]:
+    idxmin = 1e9; idxmax = -99
+    for dftemp in [df, df1, df2, df3]:
         if dftemp is not None:
             idxmin = min((idxmin, dftemp.idx.min()))
             idxmax = max((idxmax, dftemp.idx.max()))
@@ -319,7 +327,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, tlims=None, dolegend=False):
     '''Plot with units on both left and right sides of plot.'''
 
-    ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
+    if df is not None:
+        ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     if df1 is not None:
         ax1.plot(df1.idx, df1[key], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
@@ -337,17 +346,19 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     add_r2(ax1, df, df1, df2, df3, key, N=0.1)
     # add data/model legend
     if dolegend:
-        shifty(ax1, N=0.05, which='bottom')
-        add_legend(ax1, df1, df2, df3)
+        add_legend(ax1, df, df1, df2, df3)
     # right side units
     add_rhs(ax1, label2, con)
 
 
-def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None,
+def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
             dolegend=False, tlims=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
-    ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
+    if df is not None:
+        ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
+    if df1 is not None:
+        ax.plot(df1.idx, df1[var], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
         ax.plot(df2.idx, df2[var], lw=lw, color=c2, linestyle='-')
     if df3 is not None:
@@ -355,16 +366,15 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df2=None, df3=None,
     ax.set_ylabel(varlabel)
     ax.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for y limits
     # set y range by signal within tlims (in case data off-screen changing it)
-    setylimsintlims(ax, df, df2, df3, var, tlims)
+    setylimsintlims(ax, df, df1, df2, df3, var, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax)
     # add r^2 to subplot
-    add_r2(ax, df, df2, df3, var)
+    add_r2(ax, df, df1, df2, df3, var)
     # add data/model legend
     if dolegend:
-        shifty(ax, N=0.05, which='bottom')
-        add_legend(ax, df2, df3)
+        add_legend(ax, df, df1, df2, df3)
 
 
 def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
@@ -460,7 +470,7 @@ def add_xlabels(ax, df, fig, tlims=None):
     # right hand side
     text = 'Oceanography and GERG at Texas A&M University\n' \
            + datetime.utcnow().strftime('%a %b %d, %Y %H:%M UTC')
-    fig.text(0.95, 0.035, text, fontsize=8, transform=fig.transFigure,
+    fig.text(0.95, 0.025, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='right', verticalalignment='top')
     # left hand side
     text = 'TGLO, GERG, Oceanography, and Texas A&M make no representations\n' \
@@ -510,7 +520,8 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
 
     if which != 'wave' and which !='ndbc':
         # fill in missing data at 30 min frequency as nans so not plotted
-        df = df.resample('30T').asfreq()
+        if df is not None:
+            df = df.resample('30T').asfreq()
     elif which == 'wave':
         idx = df.index
         # check for gap over an hour. factor 1e9 due to nanoseconds.
@@ -524,7 +535,8 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         base = df.index[0].minute
         df = df.resample('60T', base=base).asfreq()
 
-    df = df_init(df)
+    if df is not None:
+        df = df_init(df)
 
     # change length of df2 if df1 overlaps with it to prioritize df1
     if df1 is not None and df2 is not None:
@@ -545,42 +557,57 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     fig, axes = setup(nsubplots=nsubplots, buoy=buoy)
 
     if which == 'ven':
-        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]', df1=df1, df2=df2, df3=df3, tlims=tlims)
-        add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110], df1=df1, df2=df2, df3=df3)
-        add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110], df1=df1, df2=df2, df3=df3)
-        add_var_2units(axes[3], df, 'WaterT [deg C]', 'Water temperature\n' + r'$\left[^\circ\! \mathrm{C} \right]$',
-                       'c2f', r'$\left[^\circ\! \mathrm{F} \right]$', ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]',
+                     df1=df1, df2=df2, df3=df3, tlims=tlims)
+        add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110],
+                df1=df1, df2=df2, df3=df3)
+        add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110],
+                df1=df1, df2=df2, df3=df3)
+        add_var_2units(axes[3], df, 'WaterT [deg C]',
+                       'Water temperature\n' + r'$\left[^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[^\circ\! \mathrm{F} \right]$',
+                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
     elif which == 'eng':
-        add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$', 'VBatt [sleep]', ymaxrange=[0, 15])
-        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0], tlims=tlims)
+        add_2var_sameplot(axes[0], df, 'VBatt [Oper]', 'V$_\mathrm{batt}$',
+                          'VBatt [sleep]', ymaxrange=[0, 15])
+        add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0],
+                tlims=tlims)
         add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210], tlims=tlims)
         add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
     elif which == 'met':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AirT [deg C]', 'Air temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[-25,40], df2=df2, df3=df3, tlims=tlims)
+                       'c2f', '[˚F]', ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
-                ymaxrange=[0,110], df2=df2, df3=df3, dolegend=True, tlims=tlims)
+                ymaxrange=[0,110], df1=df1, df2=df2, df3=df3, dolegend=True, tlims=tlims)
     elif which == 'salt':
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3, tlims=tlims)
-        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 37], df2=df2, df3=df3, tlims=tlims)
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df1=df1, df2=df2,
+                       df3=df3, tlims=tlims)
+        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 37], df1=df1,
+                df2=df2, df3=df3, tlims=tlims)
         # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
-        add_var(axes[2], df, 'Density [kg/m^3]', 'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
-                df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True, tlims=tlims)
+        add_var(axes[2], df, 'Density [kg/m^3]',
+                'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
+                df1=df1, df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True, tlims=tlims)
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
         add_var(axes[1], df, 'MeanPeriod [s]', 'Mean Period [s]', tlims=tlims)
         add_var(axes[2], df, 'PeakPeriod [s]', 'Peak Period [s]', ymaxrange=[2,12], tlims=tlims)
     elif which == 'ndbc':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df2=df2, df3=df3, tlims=tlims)
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df2=df2, df3=df3, tlims=tlims)
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       df2=df2, df3=df3, tlims=tlims)
         if buoy == 'PTAT2' or buoy == 'SRST2':
             axes[2].text(0.35, 0.5, 'No wave instrument', transform=axes[2].transAxes)
             axes[2].get_yaxis().set_ticks([])
@@ -591,12 +618,14 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
                            'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
             add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12], tlims=tlims)
         add_var_2units(axes[4], df, 'WaterT [deg C]', 'Water temp [˚C]',
-                       'c2f', '[˚F]', ymaxrange=[10, 32], df2=df2, df3=df3,
+                       'c2f', '[˚F]', ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
     # use longer dataframe in case data or model are cut short
-    if df2 is not None or df3 is not None and tlims is not None:
-        dfm = df_init(pd.concat([df2, df3]))
+    if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
+        dfm = df_init(pd.concat([df1, df2, df3]))
 
+        if df is None:  # if no data
+            df = dfm
         if dfm.dT > df.dT:
             df = dfm  # use the longer dataframe for labeling x axis
 
