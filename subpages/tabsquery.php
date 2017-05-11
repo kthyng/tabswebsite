@@ -29,6 +29,7 @@ $model = $_GET["model"];
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
+if (! $model) {$model = 'False';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
