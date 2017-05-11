@@ -106,7 +106,7 @@ if __name__ == "__main__":
                 else:
                     tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
                 # will plot model output from now if available, otherwise data regardless of how old
-                fig = plot_buoy.plot(df, buoy, table, dfmodelrecent, dfmodelforecast, tlims)
+                fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
                 fig.savefig(fname + '.pdf')
                 fig.savefig(fname + '.png')
                 # save smaller for hover

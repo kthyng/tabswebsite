@@ -541,17 +541,13 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     if df1 is not None and df2 is not None:
         if df1.index[-1] > df2.index[0]:
             stemp = df1.index[-1] + timedelta(minutes=30)
-            df2 = df2[stemp:]
-            df2.idx = date2num(df2.index.to_pydatetime())  # in units of days
-            df2.dT = df2.idx[-1] - df2.idx[0]  # length of dataset in days
+            df2 = df_init(df2[stemp:])
 
     # change length of df3 if df2 overlaps with it to prioritize df2
     if df2 is not None and df3 is not None:
         if df2.index[-1] > df3.index[0]:
             stemp = df2.index[-1] + timedelta(minutes=30)
-            df3 = df3[stemp:]
-            df3.idx = date2num(df3.index.to_pydatetime())  # in units of days
-            df3.dT = df3.idx[-1] - df3.idx[0]  # length of dataset in days
+            df3 = df_init(df3[stemp:])
 
     fig, axes = setup(nsubplots=nsubplots, buoy=buoy)
 
