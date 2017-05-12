@@ -8,7 +8,9 @@ python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
 '''
 
 import matplotlib as mpl
-# mpl.use('Agg')
+from sys import platform
+if platform == 'linux':
+    mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import buoy_data as bd
