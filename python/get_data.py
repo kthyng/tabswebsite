@@ -77,6 +77,7 @@ else:
 
     ## Read model ##
     if model and (table == 'ven' or table == 'met' or table == 'salt' or table == 'ndbc'):
+        # import pdb; pdb.set_trace()
         dfmodelhindcast = tools.read_model(query, timing='hindcast')
         dfmodelrecent = tools.read_model(query, timing='recent')
         dfmodelforecast = tools.read_model(query, timing='forecast')

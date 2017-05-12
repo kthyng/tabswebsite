@@ -141,7 +141,7 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
         dfnew = dfnew.reindex_like(df)#.interpolate()
         if df[key].sum() and dfnew[key].sum():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
-            ax.text(0.85, 0.03, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
+            ax.text(0.85, 0.015, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
 
 
 def add_rhs(ax1, label, con):
@@ -158,13 +158,13 @@ def add_legend(ax, df, df1, df2, df3):
     '''Add legend for data vs. model.'''
 
     if df is not None:
-        ax.text(0.21, 0.03, 'data', color='k', fontsize=12, transform=ax.transAxes)
+        ax.text(0.21, 0.015, 'data', color='k', fontsize=12, transform=ax.transAxes)
     if df1 is not None:
-        ax.text(0.3, 0.03, "{}".format("\u2014 hindcast"), color=c1, fontsize=12, transform=ax.transAxes)
+        ax.text(0.3, 0.015, "{}".format("\u2014 hindcast"), color=c1, fontsize=12, transform=ax.transAxes)
     if df2 is not None:
-        ax.text(0.48, 0.03, "{}".format("\u2014 nowcast"), color=c2, fontsize=12, transform=ax.transAxes)
+        ax.text(0.48, 0.015, "{}".format("\u2014 nowcast"), color=c2, fontsize=12, transform=ax.transAxes)
     if df3 is not None:
-        ax.text(0.65, 0.03, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
+        ax.text(0.65, 0.015, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
 
 
 def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, df3=None, tlims=None):
@@ -302,12 +302,12 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     add_rhs(ax, '[knots]', 'cps2kts')
     if which == 'Across [cm/s]':
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
-        ax.text(0.02, 0.04, 'ONSHORE', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.03, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(bd.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
-        ax.text(0.02, 0.04, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.03, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
         ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
@@ -581,7 +581,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
         add_var(axes[2], df, 'Density [kg/m^3]',
                 'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
-                df1=df1, df2=df2, df3=df3, ymaxrange=[1015, 1036], dolegend=True, tlims=tlims)
+                df1=df1, df2=df2, df3=df3, ymaxrange=[1010, 1036], dolegend=True, tlims=tlims)
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)

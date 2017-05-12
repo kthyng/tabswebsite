@@ -213,3 +213,17 @@ def model(buoy, grid):
     model = {'rho': rho, 'u': u, 'v': v}
 
     return model[grid][buoy]
+
+
+def station(buoy):
+    '''Give buoy station index if available. -999 otherwise.
+
+    Certain stations are saved separately in ROMS. Buoy B will give nan's so
+    is not included in the list, though a placeholder is in its space.'''
+
+    stations = ['wasB', 'D', 'F', 'J', 'N', 'R', 'V', 'W', '42019', '42020', '42035',
+                'BURL1', 'PTAT2', 'SRST2', 'GISL1', 'AMRL1', 'PSTL1']
+    try:
+        return stations.index(buoy)
+    except:
+        return -999

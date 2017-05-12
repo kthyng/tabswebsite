@@ -163,6 +163,8 @@ def rot2d(x, y, ang):
 def read_model(query, timing='recent'):
     '''Read in model output based on data query q.'''
 
+    dostations = False  # this is updated if buoy is in stations list on reading
+
     if 'tabs' in query:
         buoy = query.split(' ')[3].split('_')[1]
         which = query.split(' ')[3].split('_')[2]
@@ -172,7 +174,11 @@ def read_model(query, timing='recent'):
     dstart = query.split('"')[1]  # start date (beginning of day)
     dend = query.split('"')[3]  # end date and time
     if timing == 'hindcast':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg'
+        if not bd.station(buoy) == -999:  # can read faster from stations file if buoy included
+            loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta'
+            dostations = True
+        else:
+            loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'  # forcing info
     elif timing == 'recent':
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
@@ -210,18 +216,30 @@ def read_model(query, timing='recent'):
         df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
         if which == 'ven':
-            # model output needed for image
-            j, i = bd.model(buoy, 'u')  # get model indices
-            along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                           .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
-            j, i = bd.model(buoy, 'v')  # get model indices
-            across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                            .isel(s_rho=-1, eta_v=j, xi_v=i)*100
-            j, i = bd.model(buoy, 'rho')  # get model indices
-            df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+            # need separate code for dostations
+            if dostations:
+                i = bd.station(buoy)
+                along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                               .isel(s_rho=-1, station=i)*100  # convert to cm/s
+                across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                                .isel(s_rho=-1, station=i)*100
+                df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
 
-            # rotate from curvilinear to cartesian
-            anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+                # rotate from curvilinear to cartesian
+                anglev = ds['angle'][i]  # using at least nearby grid rotation angle
+            else:
+                j, i = bd.model(buoy, 'u')  # get model indices
+                along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                               .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
+                j, i = bd.model(buoy, 'v')  # get model indices
+                across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                                .isel(s_rho=-1, eta_v=j, xi_v=i)*100
+                j, i = bd.model(buoy, 'rho')  # get model indices
+                df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+
+                # rotate from curvilinear to cartesian
+                anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+
             df['East [cm/s]'], df['North [cm/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
             # Project along- and across-shelf velocity rather than use from model
@@ -231,10 +249,14 @@ def read_model(query, timing='recent'):
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
         elif which == 'salt':
-            # model output needed for image
-            j, i = bd.model(buoy, 'rho')  # get model indices
-            df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-            df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+            if dostations:
+                i = bd.station(buoy)
+                df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
+                df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
+            else:
+                j, i = bd.model(buoy, 'rho')  # get model indices
+                df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+                df['salt'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
             # change names to match data
             df.columns = ['Temp [deg C]', 'Salinity']
@@ -242,26 +264,37 @@ def read_model(query, timing='recent'):
             df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['Temp [deg C]'], np.zeros(len(df)))
 
         elif which == 'ndbc':
-            # model output needed for image
-            j, i = bd.model(buoy, 'rho')  # get model indices
-            df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-            df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-            df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+            if dostations:
+                i = bd.station(buoy)
+                df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
+                df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
+                df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
+            else:
+                j, i = bd.model(buoy, 'rho')  # get model indices
+                df['temp'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+                df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+                df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
             # change names to match data
             df.columns = ['WaterT [deg C]', 'East [m/s]', 'North [m/s]']
 
+            j, i = bd.model(buoy, 'rho')  # get model indices
             df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
 
         elif which == 'met':
-            # model output needed for image
-            j, i = bd.model(buoy, 'rho')  # get model indices
-            df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-            df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+            if dostations:
+                i = bd.station(buoy)
+                df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
+                df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
+            else:
+                j, i = bd.model(buoy, 'rho')  # get model indices
+                df['Uwind'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+                df['Vwind'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
             # change names to match data
             df.columns = ['East [m/s]', 'North [m/s]']
 
+            j, i = bd.model(buoy, 'rho')  # get model indices
             df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
             df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
             df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()

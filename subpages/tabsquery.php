@@ -155,7 +155,7 @@ else{
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
-    else if (php_uname('n') == 'tahoma.local') {
+    else if (strpos(php_uname('n'), 'tahoma') !== false) {
         $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
 
