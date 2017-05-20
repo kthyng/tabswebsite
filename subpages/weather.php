@@ -31,6 +31,12 @@
         $urls = array("gmz011","gmz013","gmz015","gmz017","gmz001");
         $base = "http://tgftp.nws.noaa.gov/data/forecasts/marine/offshore/gm/";
     }
+    // Index page
+    else {
+        $heading = "Gulf of Mexico Marine Forecast";
+        $urls = array();
+        $base = "";
+    }
 
     print "<h2>$heading</h2>";
     foreach ($urls as $url) {
@@ -38,6 +44,16 @@
         print "<br><br>";
         echo nl2br( $str );
     }
+
+    // Index page
+    if (! $area) {
+        print "<ul>";
+        print "<li><a href='/tabswebsite/subpages/weather.php?area=TX'>Texas Coastal Marine Forecast</a></li>";
+        print "<li><a href='/tabswebsite/subpages/weather.php?area=LA'>Louisiana Coastal Marine Forecast</a></li>";
+        print "<li><a href='/tabswebsite/subpages/weather.php?area=offshore'>Gulf of Mexico Offshore Marine Forecast</a></li>";
+        print "</ul>";
+    }
+
 
     ?>
 
