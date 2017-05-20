@@ -6,8 +6,7 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
-<TITLE>TABS, Texas Automated Buoy System, Gulf of Mexico Ocean Observatory, Texas Coastal Ocean Observation, Real Time
-Oceanographic Data Supporting Oil Spill Prevention and Response</TITLE>
+<TITLE>Texas Automated Buoy System (TABS)</TITLE>
 
 <meta HTTP-EQUIV="REFRESH" CONTENT="300">
 <meta HTTP-EQUIV="Expires" CONTENT="1800">
