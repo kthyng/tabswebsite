@@ -15,20 +15,24 @@
     <br><br>
     <?php
 
-        $gallery = $_GET["gallery"];  // get gallery variable
+        print "<form action=\"/tabswebsite/subpages/gallery.php\" method=\"get\">\n";
 
-        $base = "http://pong.tamu.edu/~kthyng/movies/txla_plots/";
-        $years = range(2004, 2014);
-        $imagedate = "2004-07-30T00";
+        $gallery = $_GET["gallery"];  // get gallery variable
+        $res = $_GET["res"];  // get resolution
+
+        if (! $res) {$res = "high";}  # high resolution by default
+
+        $base = "http://pong.tamu.edu/movies/";
+        $years = range(1993, 2016);
 
         // for individual variable pages
         if ($gallery) {
 
-            $image = $base.$gallery."/".$imagedate.".png";
-
             foreach ($years as $year) {
 
-                $movie = $base.$gallery."/".$year.".mp4";
+                $imagedate = $year."-07-01T00";
+                $image = $base.$gallery."/".$imagedate.".png";
+                $movie = $base.$gallery."/".$year."_".$res.".mp4";
 
                 print "<div class=\"responsive\"><div class=\"gallery\">";
                 print "<a target=\"_blank\" href=$movie width=\"300\" height=\"200\"><img src=$image alt=$year></a>";
@@ -39,19 +43,25 @@
 
         // Index page showing all variables
         if (! $gallery) {
-            $base = "http://pong.tamu.edu/~kthyng/movies/txla_plots/";
-            $year = 2004;
+            $base = "http://pong.tamu.edu/movies/";
+            $year = 1993;
             $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort");
             $varnames = array("Salinity", "Speed", "Sea surface height",
                                 "Temperature", "Along-shore velocity",
-                                "Across-shore velocity", "Vertical Vorticity");
-            $imagedate = "2004-07-30T00";
+                                "Across-shore velocity", "Vertical vorticity");
+            $imagedate = $year."-07-01T00";
+
+            // check box for resolution
+           print "<select id=\"res_id\" name=\"res\"  onchange=\"this.form.submit();\">";
+           print "<option type=radio value=\"high\">High resolution animations (70-400MB)</option> ";
+           print "<option type=radio value=\"low\">Low resolution animations (20-130MB)</option> ";
+           print "</select><br><br>";
 
             // this syntax for looping over 2 arrays at once
             $array = array_combine($vars, $varnames);
             foreach ($array as $var => $varname) {
                 $image = $base.$var."/".$imagedate.".png";
-                $newpage = "gallery.php?gallery=".$var;
+                $newpage = "gallery.php?gallery=".$var."&res=".$res;
                 $gallery = $var;  # set gallery variable
 
                 print "<div class=\"responsive\"><div class=\"gallery\">";
