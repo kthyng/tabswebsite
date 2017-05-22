@@ -95,5 +95,7 @@
     </li>
     </ul>
 
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
 
 </div>

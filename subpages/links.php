@@ -29,4 +29,7 @@
     <li> <a href=http://www.wavcis.lsu.edu/>WAVCIS</a> (LSU) </li>
     </ul>
 
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
+
 </div>

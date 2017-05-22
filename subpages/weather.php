@@ -54,6 +54,8 @@
         print "</ul>";
     }
 
+    // include footer from separate file
+    include("../includes/footer.html")
 
     ?>
 

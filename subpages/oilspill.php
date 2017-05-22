@@ -21,4 +21,7 @@
 
     <p>A newer, up-and-coming version of GNOME written in Python &ndash; <a href=http://noaa-orr-erd.github.io/PyGnome/>pyGNOME</a> &ndash; takes a broader range of input files. A summary of model output from the Texas shelf is <a href=http://pong.tamu.edu/oof_v2/main/download.php?lang=en>available</a>.
 
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
+
 </div>

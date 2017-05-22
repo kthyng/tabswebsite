@@ -43,4 +43,8 @@
     <tr> <td></td>	<td>Data system never existed.</td> </tr>
 
     </table>
+
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
+
 </div>

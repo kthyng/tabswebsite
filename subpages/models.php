@@ -73,7 +73,7 @@
 
     <a href=http://seawater.tamu.edu/tglo/RG17051507.gif><img src="http://seawater.tamu.edu/tglo/RG17051507.gif" width="50%"></a>
 
-<!-- include footer from separate file -->
-<?php include("../includes/footer.html");?>
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
 
 </div>

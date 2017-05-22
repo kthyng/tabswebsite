@@ -28,4 +28,8 @@
     <p>For example:
 
     tabsquery.php?Buoyname=F&amp;table=ven&amp;datepicker=2017-1-23+-+2017-1-30&amp;Datatype=pic&amp;units=M&amp;tz=UTC</p>
+
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
+
 </div>

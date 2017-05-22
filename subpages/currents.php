@@ -10,7 +10,11 @@
     <!-- include navigation from separate file -->
     <?php include("../includes/navigation.html");?>
 
+    <br>
 	<a href=/tabswebsite/daily/currents1.pdf> <img width=48% src=/tabswebsite/daily/currents1.png></a>
     <a href=/tabswebsite/daily/currents2.pdf> <img width=48% src=/tabswebsite/daily/currents2.png></a>
+
+    <!-- include footer from separate file -->
+    <?php include("../includes/footer.html");?>
 
 </div>
