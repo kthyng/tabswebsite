@@ -27,7 +27,7 @@
 
     <h3>Description</h3>
 
-    <p>This is the source of the highly-realistic model output shown on the front page and alongside buoy data. The domain covers the Texas and Louisiana shelves and captures the Mississippi and Atchafalaya river plume dynamics and wind-driven flow on these shelves. Loop Current information is input into the domain via the open boundary forcing, which does assimilate the Loop Current data. The domain is shown in turquoise in the image, and the actual horizonal resolution is shown near Galveston Bay. Model output is available from 1993 to present day and up through a 7 day forecast which is run operationally. Model output is available at 3 different links because forcing information varies depending on how recent the simulation is; the best forcing information available is used for the hindcast model. Funding for the model development to Dr. Rob Hetland (Texas A&amp;M University) has come primarily from the Texas General Land Office (projects 10-096-000-3927, 13-443-000-7902, 16-093-000-9285).</p>
+    <p>This is the source of the highly-realistic model output shown on the front page and alongside buoy data. The domain covers the Texas and Louisiana shelves and captures the Mississippi and Atchafalaya river plume dynamics and wind-driven flow on these shelves. Loop Current information is input into the domain via the open boundary forcing, which does assimilate the Loop Current data. The domain is shown in turquoise in the image, and the actual horizonal resolution is shown near Galveston Bay. Model output is available from 1993 to present day and up through a 7 day forecast which is run operationally. Model output is available at 3 different links because forcing information varies depending on how recent the simulation is; the best forcing information available is used for the hindcast model. Funding for the model development has come primarily from the Texas General Land Office (10-096-000-3927, 13-443-000-7902, 16-093-000-9285).</p>
 
     <img src="../images/TXLA_domain_labeled.jpg" width="50%">
 
@@ -53,22 +53,13 @@
         <li>Tracer advection: MPDATA</li>
         <li>Vertical mixing: k-&omega; (GLS)</li>
     </ul>
-    <li> Papers describing model validation and setup </li>
-    <ul>
-        <li>Zhang, X., Hetland, R. D., Marta-Almeida, M., &amp; DiMarco, S. F. (2012). A numerical investigation of the Mississippi and Atchafalaya freshwater transport, filling and flushing times on the Texas-Louisiana Shelf. <i>Journal of Geophysical Research: Oceans</i>, 117(C11), C11009, doi:10.1029/2012JC008108.
-        <a href=http://doi.org/10.1029/2012JC008108>link</a></li>
-        <li>Zhang, X., Marta-Almeida, M., &amp; Hetland, R. D. (2012). A high-resolution pre-operational forecast model of circulation on the Texas-Louisiana continental shelf and slope. <i>Journal of Operational Oceanography</i>, 5(1), 19&ndash;34, doi:10.1080/1755876X.2012.11020129.
-            <a href=http://dx.doi.org/10.1080/1755876X.2012.11020129>link</a></li>
-</li>
-    </ul>
 </ul>
 
     Note that there is a legacy version of the hindcast model, run from 2004-2014. This model output is <a href=http://barataria.tamu.edu:8080/thredds/catalog.html?dataset=TXLA-Nesting6>available</a>.
 
 
-    <a name="gulf"></a>
 
-    <h2><a href=#gulf>Legacy Gulf-wide Model</a></h2>
+    <h2><a href=#tglo>Legacy Gulf-wide Model</a></h2>
 
     <h3>Links</h3>
 
