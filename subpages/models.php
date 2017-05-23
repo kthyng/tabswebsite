@@ -53,13 +53,22 @@
         <li>Tracer advection: MPDATA</li>
         <li>Vertical mixing: k-&omega; (GLS)</li>
     </ul>
+    <li> Papers describing model validation and setup </li>
+    <ul>
+        <li>Zhang, X., Hetland, R. D., Marta-Almeida, M., &amp; DiMarco, S. F. (2012). A numerical investigation of the Mississippi and Atchafalaya freshwater transport, filling and flushing times on the Texas-Louisiana Shelf. <i>Journal of Geophysical Research: Oceans</i>, 117(C11), C11009, doi:10.1029/2012JC008108.
+        <a href=http://doi.org/10.1029/2012JC008108>link</a></li>
+        <li>Zhang, X., Marta-Almeida, M., &amp; Hetland, R. D. (2012). A high-resolution pre-operational forecast model of circulation on the Texas-Louisiana continental shelf and slope. <i>Journal of Operational Oceanography</i>, 5(1), 19&ndash;34, doi:10.1080/1755876X.2012.11020129.
+            <a href=http://dx.doi.org/10.1080/1755876X.2012.11020129>link</a></li>
+</li>
+    </ul>
 </ul>
 
     Note that there is a legacy version of the hindcast model, run from 2004-2014. This model output is <a href=http://barataria.tamu.edu:8080/thredds/catalog.html?dataset=TXLA-Nesting6>available</a>.
 
 
+    <a name="gulf"></a>
 
-    <h2><a href=#tglo>Legacy Gulf-wide Model</a></h2>
+    <h2><a href=#gulf>Legacy Gulf-wide Model</a></h2>
 
     <h3>Links</h3>
 
