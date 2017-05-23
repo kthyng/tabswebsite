@@ -1,5 +1,5 @@
 <head>
-    <title>Models</title>
+    <title>About</title>
 </head>
 
 <div id="container">
@@ -11,12 +11,12 @@
     <!-- include navigation from separate file -->
     <?php include("../includes/navigation.html");?>
 
-    <a name="txla"></a>
+    <h2>About this site</h2>
 
-    <h2><a href=#txla>Texas-Louisiana Shelf Model</a></h2>
+    The TABS website has been running for about two decades to share buoy data taken by the Geochemical and Environmental Research Group (GERG) at Texas A&amp;M University. Recent development on the site was completed with funding from the Texas General Land Office to co-PIs Drs. Steve DiMarco and Rob Hetland of Texas A&amp;M University (project 13-435-000-7894) and co-PIs Drs. Kristen Thyng and Rob Hetland of Texas A&amp;M University (project 16-092-000-9284).
 
 
-    <h3>Links</h3>
+    <!-- <h3>Links</h3>
 
     <ul>
     <li> Forecast output (7 days): <a href=http://barataria.tamu.edu:8080/thredds/catalog/NcML/oof_latest_agg/catalog.html?dataset=oof_latest_agg/roms_his_f_latest.nc>thredds</a> </li>
@@ -27,7 +27,7 @@
 
     <h3>Description</h3>
 
-    <p>This is the source of the highly-realistic model output shown on the front page and alongside buoy data. The domain covers the Texas and Louisiana shelves and captures the Mississippi and Atchafalaya river plume dynamics and wind-driven flow on these shelves. Loop Current information is input into the domain via the open boundary forcing, which does assimilate the Loop Current data. The domain is shown in turquoise in the image, and the actual horizonal resolution is shown near Galveston Bay. Model output is available from 1993 to present day and up through a 7 day forecast which is run operationally. Model output is available at 3 different links because forcing information varies depending on how recent the simulation is; the best forcing information available is used for the hindcast model. Funding for the model development to Dr. Rob Hetland (Texas A&amp;M University) has come primarily from the Texas General Land Office (projects 10-096-000-3927, 13-443-000-7902, 16-093-000-9285).</p>
+    <p>This is the source of the highly-realistic model output shown on the front page and alongside buoy data. The domain covers the Texas and Louisiana shelves and captures the Mississippi and Atchafalaya river plume dynamics and wind-driven flow on these shelves. Loop Current information is input into the domain via the open boundary forcing, which does assimilate the Loop Current data. The domain is shown in turquoise in the image, and the actual horizonal resolution is shown near Galveston Bay. Model output is available from 1993 to present day and up through a 7 day forecast which is run operationally. Model output is available at 3 different links because forcing information varies depending on how recent the simulation is; the best forcing information available is used for the hindcast model. Funding for the model development has come primarily from the Texas General Land Office (10-096-000-3927, 13-443-000-7902, 16-093-000-9285).</p>
 
     <img src="../images/TXLA_domain_labeled.jpg" width="50%">
 
@@ -71,7 +71,7 @@
 
     <p>This model covers the full Gulf and is being run operationally. It is lower resolution than the shelf model and is driven only by winds (i.e., it does not include the Loop Current).</p>
 
-    <a href=http://seawater.tamu.edu/tglo/RG17051507.gif><img src="http://seawater.tamu.edu/tglo/RG17051507.gif" width="50%"></a>
+    <a href=http://seawater.tamu.edu/tglo/RG17051507.gif><img src="http://seawater.tamu.edu/tglo/RG17051507.gif" width="50%"></a> -->
 
     <!-- include footer from separate file -->
     <?php include("../includes/footer.html");?>
