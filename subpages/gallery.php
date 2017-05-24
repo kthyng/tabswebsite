@@ -31,8 +31,14 @@
             foreach ($years as $year) {
 
                 $imagedate = $year."-07-01T00";
-                $image = $base.$gallery."/".$imagedate.".png";
-                $movie = $base.$gallery."/".$year."_".$res.".mp4";
+                if ($gallery == "oxygen") {
+                    $image = $base.$gallery."/".$year."/".$imagedate.".png";
+                    $movie = $base.$gallery."/".$year."/".$year."_".$res.".mp4";
+                }
+                else {
+                    $image = $base.$gallery."/".$imagedate.".png";
+                    $movie = $base.$gallery."/".$year."_".$res.".mp4";
+                }
 
                 print "<div class=\"responsive\"><div class=\"gallery\">";
                 print "<a target=\"_blank\" href=$movie width=\"300\" height=\"200\"><img src=$image alt=$year></a>";
@@ -45,10 +51,11 @@
         if (! $gallery) {
             $base = "http://pong.tamu.edu/movies/";
             $year = 1993;
-            $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort");
+            $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort", "oxygen");
             $varnames = array("Salinity", "Speed", "Sea surface height",
                                 "Temperature", "Along-shore velocity",
-                                "Across-shore velocity", "Vertical vorticity");
+                                "Across-shore velocity", "Vertical vorticity",
+                                "Bottom oxygen");
             $imagedate = $year."-07-01T00";
 
             // check box for resolution
@@ -60,7 +67,12 @@
             // this syntax for looping over 2 arrays at once
             $array = array_combine($vars, $varnames);
             foreach ($array as $var => $varname) {
-                $image = $base.$var."/".$imagedate.".png";
+                if ($var == "oxygen") {
+                    $image = $base.$var."/".$year."/".$imagedate.".png";
+                }
+                else {
+                    $image = $base.$var."/".$imagedate.".png";
+                }
                 $newpage = "gallery.php?gallery=".$var."&res=".$res;
                 $gallery = $var;  # set gallery variable
 
