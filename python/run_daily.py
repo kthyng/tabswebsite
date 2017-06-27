@@ -66,10 +66,13 @@ def query_setup(engine, buoy, table, dend, ndays=5):
     return query
 
 
-def make_text(df, fname):
+def make_text(df, fname, compression=False):
     '''Make text file of data'''
 
-    df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='')
+    if compression:
+        df.to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='', compression='gzip')
+    else:
+        df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='')
 
 
 if __name__ == "__main__":

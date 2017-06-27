@@ -50,4 +50,4 @@ if __name__ == "__main__":
                     fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
                 # write daily data file, for whatever most recent time period
                 # data was available
-                rd.make_text(df, fname)  # there is always data to write, but it might be old
+                rd.make_text(df, fname, compression=True)  # there is always data to write, but it might be old
