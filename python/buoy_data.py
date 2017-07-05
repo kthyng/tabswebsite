@@ -24,7 +24,7 @@ def avail(key):
     avail = {}
     avail['ven'] = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','R','S','V','W','X']
     avail['eng'] = ['A','B','C','D','E','F','G','H','J','K','L','M','N','P','R','S','V','W','X']
-    avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V']
+    avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V', 'X']
     avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
     avail['wave'] = ['K', 'N', 'V', 'X']
     avail['ndbc'] = ['42019','42020','42035','SRST2','PTAT2']

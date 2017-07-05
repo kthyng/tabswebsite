@@ -82,7 +82,7 @@ elseif ($datatype=="download"){
 
 $noinstr = False;  // Flag for if instrument is not available
 // Met instrument availability
-if ($table == "met" && ! preg_match('/B|H|J|K|N|V/',$Buoyname) ) {
+if ($table == "met" && ! preg_match('/B|H|J|K|N|V|X/',$Buoyname) ) {
     $noinstr = True;
     $statement = "No meteorological data available for buoy ".$Buoyname;
 }

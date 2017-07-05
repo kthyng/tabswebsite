@@ -34,14 +34,13 @@ if __name__ == "__main__":
     engine = tools.engine()
 
     # loop through buoys: query, make text file, make plot
+    # active buoys
     for buoy in bd.buoys():
         for table in bd.tables():  # loop through tables for each buoy
 
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                # if table == 'ndbc' and buoy == 'PTAT2':
-                #     import pdb; pdb.set_trace()
                 q = query_setup(engine, buoy, table)
                 df = tools.read([q, engine])
                 if table != 'ndbc':
@@ -52,3 +51,22 @@ if __name__ == "__main__":
                 # data was available
                 rd.make_text(df, fname, compression=True)  # .gz
                 rd.make_text(df, fname, compression=False) # not .gz
+    # inactive buoys
+    for buoy in bd.buoys(kind='inactive'):
+        for table in bd.tables():  # loop through tables for each buoy
+
+            if not buoy in bd.avail(table):
+                continue  # instrument not available for this buoy
+            else:
+                if table != 'ndbc':
+                    fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
+                elif table == 'ndbc':
+                    fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
+                # only remake files if they don't exist since they aren't changing
+                if path.exists(fname):
+                    continue
+                else:
+                    q = query_setup(engine, buoy, table)
+                    df = tools.read([q, engine])
+                    rd.make_text(df, fname, compression=True)  # .gz
+                    rd.make_text(df, fname, compression=False) # not .gz
