@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from matplotlib.dates import date2num
 import buoy_data as bd
-from prettypandas import PrettyPandas
 from sqlalchemy import create_engine
 import xarray as xr
 import gsw
@@ -307,6 +306,8 @@ def read_model(query, timing='recent'):
 
 def present(df):
     '''Present dataframe df nicely by printing to screen'''
+
+    from prettypandas import PrettyPandas
 
     # formatters={'AtmPr [MB]':'{:,.2f}'.format}
     # myformatter = lambda x: '[%4.1f]' % x
