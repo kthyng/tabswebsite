@@ -3,6 +3,25 @@ body {
     background-color: #333;
     font-family: 'Raleway', sans-serif;
 }
+/*following are for buoy status*/
+.green{
+    background-color:limegreen;
+}
+.yellow{
+    background-color:yellow;
+}
+.orange{
+    background-color:orange;
+}
+.red{
+    background-color:#D96259;
+}
+.none{
+    background-color:;
+}
+.gray{
+    background-color:lightgray;
+}
 h1,
 h2,
 h3,
