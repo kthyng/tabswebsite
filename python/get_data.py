@@ -33,8 +33,9 @@ args = parser.parse_args()
 fname = args.fname
 dstart = args.dstart
 dend = args.dend
-# make it so dend time is at end of the day
-dend += ' 23:00'
+if dend is not None:
+    # make it so dend time is at end of the day
+    dend += ' 23:00'
 datatype = args.datatype
 units = args.units
 tz = args.tz
@@ -57,6 +58,9 @@ elif 'ndbc' in fname:
 if dstart is None:
 
     df = tools.read(fname, units=units, tz=tz)
+    dfmodelhindcast = None
+    dfmodelrecent = None
+    dfmodelforecast = None
 
 # Call to database if needed
 else:
@@ -96,7 +100,10 @@ elif datatype == 'pic':
     # does this get called from the front page or otherwise for "recent" data?
     if not path.exists(fname + '.png'):
         print('<br><br>')
-        tlims = [date2num(pd.to_datetime(dstart).to_pydatetime()), date2num(pd.to_datetime(dend).to_pydatetime())]
+        if dend is not None:
+            tlims = [date2num(pd.to_datetime(dstart).to_pydatetime()), date2num(pd.to_datetime(dend).to_pydatetime())]
+        else:
+            tlims = None
         fig = plot_buoy.plot(df, buoy, table, dfmodelhindcast, dfmodelrecent, dfmodelforecast, tlims)
         fig.savefig(fname + '.pdf')
         fig.savefig(fname + '.png')

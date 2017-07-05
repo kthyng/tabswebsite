@@ -1,10 +1,7 @@
 '''
 Make plot of recent buoy data.
 
-python plot_buoy.py -h for help
-python plot_buoy.py 'ven' '../tmp/FvengV2KrI'
-python plot_buoy.py 'ven' '../tmp/Fven7YU0EB'
-python plot_buoy.py 'eng' '../tmp/FengUy3wt2'
+Easier to access through get_data.py
 '''
 
 import matplotlib as mpl
@@ -578,12 +575,12 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         add_var_2units(axes[0], df, 'Temp [deg C]', 'Water temperature [˚C]',
                        'c2f', '[˚F]', ymaxrange=[10, 32], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
-        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[15, 37], df1=df1,
+        add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[12, 37], df1=df1,
                 df2=df2, df3=df3, tlims=tlims)
         # add_var(axes[2], df, 'Cond [ms/cm]', 'Conductivity [ms/cm]', ymaxrange=[3, 60])
         add_var(axes[2], df, 'Density [kg/m^3]',
                 'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
-                df1=df1, df2=df2, df3=df3, ymaxrange=[1010, 1036], dolegend=True, tlims=tlims)
+                df1=df1, df2=df2, df3=df3, ymaxrange=[1005, 1036], dolegend=True, tlims=tlims)
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
