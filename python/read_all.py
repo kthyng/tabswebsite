@@ -21,7 +21,7 @@ def query_setup(engine, buoy, table):
     # ndbc buoys diff too
     if buoy == 'C':
         query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    if len(buoy) > 1:
+    elif len(buoy) > 1:
         query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
     else:
         query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
