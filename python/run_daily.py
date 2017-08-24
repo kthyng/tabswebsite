@@ -104,7 +104,7 @@ if __name__ == "__main__":
                 # read in forecast model output, not tied to when data output was found
                 q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=5), ndays=5)
                 dfmodelforecast = tools.read_model(q, timing='forecast')
-                if table == 'wave' or table == 'eng':
+                if table == 'wave' or table == 'eng' or dfmodelrecent is None or dfmodelforecast is None:
                     tlims = None
                 else:
                     tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]

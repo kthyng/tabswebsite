@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 import xarray as xr
 import gsw
 from dateutil.parser import parse
+from os import system
 
 
 def convert(vin, which):
@@ -189,33 +190,35 @@ def read_model(query, timing='recent'):
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
 
     # Try two different locations for model output. If won't work, give up.
-    try:
+    try:  # try copano thredds first
         ds = xr.open_dataset(loc)
-    except:
-        loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
-        ds = xr.open_dataset(loc)
-    else:
-        # email Kristen warning that model isn't working
-        command = 'mail -s "Model output problem" kthyng@tamu.edu <<< "Model output of type "' + timing + '"is not working.""'
-        os.system(command)
-        # skip model output but do data
-        df = None
-        return df
+    except IOError as e:  # if copano thredds is not working
+        try:  # try barataria thredds
+            loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
+            ds = xr.open_dataset(loc)
+        except IOError as e:  # if this also doesn't work, send email and give up
+            # email Kristen warning that model isn't working
+            command = 'mail -s "Model output problem" kthyng@tamu.edu <<< "Model output of type ' + timing + ' is not working."'
+            system(command)
+            # skip model output but do data
+            df = None
+            return df
 
     # use modeling forcing information instead of model output. If won't work, give up.
     if which == 'met' or which == 'ndbc':  # read in forcing info
         try:
             dsf = xr.open_dataset(locf)
-        except:
-            locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
-            dsf = xr.open_dataset(locf)
-        else:
-            # email Kristen warning
-            command = 'mail -s "Model forcing output problem" kthyng@tamu.edu <<< "Model output of type "' + timing + '" for data type "' + which + '" is not working.""'
-            os.system(command)
-            # skip model output but do data
-            df = None
-            return df
+        except IOError as e:  # if copano thredds is not working
+            try:
+                locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
+                dsf = xr.open_dataset(locf)
+            except IOError as e:  # if barataria thredds is also not working
+                # email Kristen warning
+                command = 'mail -s "Model forcing output problem" kthyng@tamu.edu <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working.""'
+                os.system(command)
+                # skip model output but do data
+                df = None
+                return df
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
