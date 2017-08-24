@@ -19,7 +19,6 @@ $units = isset($_GET["units"]) ? $_GET["units"] : "";
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
-// if (! $table) {$table = 'ven';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -34,8 +33,6 @@ if ($units == 'M') {
 else if ($units == 'E') {
     $unitsname = 'English';
 }
-
-// $PageTitle="TABS Buoy Database Query page";
 
 include("../includes/header.html");
 include("../includes/navigation.html");
@@ -142,6 +139,10 @@ print <<<_HTML_
 
 <TR><TD><br></TD></TR>
 
+
+<TR>
+<TD></TD><TD><i>Archives are available on the <a href="buoy_status.php">status</a> page.</i></TD>
+</TR>
 
 <TR>
 <!-- <TD><input type=reset name="Reset" Value="Reset Fields"></TD> -->
