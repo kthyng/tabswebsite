@@ -98,6 +98,9 @@ if __name__ == "__main__":
                 # write daily data file, for whatever most recent time period
                 # data was available
                 make_text(df, fname)  # there is always data to write, but it might be old
+                # if there are too few rows to plot, set as None
+                if len(df) < 5:
+                    df = None
                 # read in recent model output, not tied to when data output was found
                 q = query_setup(engine, buoy, table, pd.datetime.now())
                 dfmodelrecent = tools.read_model(q, timing='recent')
