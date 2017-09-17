@@ -14,6 +14,8 @@ from dateutil.parser import parse
 from os import system
 
 
+email = 'kthyng@tamu.edu'
+
 def convert(vin, which):
     '''Convert units.'''
 
@@ -198,7 +200,7 @@ def read_model(query, timing='recent'):
             ds = xr.open_dataset(loc)
         except IOError as e:  # if this also doesn't work, send email and give up
             # email Kristen warning that model isn't working
-            command = 'mail -s "Model output problem" kthyng@tamu.edu <<< "Model output of type ' + timing + ' is not working."'
+            command = 'mail -s "Model output problem" ' + email + ' <<< "Model output of type ' + timing + ' is not working."'
             system(command)
             # skip model output but do data
             df = None
@@ -214,7 +216,7 @@ def read_model(query, timing='recent'):
                 dsf = xr.open_dataset(locf)
             except IOError as e:  # if barataria thredds is also not working
                 # email Kristen warning
-                command = 'mail -s "Model forcing output problem" kthyng@tamu.edu <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working.""'
+                command = 'mail -s "Model forcing output problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working.""'
                 os.system(command)
                 # skip model output but do data
                 df = None
@@ -250,17 +252,24 @@ def read_model(query, timing='recent'):
                 # rotate from curvilinear to cartesian
                 anglev = ds['angle'][i]  # using at least nearby grid rotation angle
             else:
-                j, i = bd.model(buoy, 'u')  # get model indices
-                along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                               .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
-                j, i = bd.model(buoy, 'v')  # get model indices
-                across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                                .isel(s_rho=-1, eta_v=j, xi_v=i)*100
-                j, i = bd.model(buoy, 'rho')  # get model indices
-                df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+                try:
+                    j, i = bd.model(buoy, 'u')  # get model indices
+                    along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                                   .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
+                    j, i = bd.model(buoy, 'v')  # get model indices
+                    across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                                    .isel(s_rho=-1, eta_v=j, xi_v=i)*100
+                    j, i = bd.model(buoy, 'rho')  # get model indices
+                    df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
 
-                # rotate from curvilinear to cartesian
-                anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+                    # rotate from curvilinear to cartesian
+                    anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+                except:
+                    # email Kristen warning that model isn't working
+                    command = 'mail -s "Model problem" ' + email + ' <<< "Model output of type ' + timing + ' is not working. NetCDF file not found when using to access currents."'
+                    system(command)
+                    return df
+
 
             df['East [cm/s]'], df['North [cm/s]'] = rot2d(along, across, anglev)  # approximately to east, north
 
