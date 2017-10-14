@@ -46,10 +46,10 @@ if model == 'False':
 elif model == 'True':
     model = True
 
-if 'ndbc' not in fname:
+if 'tabs_' in fname:
     buoy = fname.split('/')[-1].split('_')[1]
     table = fname.split('/')[-1].split('_')[2]
-elif 'ndbc' in fname:
+elif 'ndbc_' in fname or 'tcoon_' in fname:
     buoy = fname.split('/')[-1].split('_')[1]
     table = fname.split('/')[-1].split('_')[0]
 
@@ -65,16 +65,21 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
-    engine = tools.engine()
-    # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
-    if buoy == 'C':
-        query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    # NOAA data stations have a different table name
-    elif table == 'ndbc':
-        query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    else:
-        query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    df = tools.read([query, engine], units=units, tz=tz)
+
+    # from mysql database
+    if 'tabs' in table or 'ndbc' in table:
+        engine = tools.engine()
+        # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
+        if buoy == 'C':
+            query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+        # NOAA data stations have a different table name
+        elif table == 'ndbc':
+            query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+        else:
+            query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+        df = tools.read([query, engine], units=units, tz=tz)
+    elif 'tcoon' in table:
+        df = tools.read_tcoon(buoy, dstart, dend)
     if df is not None:  # won't work if data isn't available in this time period
         run_daily.make_text(df, fname)
 

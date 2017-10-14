@@ -11,8 +11,11 @@ This includes all listed on the right hand side of the map in index.php.
 * need to be added to front page map
 * update hover image (see below)
 * update "Last Data Report" listing (see below)
-* update list of buoys in subpages/tabsqueryform.php
 * update python/buoy_header.py and subpages/tabsquery.php (under header part)
+* update list of buoys in subpages/tabsqueryform.php
+* update list of buoys in includes/control.php
+* update js/dynamic_dropdown.js with name of new buoy type
+* need to have a way to read in the data via python/get_data.py.
 
 ## How to update hover images on front page
 

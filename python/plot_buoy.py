@@ -173,6 +173,12 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     '''
     color = 'k'  # color of data arrows
 
+    # TCOON has too high frequency information to plot nicely
+    if (df.index[1] - df.index[0]).seconds/60. < 30:
+        # want 30 min
+        df = df.resample('30T').asfreq()
+        df = df_init(df)
+
     # if data is None, use model output
     if df is None:
         df = df_init(pd.concat([df1, df2, df3]))  # in case there is a df3
@@ -495,13 +501,18 @@ def setup(nsubplots, buoy=None):
     '''Set up plot'''
 
     # plot
-    if buoy is None or len(buoy) < 7:  # not TCOON buoys
+    if buoy is None or (len(buoy) != 7 and nsubplots != 3):
         fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
-    elif len(buoy) == 7 and nsubplots == 3:  # TCOON buoys with no met data
+    else:  # TCOON buoys with no met data
         # don't sharex for degenerative case so that dates are shown on top subplot
-        fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11))
-    elif len(buoy) == 7:
-        fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
+        # Axes that share the x-axis
+        fig = plt.figure(figsize=(8.5,11))
+        ax = fig.add_subplot(nsubplots, 1, 1)
+        axes = [ax] + [fig.add_subplot(nsubplots, 1, 2, sharex=ax)]
+        plt.setp(axes[0].get_xticklabels(), visible=False)
+
+        # The bottom independent axes
+        axes.append(fig.add_subplot(nsubplots, 1, 3))
     # bottom controlled later
     fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
     # title
@@ -526,6 +537,10 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     Find data in dataname and save fig, both in /tmp.
     Optional df1, df2, df3. If given, also plot on each axis.
     '''
+
+    # if TCOON buoy doesn't have met data
+    if which == 'tcoon' and buoy in bd.avail('tcoon-nomet'):
+        which = 'tcoon-nomet'
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
         nsubplots = 4
@@ -651,30 +666,31 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, datum]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
-        # import pdb; pdb.set_trace()
+        add_var_2units(axes[1], df, 'WaterT [deg C]',
+                       'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3)
         # turn off other subplots, but keep the space white
-        axes[1].axis('off')
         axes[2].axis('off')
 
     elif which == 'tcoon':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
-                     df2=df2, df3=df3, tlims=tlims)
+                     df2=df2, df3=df3)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
-                       df2=df2, df3=df3, tlims=tlims)
+                       df2=df2, df3=df3)
         add_var_2units(axes[2], df, 'AirT [deg C]',
                        'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
-                       df3=df3, tlims=tlims)
+                       df3=df3)
         add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], df1=df1,
-                       df2=df2, df3=df3, tlims=tlims)
+                       df2=df2, df3=df3)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
-                       tlims=tlims)
+                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
@@ -687,7 +703,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
 
     if which == 'tcoon-nomet':
         # has only one actual subplot, and want to label that one
-        add_xlabels(axes[0], df, fig, tlims=tlims)
+        add_xlabels(axes[1], df, fig, tlims=tlims)
     else:
         add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
 

@@ -32,6 +32,35 @@ var data = {
     "42040": ["ndbc"],
     "SRST2": ["ndbc"],
     "PTAT2": ["ndbc"],
+    '8770475': ["tcoon"],
+    '8770520': ["tcoon"],
+    '8770733': ["tcoon"],
+    '8770777': ["tcoon"],
+    '8770808': ["tcoon"],
+    '8770822': ["tcoon"],
+    '8770971': ["tcoon"],
+    '8771486': ["tcoon"],
+    '8771972': ["tcoon"],
+    '8772985': ["tcoon"],
+    '8773037': ["tcoon"],
+    '8773146': ["tcoon"],
+    '8773259': ["tcoon"],
+    '8773701': ["tcoon"],
+    '8774230': ["tcoon"],
+    '8774513': ["tcoon"],
+    '8775237': ["tcoon"],
+    '8775241': ["tcoon"],
+    '8775244': ["tcoon"],
+    '8775283': ["tcoon"],
+    '8775296': ["tcoon"],
+    '8775792': ["tcoon"],
+    '8776139': ["tcoon"],
+    '8776604': ["tcoon"],
+    '8777812': ["tcoon"],
+    '8778490': ["tcoon"],
+    '8779280': ["tcoon"],
+    '8779748': ["tcoon"],
+    '8779749': ["tcoon"],
 }
 
 $(function() {
@@ -65,6 +94,9 @@ http://jsfiddle.net/NaUAL/
         else if (valorig == "ndbc"){
           valnameorig = "NDBC buoy"
         }
+        else if (valorig == "tcoon"){
+          valnameorig = "TCOON buoy"
+        }
         // only create html if initial table value exists
         // also only use table variable if it is an option for the buoy
         if (valorig && $.inArray(valorig, vals) != -1){
@@ -93,6 +125,9 @@ http://jsfiddle.net/NaUAL/
               }
               else if (val == "ndbc"){
                 valname = "NDBC buoy"
+              }
+              else if (val == "tcoon"){
+                valname = "TCOON buoy"
               }
               html.push('<option value=' + val + '>'+valname+'</option>')
             // //   html.push('<option>'+val+'</option>')

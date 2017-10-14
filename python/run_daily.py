@@ -94,30 +94,10 @@ if __name__ == "__main__":
                     dend = pd.datetime.now()
                     # start 5 days earlier from last data
                     dstart = (dend - timedelta(days=5)).strftime("%Y%m%d")
-                    # need to form url for TCOON data
-                    if 'nomet' in table:
-                        prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station='
-                        suffix = '&begin_date=' + dstart + '&end_date=' + dend.strftime("%Y%m%d") + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
-                        url = prefix + buoy + suffix
-                        df = tools.read(url)
-                        # import pdb; pdb.set_trace()
-                    else:
-                        # tide data
-                        prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station='
-                        suffix = '&begin_date=' + dstart + '&end_date=' + dend.strftime("%Y%m%d") + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
-                        url = prefix + buoy + suffix
-                        df1 = tools.read(url)
-                        # met data
-                        prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id='
-                        suffix = '&begin=' + dstart + '&end=' + dend.strftime("%Y%m%d") + '&units=metric&timezone=GMT&mode=csv&interval=6'
-                        url = prefix + buoy + suffix
-                        df2 = tools.read(url)
-                        # phys data
-                        prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=8770475'
-                        url = prefix + buoy + suffix
-                        df3 = tools.read(url)
-                        # combine the dataframes together
-                        df = pd.concat([df1, df2, df3], axis=1)
+                    # change dend to string
+                    dend = dend.strftime("%Y%m%d")
+                    # works whether -nomet or not
+                    df = tools.read_tcoon(buoy, dstart, dend)
                 if table != 'ndbc' and 'tcoon' not in table:
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                 elif table == 'ndbc':

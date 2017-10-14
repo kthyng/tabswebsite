@@ -64,6 +64,9 @@ elseif ($table == 'wave') {
 elseif ($table == 'ndbc') {
     $tablename = 'NDBC data';
 }
+elseif ($table == 'tcoon') {
+    $tablename = 'TCOON data';
+}
 
 
 // if recent and data table, give ability to switch to recent and image
@@ -114,7 +117,7 @@ if ($noinstr) {
 
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
-    if (strpos($table, 'tabs') !== false) {
+    if (strlen($Buoyname) == 1) {
         $tempaccess = "../daily/tabs_".$Buoyname."_".$table;
     }
     else if ($table == 'ndbc') {
@@ -144,7 +147,7 @@ else{
             // if there is not an end date, use start date
             $dend = $dstart;
     }
-    if (strpos($table, 'tabs') !== false) {
+    if (strlen($Buoyname) == 1) {
         $tempfile=tempnam("../tmp","tabs_".$Buoyname."_".$table."_");  // full file location
     }
     else if ($table == 'ndbc') {
@@ -162,7 +165,7 @@ else{
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
     else if (strpos(php_uname('n'), 'tahoma') !== false) {
-        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
     }
 
     chmod($tempfile, 0644);
@@ -229,7 +232,7 @@ if ($datepicker=="recent") {
     }
     else {
         // show header file contents for "recent" data, above table
-        if (strpos($table, 'tabs') !== false) {
+        if (strlen($Buoyname) == 1) {
             echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
         }
         else if ($table == 'ndbc') {

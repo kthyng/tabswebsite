@@ -42,6 +42,39 @@ def degrees_to_cardinal(d):
     return dirs[ix % 16]
 
 
+def read_tcoon(buoy, dstart, dend):
+    '''Set up urls and then read from them to get TCOON data.
+
+    Most stations have several data sources, so they are aggregated here.'''
+
+    # try to fix dates if they are wrong length
+    # some string parsing and rearranging to get month/day 2 digit
+    if '/' in dstart:
+        sts = dstart.split('/')
+        dstart = sts[0] + sts[1].zfill(2) + sts[2].zfill(2)
+        sts = dend[:10].split('/')
+        dend = sts[0] + sts[1].zfill(2) + sts[2].zfill(2)
+
+    # tide data
+    prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station='
+    suffix = '&begin_date=' + dstart + '&end_date=' + dend + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
+    url = prefix + buoy + suffix
+    df1 = read(url)
+    # met data
+    prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id='
+    suffix = '&begin=' + dstart + '&end=' + dend + '&units=metric&timezone=GMT&mode=csv&interval=6'
+    url = prefix + buoy + suffix
+    df2 = read(url)
+    # phys data
+    prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=8770475'
+    url = prefix + buoy + suffix
+    df3 = read(url)
+    # combine the dataframes together
+    df = pd.concat([df1, df2, df3], axis=1)
+
+    return df
+
+
 def read(dataname, units='M', tz='UTC'):
     '''Load in data already saved into /tmp file by tabsquery.php
 
@@ -55,7 +88,7 @@ def read(dataname, units='M', tz='UTC'):
     if isinstance(dataname, str) and 'csv' in dataname:
 
         df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
-        # import pdb; pdb.set_trace()
+
         if 'type=met' in dataname:
             names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
             df = df.drop([' VIS'], axis=1)
