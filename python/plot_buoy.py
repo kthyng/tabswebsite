@@ -321,12 +321,13 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     '''Plot with units on both left and right sides of plot.'''
 
     # this catches when TCOON data is temporarily unavailable
-    if key not in df.keys() or df[key].isnull().sum() == len(df):
-        ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
-        ax1.get_yaxis().set_ticks([])
-        return
     if df is not None:
-        ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
+        if key not in df.keys() or df[key].isnull().sum() == len(df):
+            ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
+            ax1.get_yaxis().set_ticks([])
+            return
+        else:
+            ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
     if df1 is not None:
         ax1.plot(df1.idx, df1[key], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
@@ -494,7 +495,7 @@ def setup(nsubplots, buoy=None):
     '''Set up plot'''
 
     # plot
-    if len(buoy) < 7:  # not TCOON buoys
+    if buoy is None or len(buoy) < 7:  # not TCOON buoys
         fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
     elif len(buoy) == 7 and nsubplots == 3:  # TCOON buoys with no met data
         # don't sharex for degenerative case so that dates are shown on top subplot

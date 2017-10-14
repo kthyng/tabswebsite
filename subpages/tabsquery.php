@@ -114,11 +114,14 @@ if ($noinstr) {
 
 # if being called from front page, show previously-made "recent" image from daily directory
 if ($datepicker == "recent") {
-    if ($table != 'ndbc') {
+    if (strpos($table, 'tabs') !== false) {
         $tempaccess = "../daily/tabs_".$Buoyname."_".$table;
     }
     else if ($table == 'ndbc') {
         $tempaccess = "../daily/ndbc_".$Buoyname;
+    }
+    else if (strpos($table, 'tcoon') !== false) {
+        $tempaccess = "../daily/tcoon_".$Buoyname;
     }
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
@@ -141,11 +144,14 @@ else{
             // if there is not an end date, use start date
             $dend = $dstart;
     }
-    if ($table != 'ndbc') {
+    if (strpos($table, 'tabs') !== false) {
         $tempfile=tempnam("../tmp","tabs_".$Buoyname."_".$table."_");  // full file location
     }
     else if ($table == 'ndbc') {
         $tempfile=tempnam("../tmp", "ndbc_".$Buoyname."_");  // full file location
+    }
+    else if (strpos($table, 'tcoon') !== false) {
+        $tempfile=tempnam("../tmp", "tcoon_".$Buoyname."_");  // full file location
     }
     // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
@@ -192,15 +198,6 @@ print "<div id='container'>";
 include("../includes/header.html");
 include("../includes/navigation.html");
 
-// // show header file contents for "recent" data, above table
-// if ($datepicker=="recent") {
-//     if ($table != 'ndbc') {
-//         echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
-//     }
-//     else if ($table == 'ndbc') {
-//         echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
-//     }
-// }
 
 // Warning about data being out of data if most recent point is more than 3 days old
 if ($datepicker=="recent") {
@@ -232,11 +229,14 @@ if ($datepicker=="recent") {
     }
     else {
         // show header file contents for "recent" data, above table
-        if ($table != 'ndbc') {
+        if (strpos($table, 'tabs') !== false) {
             echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
         }
         else if ($table == 'ndbc') {
             echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
+        }
+        else if (strpos($table, 'tcoon') !== false) {
+            echo file_get_contents( "../daily/tcoon_".$Buoyname."_header" );
         }
     }
 }

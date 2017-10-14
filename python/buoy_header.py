@@ -6,6 +6,7 @@ import buoy_data as bd
 import pandas as pd
 import tools
 import os
+from numpy import isnan
 
 relloc = '../'
 def make(buoy):
@@ -37,8 +38,10 @@ def make(buoy):
         which = 'met'
         fname = relloc + 'daily/tabs_' + buoy + '_' + which
         domet = False
+        dohum = False
         if os.path.exists(fname):
             domet = True
+            dohum = True
             df = tools.read(fname)
             tail = df.tail(1)
             wind = tail['Speed [m/s]'].values[0]
@@ -76,7 +79,7 @@ def make(buoy):
         dotemp = True
         fname = relloc + 'daily/tabs_' + buoy + '_header'
 
-    elif len(buoy) > 1:  # NBDC buoys
+    elif len(buoy) == 5:  # NBDC buoys
         fname = relloc + 'daily/ndbc_' + buoy
         df = tools.read(fname)
         df = df.tz_localize('UTC')  # timezone is UTC
@@ -111,10 +114,53 @@ def make(buoy):
         a = bd.anemometer(buoy)  # 0 if doesn't exist
         doeng = False
         domet = True
+        dohum = True
         dowave = True
         dosensor = False
         fname = relloc + 'daily/ndbc_' + buoy + '_header'
 
+    elif len(buoy) == 7:  # TCOON buoys
+        fname = relloc + 'daily/tcoon_' + buoy
+        df = tools.read(fname)
+        df = df.tz_localize('UTC')  # timezone is UTC
+        tail = df.tail(1)
+        time = tail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
+        time2 = tail.index.tz_convert('US/Central').strftime("%Y-%m-%d %H:%M %Z")[0]
+        speed = None
+        direct = None
+        dotemp = False
+        domet = False
+        if 'WaterT [deg C]' in df.keys():
+            temp = tail['WaterT [deg C]'].values[0]
+            dotemp = True
+        if 'Speed [m/s]' in df.keys():
+            wind = tail['Speed [m/s]'].values[0]
+        if 'AirT [deg C]' in df.keys():
+            airtemp = tail['AirT [deg C]'].values[0]
+        if 'AtmPr [MB]' in df.keys():
+            press = tail['AtmPr [MB]'].values[0]
+        if 'Dir from [deg T]' in df.keys():
+            wdirect = tail['Dir from [deg T]'].values[0]
+            if not isnan(wdirect):
+                domet = True
+        loc = bd.locs(buoy)['lat'][0] + '&deg; ' +\
+            bd.locs(buoy)['lat'][1] + '\'' +\
+            bd.locs(buoy)['lat'][2] + '&nbsp;&nbsp;' +\
+            bd.locs(buoy)['lon'][0] + '&deg; ' +\
+            bd.locs(buoy)['lon'][1] + '\'' +\
+            bd.locs(buoy)['lon'][2]
+        # kind = bd.kind(buoy)
+        try:
+            d = bd.depth(buoy)
+            dodepth = True
+        except:
+            dodepth = False
+        a = bd.anemometer(buoy)  # 0 if doesn't exist
+        doeng = False
+        dohum = False
+        dowave = False
+        dosensor = False
+        fname = relloc + 'daily/tcoon_' + buoy + '_header'
 
     # html
     head = []
@@ -150,7 +196,7 @@ def make(buoy):
         head.append('</tr>')
 
     head.append('<tr>')
-    if domet:
+    if dohum:
         head.append('<td><small>Relative humidity: %2.0f&#37;</small></td>' % (humid))
     if dowave:
         head.append('<td><small>Waves: %2.1fm (%2.1f ft) @ %2.1f sec</small></td>' % (wheight, tools.convert(wheight, 'm2ft'), wperiod))

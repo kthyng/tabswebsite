@@ -84,9 +84,6 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                if 'tcoon' not in table:
-                    continue
-                #     import pdb; pdb.set_trace()
                 if 'tcoon' not in table:  # tcoon are not in mysql
                     dend = query_setup_recent(engine, buoy, table)
                     # start 5 days earlier from last data
