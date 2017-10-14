@@ -86,22 +86,27 @@ The date and time at each station indicates the end of the three-hour average.<b
 </tr>
 
 <?php
-// echo "<table border=0 bgcolor=\"#f8f8f8\">";
 
-// slow!
-// $command = escapeshellcmd('/anaconda/bin/python return_recent_datetime.py');
-// exec($command, $output);
-// var_dump($output);
-$blet=array("B","D","F","J","K","R","V","W","X",'42019','42020','42035','SRST2','PTAT2');
+// this list should match the "active" buoy list in python/buoy_data.py
+$blet=array("B","D","F","J","K","R","V","W","X",'42019','42020','42035','SRST2',
+            'PTAT2','8770475','8770520', '8770733', '8770777', '8770808',
+            '8770822','8770971', '8771486', '8771972', '8772985', '8773037',
+            '8773146', '8773259', '8773701', '8774230', '8774513', '8775237',
+            '8775241', '8775244', '8775283', '8775296', '8775792', '8776139',
+            '8776604', '8777812', '8778490', '8779280', '8779748', '8779749');
 $bidx=0;
 foreach ($blet as $f) {
     if (strlen($f) == 1) {
     	$venfile="daily/tabs_".$f."_ven";
         $table = "ven";
     }
-    else if (strlen($f) > 1) {
+    else if (strlen($f) == 5) {
     	$venfile="daily/ndbc_".$f;
         $table = "ndbc";
+    }
+    else if (strlen($f) == 7) {
+    	$venfile="daily/tcoon_".$f;
+        $table = "tcoon";
     }
 
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
@@ -162,12 +167,19 @@ foreach ($blet as $f) {
     print $buoystr;
     $bidx++;
     if ($f == "X") {
-    print "<tr><td><br></td></tr>";  // space between TABS and NDBC buoys
+    print "<tr><td><br></td></tr>";  // space
+    print "<tr><td></td><td><i>NDBC</i></td></tr>";  // Label between TABS and NDBC buoys
+    }
+    if ($f == "PTAT2") {
+    print "<tr><td><br></td></tr>";  // space
+    print "<tr><td></td><td><i>TCOON</i></td></tr>";  
     }
 }
 print "<tr></tr>";
 
 ?>
+
+
 <tr><td></td></tr>
 <tr><td></td></tr>
 <tr><td></td></tr>

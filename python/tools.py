@@ -51,10 +51,59 @@ def read(dataname, units='M', tz='UTC'):
     entries, they give the query string and the mysql engine.
     '''
 
-    # read method: from a file or from mysql
-    if isinstance(dataname, str):
+    # read method: from NOAA for TCOON sites
+    if isinstance(dataname, str) and 'csv' in dataname:
+
+        df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
+        # import pdb; pdb.set_trace()
+        if 'type=met' in dataname:
+            names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
+            df = df.drop([' VIS'], axis=1)
+            # dictionary for rounding decimal places
+            rdict = {'East [m/s]': 2, 'North [m/s]': 2}
+
+            # angle needs to be in math convention for trig and between 0 and 360
+            # also have to switch wind from direction from to direction to with 180 switch
+            theta = 90 - (df[' DIR'] - 180)
+            theta[theta<0] += 360
+            df['East [m/s]'] = df[' WINDSPEED']*np.cos(np.deg2rad(theta))
+            df['North [m/s]'] = df[' WINDSPEED']*np.sin(np.deg2rad(theta))
+
+            # # first remove calculate values (East, North) if associated with nan's
+            # ind = (df[' WINDSPEED']==-99.0) | (df[' DIR']==-99.0)
+            # df.loc[ind, 'East [m/s]'] = np.nan
+            # df.loc[ind, 'North [m/s]'] = np.nan
+            # # remove original missing values
+            # df.replace('-99.0', np.nan, inplace=True)
+        elif 'product=water_level' in dataname:
+            names = ['Water Level [m]']
+            df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1)
+            # dictionary for rounding decimal places
+            rdict = {}
+
+        elif 'type=phys' in dataname:
+            # import pdb; pdb.set_trace()
+            names = ['WaterT [deg C]']
+            df = df.drop(['CONDUCTIVITY'], axis=1)
+            # dictionary for rounding decimal places
+            rdict = {}
+
+        # remove error message from when data is missing
+        # import pdb; pdb.set_trace()
+        if not df.empty:
+            if isinstance(df.index[0], str):
+                df = df.drop(df.index[0], axis=0)
+
+        df.columns = names
+        df.index.name = 'Dates [UTC]'
+        df = df.round(rdict)
+
+    # from file (WHEN IS THIS USED?)
+    elif isinstance(dataname, str):
+
         # columns have already been processed previously and can be inferred
         df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values=['-999', '-99.0'])
+
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
@@ -162,19 +211,19 @@ def rot2d(x, y, ang):
     return xr, yr
 
 
-def read_model(query, timing='recent'):
+def read_model(buoy, which, dstart, dend, timing='recent'):
     '''Read in model output based on data query q.'''
 
     dostations = False  # this is updated if buoy is in stations list on reading
 
-    if 'tabs' in query:
-        buoy = query.split(' ')[3].split('_')[1]
-        which = query.split(' ')[3].split('_')[2]
-    elif 'ndbc' in query:
-        buoy = query.split(' ')[3].split('_')[1]
-        which = query.split(' ')[3].split('_')[0]
-    dstart = query.split('"')[1]  # start date (beginning of day)
-    dend = query.split('"')[3]  # end date and time
+    # if 'tabs' in query:
+    #     buoy = query.split(' ')[3].split('_')[1]
+    #     which = query.split(' ')[3].split('_')[2]
+    # elif 'ndbc' in query:
+    #     buoy = query.split(' ')[3].split('_')[1]
+    #     which = query.split(' ')[3].split('_')[0]
+    # dstart = query.split('"')[1]  # start date (beginning of day)
+    # dend = query.split('"')[3]  # end date and time
 
     # separate out which model type we want
     if timing == 'hindcast':

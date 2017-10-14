@@ -46,11 +46,9 @@ def query_setup_recent(engine, buoy, table):
     return df.index[-1]  # date for last available data
 
 
-def query_setup(engine, buoy, table, dend, ndays=5):
+def query_setup(engine, buoy, table, dstart, dend):
     '''Query mysql database for data, given end date dend from
     query_setup_recent().'''
-
-    dstart = (dend - timedelta(days=ndays)).strftime("%Y-%m-%d")  # 5 days earlier
 
     # get 5 days of data
     # want from beginning of first day but only up until data time on final day
@@ -86,27 +84,67 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
-                # if table == 'wave' and buoy == 'X':
+                if 'tcoon' not in table:
+                    continue
                 #     import pdb; pdb.set_trace()
-                dend = query_setup_recent(engine, buoy, table)
-                q = query_setup(engine, buoy, table, dend)
-                df = tools.read([q, engine])
-                if table != 'ndbc':
+                if 'tcoon' not in table:  # tcoon are not in mysql
+                    dend = query_setup_recent(engine, buoy, table)
+                    # start 5 days earlier from last data
+                    dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")
+                    q = query_setup(engine, buoy, table, dstart, dend)
+                    df = tools.read([q, engine])
+                elif 'tcoon' in table:
+                    dend = pd.datetime.now()
+                    # start 5 days earlier from last data
+                    dstart = (dend - timedelta(days=5)).strftime("%Y%m%d")
+                    # need to form url for TCOON data
+                    if 'nomet' in table:
+                        prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station='
+                        suffix = '&begin_date=' + dstart + '&end_date=' + dend.strftime("%Y%m%d") + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
+                        url = prefix + buoy + suffix
+                        df = tools.read(url)
+                        # import pdb; pdb.set_trace()
+                    else:
+                        # tide data
+                        prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station='
+                        suffix = '&begin_date=' + dstart + '&end_date=' + dend.strftime("%Y%m%d") + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
+                        url = prefix + buoy + suffix
+                        df1 = tools.read(url)
+                        # met data
+                        prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id='
+                        suffix = '&begin=' + dstart + '&end=' + dend.strftime("%Y%m%d") + '&units=metric&timezone=GMT&mode=csv&interval=6'
+                        url = prefix + buoy + suffix
+                        df2 = tools.read(url)
+                        # phys data
+                        prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=8770475'
+                        url = prefix + buoy + suffix
+                        df3 = tools.read(url)
+                        # combine the dataframes together
+                        df = pd.concat([df1, df2, df3], axis=1)
+                if table != 'ndbc' and 'tcoon' not in table:
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                 elif table == 'ndbc':
                     fname = path.join('..', 'daily', 'ndbc_' + buoy)
+                elif 'tcoon' in table:
+                    fname = path.join('..', 'daily', 'tcoon_' + buoy)
                 # write daily data file, for whatever most recent time period
                 # data was available
                 make_text(df, fname)  # there is always data to write, but it might be old
                 # if there are too few rows to plot, set as None
                 if len(df) < 2:
                     df = None
-                # read in recent model output, not tied to when data output was found
-                q = query_setup(engine, buoy, table, pd.datetime.now())
-                dfmodelrecent = tools.read_model(q, timing='recent')
-                # read in forecast model output, not tied to when data output was found
-                q = query_setup(engine, buoy, table, pd.datetime.now()+timedelta(days=5), ndays=5)
-                dfmodelforecast = tools.read_model(q, timing='forecast')
+                # no model output for TCOON stations since in bays
+                if 'tcoon' in table:
+                    dfmodelrecent = None
+                    dfmodelforecast = None
+                else:
+                    # read in recent model output, not tied to when data output was found
+                    now = pd.datetime.now()
+                    future = (pd.datetime.now()+timedelta(days=5)).strftime('%Y-%m-%d %H:%M')
+                    dfmodelrecent = tools.read_model(buoy, table, dstart, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
+                    # read in forecast model output, not tied to when data output was found
+                    dfmodelforecast = tools.read_model(buoy, table, now.strftime('%Y-%m-%d'), future, timing='forecast')
+
                 if table == 'wave' or table == 'eng' or dfmodelrecent is None or dfmodelforecast is None:
                     tlims = None
                 else:

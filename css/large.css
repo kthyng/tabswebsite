@@ -17,6 +17,8 @@ div#mapcontainer{
 }
 
 div#buoycontainer{
+    height: 470px;
+    overflow: scroll;
 }
 
 div#map{
