@@ -172,21 +172,13 @@ foreach ($blet as $f) {
     }
     if ($f == "PTAT2") {
     print "<tr><td><br></td></tr>";  // space
-    print "<tr><td></td><td><i>TCOON</i></td></tr>";  
+    print "<tr><td></td><td><i>TCOON</i></td></tr>";
     }
 }
 print "<tr></tr>";
 
 ?>
 
-
-<tr><td></td></tr>
-<tr><td></td></tr>
-<tr><td></td></tr>
-<tr><td></td></tr>
-<tr><td></td>
-<td><div id="Report"><a href="http://pong.tamu.edu/tabs_map/"  target="_blank" style="text-decoration: none">Fullscreen map</a></div></td>
-<!-- <a href="http://localhost:5000/static/index.html"  target="_blank" style="font-size: 18px; color:#009933; text-decoration: none">&nbsp &nbsp Click for full-screen map </a> -->
 </tr>
 </table>
 

@@ -60,15 +60,21 @@ def read_tcoon(buoy, dstart, dend):
     suffix = '&begin_date=' + dstart + '&end_date=' + dend + '&datum=MSL&units=metric&time_zone=GMT&format=csv'
     url = prefix + buoy + suffix
     df1 = read(url)
+    if df1 is not None:
+        df1 = df1[~df1.index.duplicated(keep='first')]  # remove any duplicated indices
     # met data
     prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id='
     suffix = '&begin=' + dstart + '&end=' + dend + '&units=metric&timezone=GMT&mode=csv&interval=6'
     url = prefix + buoy + suffix
     df2 = read(url)
+    if df2 is not None:
+        df2 = df2[~df2.index.duplicated(keep='first')]  # remove any duplicated indices
     # phys data
     prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=8770475'
     url = prefix + buoy + suffix
     df3 = read(url)
+    if df3 is not None:
+        df3 = df3[~df3.index.duplicated(keep='first')]  # remove any duplicated indices
     # combine the dataframes together
     df = pd.concat([df1, df2, df3], axis=1)
 
