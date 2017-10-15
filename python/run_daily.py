@@ -117,8 +117,9 @@ if __name__ == "__main__":
                 else:
                     # read in recent model output, not tied to when data output was found
                     now = pd.datetime.now()
+                    past = (now - timedelta(days=5)).strftime("%Y-%m-%d")
                     future = (pd.datetime.now()+timedelta(days=5)).strftime('%Y-%m-%d %H:%M')
-                    dfmodelrecent = tools.read_model(buoy, table, dstart, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
+                    dfmodelrecent = tools.read_model(buoy, table, past, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
                     # read in forecast model output, not tied to when data output was found
                     dfmodelforecast = tools.read_model(buoy, table, now.strftime('%Y-%m-%d'), future, timing='forecast')
 
