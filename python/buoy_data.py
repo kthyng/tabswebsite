@@ -7,20 +7,24 @@ def buoys(kind='active'):
     '''Return list of buoys.'''
 
     if kind == 'active':
-        return ['B','D','F','J','K','R','V','W','X','42019','42020','42035','SRST2','PTAT2',
+        return ['B','D','F','J','K','R','V','W','X',
+                '42001','42002','42019','42020','42035','42036','42039','42040',
+                'SRST2','PTAT2', 'BURL1', 'GISL1', 'AMRL1', 'PSTL1',
                 '8770475', '8770520', '8770733', '8770777', '8770808', '8770822',
                 '8770971', '8771486', '8771972', '8772985', '8773037', '8773146',
                 '8773259', '8773701', '8774230', '8774513', '8775237', '8775241',
                 '8775244', '8775283', '8775296', '8775792', '8776139', '8776604',
                 '8777812', '8778490', '8779280', '8779748', '8779749']
     elif kind == 'inactive':
-        return ['A','C','E','G','H','L','M','N','P','S','42001','42002','42007','42036','42039','42040']
+        return ['A','C','E','G','H','L','M','N','P','S','42007']
 
 
 def tables():
     '''Return list of tables.'''
 
-    return ['ven', 'met', 'eng', 'salt', 'wave', 'ndbc', 'tcoon-nomet', 'tcoon']
+    return ['ven', 'met', 'eng', 'salt', 'wave', 'ndbc', 'ndbc-nowave',
+            'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress',
+            'tcoon-nomet', 'tcoon']
 
 
 def avail(key):
@@ -32,7 +36,10 @@ def avail(key):
     avail['met'] = ['B', 'H', 'J', 'K', 'N', 'V', 'X']
     avail['salt'] = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X']
     avail['wave'] = ['K', 'N', 'V', 'X']
-    avail['ndbc'] = ['42019','42020','42035','SRST2','PTAT2']
+    avail['ndbc'] = ['42001','42002','42019','42020','42035','42036','42039','42040']
+    avail['ndbc-nowave'] = ['PTAT2', 'GISL1', 'AMRL1']
+    avail['ndbc-nowave-nowtemp'] = ['SRST2','BURL1']
+    avail['ndbc-nowave-nowtemp-nopress'] = ['PSTL1']
     avail['tcoon-nomet'] = ['8770520']
     avail['tcoon'] = ['8770475', '8770733', '8770777', '8770808', '8770822',
                     '8770971', '8771486', '8771972', '8772985', '8773037', '8773146',
@@ -41,6 +48,15 @@ def avail(key):
                     '8777812', '8778490', '8779280', '8779748', '8779749']
 
     return avail[key]
+
+
+def inmysql(buoy):
+    '''Check if NDBC buoy is stored in mysql database or not. Returns True
+    if so, and False otherwise.'''
+
+    mysql = ['42001','42002','42019','42020','42035','42036','42039','42040',
+             'SRST2','PTAT2']
+    return buoy in mysql
 
 
 def health(buoy):
@@ -131,6 +147,10 @@ def locs(buoy):
             '42035': {'lon': ['94', '24.500', 'W'], 'lat': ['29', '14.7830', 'N']},
             'SRST2': {'lon': ['94', '3.000', 'W'], 'lat': ['29', '40.200', 'N']},
             'PTAT2': {'lon': ['97', '3.000', 'W'], 'lat': ['27', '49.700', 'N']},
+            'BURL1': {'lon': ['89', '25.7', 'W'], 'lat': ['28', '54.3', 'N']},
+            'GISL1': {'lon': ['89', '57.45', 'W'], 'lat': ['29', '15.88', 'N']},
+            'AMRL1': {'lon': ['91', '20.28', 'W'], 'lat': ['29', '26.97', 'N']},
+            'PSTL1': {'lon': ['89', '24.42', 'W'], 'lat': ['28', '55.93', 'N']},
             '42001': {'lon': ['89', '40.800', 'W'], 'lat': ['25', '55.200', 'N']},
             '42002': {'lon': ['94', '25.000', 'W'], 'lat': ['25', '10.167', 'N']},
             '42007': {'lon': ['88', '46.14', 'W'], 'lat': ['30', '5.4', 'N']},

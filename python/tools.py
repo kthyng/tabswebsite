@@ -70,7 +70,7 @@ def read_tcoon(buoy, dstart, dend):
     if df2 is not None:
         df2 = df2[~df2.index.duplicated(keep='first')]  # remove any duplicated indices
     # phys data
-    prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=8770475'
+    prefix = 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id='
     url = prefix + buoy + suffix
     df3 = read(url)
     if df3 is not None:
@@ -78,6 +78,24 @@ def read_tcoon(buoy, dstart, dend):
     # combine the dataframes together
     df = pd.concat([df1, df2, df3], axis=1)
 
+    return df
+
+
+def read_ndbc(buoy, dstart, dend):
+    ''''''
+
+    # recent
+    url = 'http://www.ndbc.noaa.gov/data/realtime2/' + buoy + '.txt'
+    df = read(url)
+    if df.index[-1] < df.index[0]:  # backward order
+        df = df[::-1]
+    df = df[dstart:dend]
+
+    # # historical
+    # url = 'http://www.ndbc.noaa.gov/view_text_file.php?filename=pstl1h2016.txt.gz&dir=data/historical/stdmet/'
+
+
+    # MAY WANT TO AGGREGATE OWN TEXT FILES AND READ FROM THEM FOR HISTORICAL
     return df
 
 
@@ -137,8 +155,38 @@ def read(dataname, units='M', tz='UTC'):
         df.index.name = 'Dates [UTC]'
         df = df.round(rdict)
 
-    # from file (WHEN IS THIS USED?)
-    elif isinstance(dataname, str):
+    # for NDBC met stations that aren't in mysql
+    elif isinstance(dataname, str) and 'ndbc' in dataname and 'http' in dataname:
+        df = pd.read_table(dataname, delim_whitespace=True, header=0,
+                         skiprows=[1], na_values=['MM',-99.0],
+                         parse_dates=[[0,1,2,3,4]],
+                         index_col=0)#, date_parser=dateparse)
+        df.index = pd.to_datetime(df.index, format='%Y %m %d %H %M')
+
+        names = ['Dir from [deg T]', 'Speed [m/s]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'WaterT [deg C]', 'Dew pt [deg C]', 'East [m/s]', 'North [m/s]']
+        df = df.drop(['WVHT', 'DPD', 'APD', 'MWD', 'VIS', 'PTDY', 'TIDE'], axis=1)
+        rdict = {'East [m/s]': 2, 'North [m/s]': 2}
+
+        # angle needs to be in math convention for trig and between 0 and 360
+        # also have to switch wind from direction from to direction to with 180 switch
+        theta = 90 - (df['WDIR'] - 180)
+        theta[theta<0] += 360
+        df['East [m/s]'] = df['WSPD']*np.cos(np.deg2rad(theta))
+        df['North [m/s]'] = df['WSPD']*np.sin(np.deg2rad(theta))
+
+        # # first remove calculate values (East, North) if associated with nan's
+        # ind = (df['WSPD']==-99.0) | (df['WDIR']==-99.0)
+        # df.loc[ind, 'East [m/s]'] = np.nan
+        # df.loc[ind, 'North [m/s]'] = np.nan
+        # # remove original missing values
+        # df.replace('-99.0', np.nan, inplace=True)
+
+        df.columns = names
+        df.index.name = 'Dates [UTC]'
+        df = df.round(rdict)
+
+    # from file (used in e.g. buoy_header.py)
+    elif isinstance(dataname, str) and 'daily' in dataname:
 
         # columns have already been processed previously and can be inferred
         df = pd.read_table(dataname, parse_dates=[0], index_col=0, na_values=['-999', '-99.0'])
@@ -146,12 +194,14 @@ def read(dataname, units='M', tz='UTC'):
     elif len(dataname) == 2:
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
+        df[df == -99.0] = np.nan  # replace missing values
+
         if 'tabs' in query:
             buoy = query.split(' ')[3].split('_')[1]
             which = query.split(' ')[3].split('_')[2]
         elif 'ndbc' in query:
             buoy = query.split(' ')[3].split('_')[1]
-            which = query.split(' ')[3].split('_')[0]
+            which = 'ndbc'
 
         if which == 'ven':# or which == 'sum':
             ind = df['tx']==-99

@@ -24,7 +24,7 @@ def query_setup_recent(engine, buoy, table):
     '''
 
     # query for last entry
-    if table == 'ndbc':
+    if 'ndbc' in table:
         lastline = 'SELECT * FROM ndbc_' + buoy + ' order by obs_time DESC limit 1'
     else:
         lastline = 'SELECT * FROM tabs_' + buoy + '_' + table + ' order by obs_time DESC limit 1'
@@ -84,12 +84,24 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
+                print(buoy)
                 if 'tcoon' not in table:  # tcoon are not in mysql
-                    dend = query_setup_recent(engine, buoy, table)
-                    # start 5 days earlier from last data
-                    dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")
-                    q = query_setup(engine, buoy, table, dstart, dend)
-                    df = tools.read([q, engine])
+                    # read from mysql if available
+                    if bd.inmysql(buoy) or len(buoy) == 1:
+                        dend = query_setup_recent(engine, buoy, table)
+                        # start 5 days earlier from last data
+                        dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")
+                        q = query_setup(engine, buoy, table, dstart, dend)
+                        df = tools.read([q, engine])
+                    else:
+                        dend = pd.datetime.now()
+                        # start 5 days earlier from last data
+                        dstart = (dend - timedelta(days=5)).strftime("%Y-%m-%d")
+                        # change dend to string
+                        dend = dend.strftime("%Y-%m-%d")
+                        df = tools.read_ndbc(buoy, dstart, dend)
+                    # if buoy == 'SRST2':
+                    #     import pdb; pdb.set_trace()
                 elif 'tcoon' in table:
                     dend = pd.datetime.now()
                     # start 5 days earlier from last data
@@ -98,9 +110,9 @@ if __name__ == "__main__":
                     dend = dend.strftime("%Y%m%d")
                     # works whether -nomet or not
                     df = tools.read_tcoon(buoy, dstart, dend)
-                if table != 'ndbc' and 'tcoon' not in table:
+                if 'ndbc' not in table and 'tcoon' not in table:
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
-                elif table == 'ndbc':
+                elif 'ndbc' in table:
                     fname = path.join('..', 'daily', 'ndbc_' + buoy)
                 elif 'tcoon' in table:
                     fname = path.join('..', 'daily', 'tcoon_' + buoy)
@@ -111,17 +123,17 @@ if __name__ == "__main__":
                 if len(df) < 2:
                     df = None
                 # no model output for TCOON stations since in bays
-                if 'tcoon' in table:
-                    dfmodelrecent = None
-                    dfmodelforecast = None
-                else:
-                    # read in recent model output, not tied to when data output was found
-                    now = pd.datetime.now()
-                    past = (now - timedelta(days=5)).strftime("%Y-%m-%d")
-                    future = (pd.datetime.now()+timedelta(days=5)).strftime('%Y-%m-%d %H:%M')
-                    dfmodelrecent = tools.read_model(buoy, table, past, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
-                    # read in forecast model output, not tied to when data output was found
-                    dfmodelforecast = tools.read_model(buoy, table, now.strftime('%Y-%m-%d'), future, timing='forecast')
+                # if 'tcoon' in table:
+                dfmodelrecent = None
+                dfmodelforecast = None
+                # else:
+                #     # read in recent model output, not tied to when data output was found
+                #     now = pd.datetime.now()
+                #     past = (now - timedelta(days=5)).strftime("%Y-%m-%d")
+                #     future = (pd.datetime.now()+timedelta(days=5)).strftime('%Y-%m-%d %H:%M')
+                #     dfmodelrecent = tools.read_model(buoy, table, past, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
+                #     # read in forecast model output, not tied to when data output was found
+                #     dfmodelforecast = tools.read_model(buoy, table, now.strftime('%Y-%m-%d'), future, timing='forecast')
 
                 if table == 'wave' or table == 'eng' or dfmodelrecent is None or dfmodelforecast is None:
                     tlims = None

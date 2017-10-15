@@ -225,7 +225,6 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # use hindcast currents to fill in before data (in case there has been a gap)
     if df1 is not None and tlims is not None:
         if (df.idx[0] - tlims[0]) > 3600:  # more than an hour
-            # import pdb; pdb.set_trace()
             stemp = df.index[0] - timedelta(minutes=30)
             df4 = df_init(df1[:stemp])
             ax.quiver(df4.idx[::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
@@ -233,7 +232,6 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # use nowcast currents to fill in before data (in case there has been a gap)
     if df2 is not None and tlims is not None:
         if (df.idx[0] - tlims[0]) > 3600:  # more than an hour
-            # import pdb; pdb.set_trace()
             stemp = df.index[0] - timedelta(minutes=30)
             df4 = df_init(df2[:stemp])
             ax.quiver(df4.idx[::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
@@ -497,13 +495,13 @@ def add_xlabels(ax, df, fig, tlims=None):
              horizontalalignment='left', verticalalignment='top')
 
 
-def setup(nsubplots, buoy=None):
+def setup(nsubplots, table=None, buoy=None):
     '''Set up plot'''
 
     # plot
     if buoy is None:
         fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
-    elif len(buoy) == 7 and nsubplots == 3:  # TCOON buoys with no met data
+    elif table == 'tcoon-nomet' or table == 'ndbc-nowave-nowtemp-nopress':  # only need 2 subplots
         # don't sharex for degenerative case so that dates are shown on top subplot
         # Axes that share the x-axis
         fig = plt.figure(figsize=(8.5,11))
@@ -540,12 +538,18 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     Optional df1, df2, df3. If given, also plot on each axis.
     '''
 
-    # if TCOON buoy doesn't have met data
-    if which == 'tcoon' and buoy in bd.avail('tcoon-nomet'):
-        which = 'tcoon-nomet'
-    # PTAT2 and SRST2 don't have wave data, so plot separately
-    if which == 'ndbc' and buoy == 'PTAT2' or buoy == 'SRST2':
-        which = 'ndbc-nowave'
+    # # if TCOON buoy doesn't have met data
+    # if which == 'tcoon' and buoy in bd.avail('tcoon-nomet'):
+    #     which = 'tcoon-nomet'
+    # # if ndbc buoy doesn't have wave data
+    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave'):
+    #     which = 'ndbc-nowave'
+    # # if ndbc buoy doesn't have wave data nor water temp
+    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave-nowtemp'):
+    #     which = 'ndbc-nowave-nowtemp'
+    # # if ndbc buoy doesn't have wave data nor water temp
+    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave-nowtemp-nopress'):
+    #     which = 'ndbc-nowave-nowtemp-nopress'
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
         nsubplots = 4
@@ -555,6 +559,10 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         nsubplots = 5
     elif which == 'ndbc-nowave':
         nsubplots = 3
+    elif which == 'ndbc-nowave-nowtemp':
+        nsubplots = 3
+    elif which == 'ndbc-nowave-nowtemp-nopress':
+        nsubplots = 3  # but only use 2
     elif which == 'tcoon-nomet':
         nsubplots = 3  # but only use 2
     elif which == 'tcoon':
@@ -573,9 +581,26 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         # reindex dataframe with added entries for nans, and sort back into order
         df = df.reindex(np.hstack((idx, addidx))).sort_index()
     elif 'ndbc' in which:
-        # fill in missing data at 60 min frequency as nans so not plotted
-        base = df.index[0].minute
-        df = df.resample('60T', base=base).asfreq()
+        # Resample and interpolate to catch the case where wind data is at
+        # higher frequency than wave data so wave data is plotted with holes.
+        if df is not None:
+            # only interpolate wave data
+            for key in ['Wave Ht [m]', 'Wave Pd [s]']:
+                idx = df.index
+                base = idx[0].minute
+                datafreq = (idx[1] - idx[0]).seconds/60.
+                if key in df.columns:
+                    df[key] = df[key].resample(str(datafreq) + 'T', base=base).interpolate()
+                    # but then need to check for data gap that should not be connected
+                    # check for gap over an hour. factor 1e9 due to nanoseconds.
+                    ind = (np.diff(idx)/1e9).astype(float) > 3700
+                    # if big gap, insert nan
+                    addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
+                    # reindex dataframe with added entries for nans, and sort back into order
+                    df = df.reindex(np.hstack((idx, addidx))).sort_index()
+        # # fill in missing data at 60 min frequency as nans so not plotted
+        # base = df.index[0].minute
+        # df = df.resample('60T', base=base).asfreq()
 
     if df is not None:
         df = df_init(df)
@@ -592,7 +617,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
             stemp = df2.index[-1] + timedelta(minutes=30)
             df3 = df_init(df3[stemp:])
 
-    fig, axes = setup(nsubplots=nsubplots, buoy=buoy)
+    fig, axes = setup(nsubplots=nsubplots, table=which, buoy=buoy)
 
     if which == 'ven':
         add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]',
@@ -675,6 +700,29 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
                        ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
+    elif which == 'ndbc-nowave-nowtemp':
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
+        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       df2=df2, df3=df3, tlims=tlims)
+        add_var_2units(axes[2], df, 'AirT [deg C]',
+                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                        ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, dolegend=True, tlims=tlims)
+
+    elif which == 'ndbc-nowave-nowtemp-nopress':
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
+        add_var_2units(axes[1], df, 'AirT [deg C]',
+                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                        ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, dolegend=True, tlims=tlims)
+        # turn off other subplots, but keep the space white
+        axes[2].axis('off')
+
     elif which == 'tcoon-nomet':
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, datum]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], df1=df1,
@@ -714,7 +762,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         if dfm.dT > df.dT:
             df = dfm  # use the longer dataframe for labeling x axis
 
-    if which == 'tcoon-nomet':
+    if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
         # has only one actual subplot, and want to label that one
         add_xlabels(axes[1], df, fig, tlims=tlims)
     else:
