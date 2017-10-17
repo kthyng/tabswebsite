@@ -22,7 +22,7 @@ if __name__ == "__main__":
     engine = tools.setup_engine()
 
     # loop through buoys: query, make text file, make plot
-    for buoy in bd.buoys():
+    for buoy in ['B']: #bd.buoys():
         for table in bd.tables():  # loop through tables for each buoy
 
             if not buoy in bd.avail(table):
@@ -37,16 +37,18 @@ if __name__ == "__main__":
                 else:
                     dend = pd.datetime.now()
                 # start 6 days earlier from last data
-                dstart = (dend - timedelta(days=6)).strftime("%Y-%m-%d %H:%M")
-                # change dend to string
-                dend = dend.strftime("%Y-%m-%d %H:%M")
+                dstart = dend - timedelta(days=6)
                 df = read.read(table, buoy, dstart, dend)
-                if 'ndbc' not in table and 'tcoon' not in table:
+                if len(buoy) == 1:
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                 elif 'ndbc' in table:
                     fname = path.join('..', 'daily', 'ndbc_' + buoy)
                 elif 'tcoon' in table:
                     fname = path.join('..', 'daily', 'tcoon_' + buoy)
+                elif 'nos' in table:
+                    fname = path.join('..', 'daily', 'nos_' + buoy)
+                elif 'ports' in table:
+                    fname = path.join('..', 'daily', 'ports_' + buoy)
                 # write daily data file, for whatever most recent time period
                 # data was available
                 if df is not None:
@@ -55,14 +57,20 @@ if __name__ == "__main__":
                 if df is not None and len(df) < 2:
                     df = None
                 # no model output for stations in bays or outside domain
+                now = pd.datetime.now()
+                past = now - timedelta(days=5) #).strftime("%Y-%m-%d")
+                future = pd.datetime.now()+timedelta(days=5)
                 if bd.model(buoy, 'rho'):
                     # read in recent model output, not tied to when data output was found
-                    now = pd.datetime.now()
-                    past = (now - timedelta(days=5)).strftime("%Y-%m-%d")
-                    future = (pd.datetime.now()+timedelta(days=5)).strftime('%Y-%m-%d %H:%M')
-                    dfmodelrecent = read.read_model(buoy, table, past, now.strftime('%Y-%m-%d %H:%M'), timing='recent')
+                    dfmodelrecent = read.read_model(buoy, table, past, now,
+                                                    timing='recent')
                     # read in forecast model output, not tied to when data output was found
-                    dfmodelforecast = read.read_model(buoy, table, now.strftime('%Y-%m-%d'), future, timing='forecast')
+                    dfmodelforecast = read.read_model(buoy, table, now, future,
+                                                      timing='forecast')
+                elif table == 'ports':
+                    # use tidal current prediction at these sites, from NOAA
+                    dfmodelrecent = None
+                    dfmodelforecast = read.read_ports(buoy, now)
                 else:
                     dfmodelrecent = None
                     dfmodelforecast = None
@@ -83,25 +91,25 @@ if __name__ == "__main__":
     #     # write header
     #     bh.make(buoy)
 
-    # separate for making currents summaries
-    # use data that was calculated previously in this script
-    dfs = []; buoys = []
-    for buoy in bd.buoys():
-        if len(buoy) > 1:  # don't include NDBC buoys
-            continue
-        fname = 'tabs_' + buoy + '_ven'
-        df = tools.read(path.join('..', 'daily/', fname))
-        # check if any of dataset is from within the past 5 days before appending
-        if (pd.datetime.now() - df.index[-1]).days < 5:
-            dfs.append(df)
-        else:
-            dfs.append(None)
-        buoys.append(buoy)
-    fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
-    fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
-    fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
-    fig1.savefig(path.join('..', 'daily', 'currents1.png'))
-    fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
-    fig2.savefig(path.join('..', 'daily', 'currents2.png'))
-    close(fig1)
-    close(fig2)
+    # # separate for making currents summaries
+    # # use data that was calculated previously in this script
+    # dfs = []; buoys = []
+    # for buoy in bd.buoys():
+    #     if len(buoy) > 1:  # don't include NDBC buoys
+    #         continue
+    #     fname = 'tabs_' + buoy + '_ven'
+    #     df = tools.read(path.join('..', 'daily/', fname))
+    #     # check if any of dataset is from within the past 5 days before appending
+    #     if (pd.datetime.now() - df.index[-1]).days < 5:
+    #         dfs.append(df)
+    #     else:
+    #         dfs.append(None)
+    #     buoys.append(buoy)
+    # fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
+    # fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
+    # fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
+    # fig1.savefig(path.join('..', 'daily', 'currents1.png'))
+    # fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
+    # fig2.savefig(path.join('..', 'daily', 'currents2.png'))
+    # close(fig1)
+    # close(fig2)

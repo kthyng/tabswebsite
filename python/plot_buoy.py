@@ -508,8 +508,15 @@ def setup(nsubplots, table=None, buoy=None):
         ax = fig.add_subplot(nsubplots, 1, 1)
         axes = [ax] + [fig.add_subplot(nsubplots, 1, 2, sharex=ax)]
         plt.setp(axes[0].get_xticklabels(), visible=False)
-
         # The bottom independent axes
+        axes.append(fig.add_subplot(nsubplots, 1, 3))
+    elif table == 'ports':  # only need 1 subplot
+        # don't sharex for degenerative case so that dates are shown on top subplot
+        # Axes that share the x-axis
+        fig = plt.figure(figsize=(8.5,11))
+        axes = [fig.add_subplot(nsubplots, 1, 1)]
+        # The bottom independent axes
+        axes.append(fig.add_subplot(nsubplots, 1, 2))
         axes.append(fig.add_subplot(nsubplots, 1, 3))
     else:
         fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
@@ -524,8 +531,12 @@ def setup(nsubplots, table=None, buoy=None):
             title = 'TGLO TABS Buoy ' + buoy + ': ' + ll
         elif len(buoy) == 5:  # NDBC
             title = 'NDBC Station ' + buoy + ': ' + ll
-        elif len(buoy) == 7:  # TCOON
+        elif 'tcoon' in table:
             title = 'TCOON Station ' + buoy + ': ' + ll
+        elif 'nos' in table:
+            title = 'NOS Station ' + buoy + ': ' + ll
+        elif 'ports' in table:
+            title = 'PORTS Station ' + buoy + ': ' + ll
         axes[0].set_title(title, fontsize=18)
 
     return fig, axes
@@ -537,19 +548,6 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     Find data in dataname and save fig, both in /tmp.
     Optional df1, df2, df3. If given, also plot on each axis.
     '''
-
-    # # if TCOON buoy doesn't have met data
-    # if which == 'tcoon' and buoy in bd.avail('tcoon-nomet'):
-    #     which = 'tcoon-nomet'
-    # # if ndbc buoy doesn't have wave data
-    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave'):
-    #     which = 'ndbc-nowave'
-    # # if ndbc buoy doesn't have wave data nor water temp
-    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave-nowtemp'):
-    #     which = 'ndbc-nowave-nowtemp'
-    # # if ndbc buoy doesn't have wave data nor water temp
-    # elif which == 'ndbc' and buoy in bd.avail('ndbc-nowave-nowtemp-nopress'):
-    #     which = 'ndbc-nowave-nowtemp-nopress'
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
         nsubplots = 4
@@ -567,8 +565,11 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         nsubplots = 3  # but only use 2
     elif which == 'tcoon':
         nsubplots = 5
+    elif which == 'ports':
+        nsubplots = 3
 
-    if which != 'wave' and 'ndbc' not in which and 'tcoon' not in which:
+    if len(buoy) == 1 and which != 'wave':
+        # for TABS buoys
         # fill in missing data at 30 min frequency as nans so not plotted
         if df is not None:
             df = df.resample('30T').asfreq()
@@ -744,12 +745,20 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3)
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MLLW]',
                        'm2ft', '[ft]', ymaxrange=[-3,3])
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3)
+
+    elif which == 'ports':
+        add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
+                       r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
+                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3)
+        # turn off other subplots, but keep the space white
+        axes[1].axis('off')
+        axes[2].axis('off')
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
@@ -761,8 +770,11 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
             df = dfm  # use the longer dataframe for labeling x axis
 
     if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
-        # has only one actual subplot, and want to label that one
+        # has only two actual subplots, and want to label that one
         add_xlabels(axes[1], df, fig, tlims=tlims)
+    elif which == 'ports':
+        # has only one actual subplot, and want to label that one
+        add_xlabels(axes[0], df, fig, tlims=tlims)
     else:
         add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
 
