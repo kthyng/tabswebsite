@@ -174,7 +174,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     color = 'k'  # color of data arrows
 
     # TCOON has too high frequency information to plot nicely
-    if (df.index[1] - df.index[0]).seconds/60. < 30:
+    if df is not None and (df.index[1] - df.index[0]).seconds/60. < 30:
         # want 30 min
         df = df.resample('30T').asfreq()
         df = df_init(df)
@@ -655,7 +655,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
                 ymaxrange=[0,110], df1=df1, df2=df2, df3=df3, dolegend=True, tlims=tlims)
 
     elif which == 'salt':
-        add_var_2units(axes[0], df, 'Temp [deg C]',
+        add_var_2units(axes[0], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
@@ -725,12 +725,11 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
 
     elif which == 'tcoon-nomet':
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, datum]',
-                       'm2ft', '[ft]', ymaxrange=[-3,3], df1=df1,
-                       df2=df2, df3=df3, tlims=tlims)
+                       'm2ft', '[ft]', ymaxrange=[-3,3])
         add_var_2units(axes[1], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3)
+                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
         # turn off other subplots, but keep the space white
         axes[2].axis('off')
 
@@ -746,8 +745,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3)
         add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
-                       'm2ft', '[ft]', ymaxrange=[-3,3], df1=df1,
-                       df2=df2, df3=df3)
+                       'm2ft', '[ft]', ymaxrange=[-3,3])
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',

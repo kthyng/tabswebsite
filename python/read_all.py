@@ -41,6 +41,11 @@ if __name__ == "__main__":
             if not buoy in bd.avail(table):
                 continue  # instrument not available for this buoy
             else:
+                # get base of table name
+                if '-' in table:
+                    table = table.split('-')[0]
+                tools.read(table, buoy, dstart, end)
+
                 q = query_setup(engine, buoy, table)
                 df = tools.read([q, engine])
                 if table != 'ndbc':
