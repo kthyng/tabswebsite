@@ -166,6 +166,13 @@ def add_legend(ax, df, df1, df2, df3):
         ax.text(0.65, 0.015, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
 
 
+def add_zero(ax):
+    '''Add dotted line at y=0.'''
+
+    idxmin, idxmax = ax.get_xlim()
+    ax.hlines(0, idxmin, idxmax, linestyles='dotted')
+
+
 def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, df3=None, tlims=None):
     '''Add current arrows to plot
 
@@ -286,13 +293,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
         ax.plot(df2.idx, df2[which], color=c2, lw=lw)
     if df3 is not None:
         ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
-    # add line at zero for reference. First get limits in x direction.
-    idxmin = 1e9; idxmax = -99
-    for dftemp in [df, df1, df2, df3]:
-        if dftemp is not None:
-            idxmin = min((idxmin, dftemp.idx.min()))
-            idxmax = max((idxmax, dftemp.idx.max()))
-    ax.plot([idxmin, idxmax], [0,0], 'k:')
+    # add line at zero for reference.
+    add_zero(ax)
     # add r^2 to subplot
     add_r2(ax, df, df1, df2, df3, which)
     # Enforce max limits for y axis in case data is very large or small
@@ -321,7 +323,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
-                   df2=None, df3=None, tlims=None, dolegend=False):
+                   df2=None, df3=None, tlims=None, dolegend=False, add0=False):
     '''Plot with units on both left and right sides of plot.'''
 
     # this catches when TCOON data is temporarily unavailable
@@ -350,6 +352,9 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     # add data/model legend
     if dolegend:
         add_legend(ax1, df, df1, df2, df3)
+    # add line at 0
+    if add0:
+        add_zero(ax1)
     # right side units
     add_rhs(ax1, label2, con)
 
@@ -494,8 +499,6 @@ def add_xlabels(ax, df, fig, tlims=None):
                     transform=ax.transAxes, rotation=30)
     else:
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %Y'))
-
-    ax.grid(lw=0.075, color='k')  # grid lines
 
     # put in GMT as time zone
     ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
@@ -789,7 +792,8 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
-                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3, dolegend=True)
+                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3,
+                       dolegend=True, add0=True)
         # turn off other subplots, but keep the space white
         axes[1].axis('off')
         axes[2].axis('off')
@@ -811,6 +815,11 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
         add_xlabels(axes[0], df, fig, tlims=tlims)
     else:
         add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
+
+    # add grid lines
+    for ax in axes:
+        ax.grid(which='major', lw=0.7, color='k', alpha=0.1)
+        ax.grid(which='minor', lw=0.5, color='k', alpha=0.05)
 
     return fig
 

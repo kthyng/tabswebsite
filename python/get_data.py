@@ -8,6 +8,7 @@ run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5 
 run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
+run get_data.py '../tmp/tcoon_8770475' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'pic' --model False
 '''
 
 import run_daily
@@ -17,6 +18,8 @@ import argparse
 from os import path
 import pandas as pd
 from matplotlib.dates import date2num
+import read
+from dateutil.parser import parse
 
 
 # parse the input arguments
@@ -31,11 +34,13 @@ parser.add_argument('--model', type=str, help='plot model output', default='Fals
 args = parser.parse_args()
 
 fname = args.fname
-dstart = args.dstart
-dend = args.dend
+# change dstart and dend to datetime objects
+dstart = parse(args.dstart)
+dend = parse(args.dend)
+
 if dend is not None:
     # make it so dend time is at end of the day
-    dend += ' 23:00'
+    dend += pd.Timedelta('23 hours')
 datatype = args.datatype
 units = args.units
 tz = args.tz
@@ -49,7 +54,7 @@ elif model == 'True':
 if 'tabs_' in fname:
     buoy = fname.split('/')[-1].split('_')[1]
     table = fname.split('/')[-1].split('_')[2]
-elif 'ndbc_' in fname or 'tcoon_' in fname:
+elif 'ndbc_' in fname or 'tcoon_' in fname or 'ports_' in fname:
     buoy = fname.split('/')[-1].split('_')[1]
     table = fname.split('/')[-1].split('_')[0]
 
@@ -65,23 +70,24 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
+    df = read.read(table, buoy, dstart, dend, units=None, tz=None)
 
-    # from mysql database
-    if 'tabs' in table or 'ndbc' in table:
-        engine = tools.engine()
-        # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
-        if buoy == 'C':
-            query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-        # NOAA data stations have a different table name
-        elif table == 'ndbc':
-            query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-        else:
-            query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-        df = tools.read([query, engine], units=units, tz=tz)
-    elif 'tcoon' in table:
-        df = tools.read_tcoon(buoy, dstart, dend)
-    if df is not None:  # won't work if data isn't available in this time period
-        run_daily.make_text(df, fname)
+    # # from mysql database
+    # if 'tabs' in table or 'ndbc' in table:
+    #     engine = tools.engine()
+    #     # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
+    #     if buoy == 'C':
+    #         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+    #     # NOAA data stations have a different table name
+    #     elif table == 'ndbc':
+    #         query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+    #     else:
+    #         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
+    #     df = tools.read([query, engine], units=units, tz=tz)
+    # elif 'tcoon' in table:
+    #     df = read.read_tcoon(buoy, dstart, dend)
+    # if df is not None:  # won't work if data isn't available in this time period
+    #     run_daily.make_text(df, fname)
 
 
     ## Read model ##
