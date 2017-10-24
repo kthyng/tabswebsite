@@ -425,8 +425,11 @@ def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
 def add_xlabels(ax, df, fig, tlims=None):
     '''Add date labels to bottom x axis'''
 
+    # use this because includes forecast model output along with data
+    xlim = np.diff(ax.get_xlim())  # x limit length in days
+
     # varied tick locations and labels for few days
-    if df.dT <=1:  # less than or equal to one day
+    if xlim <=1:  # less than or equal to one day
         # hourly minor ticks
         hours = mpl.dates.HourLocator()
         ax.xaxis.set_minor_locator(hours)
@@ -439,7 +442,7 @@ def add_xlabels(ax, df, fig, tlims=None):
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
-    elif df.dT <=2:  # less than or equal to two days
+    elif xlim <=2:  # less than or equal to two days
         # hourly minor ticks
         hours = mpl.dates.HourLocator()
         ax.xaxis.set_minor_locator(hours)
@@ -452,7 +455,36 @@ def add_xlabels(ax, df, fig, tlims=None):
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
-    elif df.dT < 12*30:  # less than 12 months
+    elif xlim <=9:  # less than or equal to 9 days
+        # hourly minor ticks
+        minor = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <=18:  # less than or equal to 18 days
+        # hourly minor ticks
+        minor = mpl.dates.HourLocator(byhour=np.arange(0,24,12))
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        # turn off every other tick label but will still get grid lines
+        # at all major ticks
+        plt.setp(ax.get_xticklabels()[1::2], visible=False)
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim < 12*30:  # less than 12 months
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
         if df.index[0].year != df.index[-1].year:
             ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
@@ -462,6 +494,8 @@ def add_xlabels(ax, df, fig, tlims=None):
                     transform=ax.transAxes, rotation=30)
     else:
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %Y'))
+
+    ax.grid(lw=0.075, color='k')  # grid lines
 
     # put in GMT as time zone
     ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
@@ -546,7 +580,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
-    Optional df1, df2, df3. If given, also plot on each axis.
+    Optional df1 (hindcast), df2 (nowcast), df3 (forecast). If given, also plot on each axis.
     '''
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
@@ -755,7 +789,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
-                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3)
+                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3, dolegend=True)
         # turn off other subplots, but keep the space white
         axes[1].axis('off')
         axes[2].axis('off')
