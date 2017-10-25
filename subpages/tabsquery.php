@@ -45,30 +45,6 @@ else if ($units == 'E') {
     $unitsname = 'English';
 }
 
-// convert from table short name to descriptive name string
-if ($table == 'ven') {
-    $tablename = 'Velocity data';
-}
-elseif ($table == 'met') {
-    $tablename = 'Meteorological data';
-}
-elseif ($table == 'salt') {
-    $tablename = 'Water property data';
-}
-elseif ($table == 'eng') {
-    $tablename = 'System data';
-}
-elseif ($table == 'wave') {
-    $tablename = 'Wave data';
-}
-elseif ($table == 'ndbc') {
-    $tablename = 'NDBC data';
-}
-elseif ($table == 'tcoon') {
-    $tablename = 'TCOON data';
-}
-
-
 // if recent and data table, give ability to switch to recent and image
 if ($datatype=="data"){
     $newdatatype="pic";
@@ -120,15 +96,9 @@ if ($datepicker == "recent") {
     if (strlen($Buoyname) == 1) {
         $tempaccess = "../daily/tabs_".$Buoyname."_".$table;
     }
-    else if ($table == 'ndbc') {
+    else {
         $tempaccess = "../daily/".$Buoyname;
     }
-    // else if ($table == 'ndbc') {
-    //     $tempaccess = "../daily/ndbc_".$Buoyname;
-    // }
-    // else if (strpos($table, 'tcoon') !== false) {
-    //     $tempaccess = "../daily/tcoon_".$Buoyname;
-    // }
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
@@ -156,13 +126,6 @@ else{
     else {
         $tempfile=tempnam("../tmp", $Buoyname."_");  // full file location
     }
-    // else if ($table == 'ndbc') {
-    //     $tempfile=tempnam("../tmp", "ndbc_".$Buoyname."_");  // full file location
-    // }
-    // else if (strpos($table, 'tcoon') !== false) {
-    //     $tempfile=tempnam("../tmp", "tcoon_".$Buoyname."_");  // full file location
-    // }
-    // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "../tmp/".$tempout;  // relative path to buoy
 
@@ -241,15 +204,6 @@ if ($datepicker=="recent") {
         if (strlen($Buoyname) == 1) {
             echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
         }
-        // else {
-        //     echo file_get_contents( "../daily/".$Buoyname."_header" );
-        // }
-        // else if ($table == 'ndbc') {
-        //     echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
-        // }
-        // else if (strpos($table, 'tcoon') !== false) {
-        //     echo file_get_contents( "../daily/tcoon_".$Buoyname."_header" );
-        // }
     }
 }
 

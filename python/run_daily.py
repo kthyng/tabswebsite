@@ -6,7 +6,6 @@ Run on a cron job.
 '''
 
 import pandas as pd
-from datetime import timedelta
 import numpy as np
 import plot_buoy
 from os import path
@@ -37,7 +36,7 @@ if __name__ == "__main__":
                 if bd.inmysql(buoy):  # mysql tables
                     dend = tools.query_setup_recent(engine, buoy, table)
                 else:
-                    dend = pd.datetime.now()
+                    dend = pd.Timestamp('now', tz='utc')
                 # start 6 days earlier from last data
                 dstart = dend - timedelta(days=6)
                 df = read.read(table, buoy, dstart, dend)
@@ -59,9 +58,9 @@ if __name__ == "__main__":
                 if df is not None and len(df) < 2:
                     df = None
                 # no model output for stations in bays or outside domain
-                now = pd.datetime.now()
+                now = pd.Timestamp('now', tz='utc')
                 past = now - timedelta(days=5) #).strftime("%Y-%m-%d")
-                future = pd.datetime.now()+timedelta(days=5)
+                future = pd.Timestamp('now', tz='utc') + pd.Timedelta('5 days')
                 if bd.model(buoy, 'rho'):
                     # read in recent model output, not tied to when data output was found
                     dfmodelrecent = read.read_model(buoy, table, past, now,

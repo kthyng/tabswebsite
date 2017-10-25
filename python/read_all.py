@@ -9,117 +9,108 @@ from os import path
 import run_daily as rd
 import read
 
+bys = bp.load() # load in buoy data
 
-def longterm(table, buoy, dstart=pd.datetime(1980, 1, 1)):
+def longterm(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
+    '''Creates or updates buoy data files.
 
+    Reads through yesterday so that when appended to everything is consistent.
+    This can take a long time to run.
+    Note that dstart is ignored if buoy data file already exists.
+    '''
 
-    dend = pd.datetime.now()
+    # bring data in file up through yesterday. This way files are
+    # consistent regardless of what time of day script is run.
+    dend = pd.Timestamp('now', tz='utc').normalize() - pd.Timedelta('1 day')
+    # file write flag
+    mode = 'w'
 
     if len(buoy) == 1:
+        assert table is not None, 'need to input table when using TABS buoy'
         fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
     else:
-        fname = path.join('..', 'daily', table + '_' + buoy + '_all')
+        fname = path.join('..', 'daily', buoy + '_all')
 
-    # if file already exists, append whatever is new to it
+    # if file already exists, overwrite dstart with day after day from last line of file
     if path.exists(fname):
-        # start from day after day from last line of file
-        dstart = parse(open(fname).readlines()[-1][:10]) + pd.Timedelta('1 days')
+        dstart = pd.Timestamp(open(fname).readlines()[-1][:10], tz='utc') + pd.Timedelta('1 days')
+        mode = 'a'  # overwrite write mode
 
-        # append to file
-        if (dend-dstart) < pd.Timedelta('30 days'):
-            dftemp = read.read(table, buoy, dstart, dend)
-            with open(fname, 'a') as f:
-                tools.write_file(df, f, compression=False)
-                # df.to_csv(f, sep='\t', header=False)
-        else:  # more than 30 days difference
-            date = dstart
-            while date < pd.datetime.now():
-                df = df.append(read.read(table, buoy, date, date + pd.Timedelta('30 days')))
-                date += pd.Timedelta('31 days')
-FINISH
-    # if the file doesn't exist, read in from dstart
-    else:
-        # if buoy data is in mysql database, can read in all dates at once
-        if bd.inmysql(buoy):
-            if 'ndbc' in table:
-                df = read.read_ndbc(buoy, dstart, dend)
-            else:
-                df = read.read_tabs(table, buoy, dstart, dend)
+    # case when difference is short
+    if (dend-dstart) < pd.Timedelta('30 days'):
+        df = read.read(buoy, dstart, dend, table=table, usemodel=False)
+        if df is not None:
+            tools.write_file(df, fname, compression=False, mode=mode)
+            tools.write_file(df, fname, compression=True, mode=mode)
         else:
-            df = pd.DataFrame()  # initialize
+            print('No new data has been read in for buoy ' + buoy + ' table ' + table)
+
+    else:  # time difference is long
+
+        # if buoy data is in mysql database, can read in all dates at once
+        if bys[buoy]['inmysql']:
+            if len(buoy) == 1:
+                df = read.read_tabs(table, buoy, dstart, dend)
+            else:
+                df = read.read_ndbc(buoy, dstart, dend)
+        else:
             date = dstart
-            while date < pd.datetime.now():
-                df = df.append(read.read(table, buoy, date, date + pd.Timedelta('30 days')))
+            df = pd.DataFrame()  # initialize
+            while date < dend:
+                daystoread = min(pd.Timedelta('30 days'), dend-date)
+                dftemp = read.read(buoy, date, date + daystoread, table=table)
+                df = df.append(dftemp)
                 date += pd.Timedelta('31 days')
 
-    return df
-
-
-def query_setup(engine, buoy, table):
-    '''Query mysql database for data, given end date dend from
-    query_setup_recent().'''
-
-    dstart = "1995-01-01"
-    dend = pd.datetime.now().strftime("%Y-%m-%d %H:%M")
-    # dstart = (dend - timedelta(days=ndays)).strftime("%Y-%m-%d")  # 5 days earlier
-
-    # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
-    # ndbc buoys diff too
-    if buoy == 'C':
-        query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    elif len(buoy) > 1:
-        query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    else:
-        query = 'SELECT * FROM tabs_' + buoy + '_' + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-
-    return query
+        tools.write_file(df, fname, compression=False, mode=mode)
+        tools.write_file(df, fname, compression=True, mode=mode)
 
 
 if __name__ == "__main__":
 
-    engine = tools.engine()
+    tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
 
-    # long_term(table, buoy)
+    # loop through buoys: query, make text file
+    for buoy in bys.keys():
 
-    # loop through buoys: query, make text file, make plot
-    # active buoys
-    for buoy in bd.buoys():
-        for table in bd.tables():  # loop through tables for each buoy
+        # pulls out the non-nan table values to loop over valid table names
+        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
-            if not buoy in bd.avail(table):
-                continue  # instrument not available for this buoy
-            else:
-                # get base of table name
-                if '-' in table:
-                    table = table.split('-')[0]
-                tools.read(table, buoy, dstart, end)
+        for table in tables:  # loop through tables for each buoy
 
-                q = query_setup(engine, buoy, table)
-                df = tools.read([q, engine])
-                if table != 'ndbc':
-                    fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
-                elif table == 'ndbc':
-                    fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
-                # write daily data file, for whatever most recent time period
-                # data was available
-                rd.make_text(df, fname, compression=True)  # .gz
-                rd.make_text(df, fname, compression=False) # not .gz
-    # inactive buoys
-    for buoy in bd.buoys(kind='inactive'):
-        for table in bd.tables():  # loop through tables for each buoy
+            longterm(buoy, table=table, dstart=pd.Timestamp('2017-8-1', tz='utc'))
 
-            if not buoy in bd.avail(table):
-                continue  # instrument not available for this buoy
-            else:
-                if table != 'ndbc':
-                    fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
-                elif table == 'ndbc':
-                    fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
-                # only remake files if they don't exist since they aren't changing
-                if path.exists(fname):
-                    continue
-                else:
-                    q = query_setup(engine, buoy, table)
-                    df = tools.read([q, engine])
-                    rd.make_text(df, fname, compression=True)  # .gz
-                    rd.make_text(df, fname, compression=False) # not .gz
+            # # get base of table name
+            # if '-' in table:
+            #     table = table.split('-')[0]
+            # tools.read(table, buoy, dstart, end)
+
+            # q = query_setup(engine, buoy, table)
+            # df = tools.read([q, engine])
+            # if table != 'ndbc':
+            #     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
+            # elif table == 'ndbc':
+            #     fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
+            # # write daily data file, for whatever most recent time period
+            # # data was available
+            # rd.make_text(df, fname, compression=True)  # .gz
+            # rd.make_text(df, fname, compression=False) # not .gz
+    # # inactive buoys
+    # for buoy in bd.buoys(kind='inactive'):
+    #     for table in bd.tables():  # loop through tables for each buoy
+    #
+    #         if not buoy in bd.avail(table):
+    #             continue  # instrument not available for this buoy
+    #         else:
+    #             if table != 'ndbc':
+    #                 fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
+    #             elif table == 'ndbc':
+    #                 fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
+    #             # only remake files if they don't exist since they aren't changing
+    #             if path.exists(fname):
+    #                 continue
+    #             else:
+    #                 q = query_setup(engine, buoy, table)
+    #                 df = tools.read([q, engine])
+    #                 rd.make_text(df, fname, compression=True)  # .gz
+    #                 rd.make_text(df, fname, compression=False) # not .gz

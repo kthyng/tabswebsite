@@ -35,8 +35,8 @@ args = parser.parse_args()
 
 fname = args.fname
 # change dstart and dend to datetime objects
-dstart = parse(args.dstart)
-dend = parse(args.dend)
+dstart = pd.Timestamp(args.dstart, tz='utc')
+dend = pd.Timestamp(args.dend, tz='utc')
 
 if dend is not None:
     # make it so dend time is at end of the day

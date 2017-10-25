@@ -92,6 +92,7 @@ def degrees_to_cardinal(d):
     ix = int((d + 11.25)/22.5)
     return dirs[ix % 16]
 
+
 def dd2dm(dd):
     '''Convert from decimal degrees to degrees/decimal minutes.'''
 
@@ -142,10 +143,20 @@ def present(df):
     print(PrettyPandas(df).render())
 
 
-def write_file(df, fname, compression=False):
-    '''Make text file of data'''
+def write_file(df, fname, compression=False, mode='w'):
+    '''Write text file of data.
+
+    mode is 'w' to write a new file and 'a' to append to existing file.'''
+
+    if mode == 'a':  # don't use header if appending
+        header = False
+    else:
+        header = True
 
     if compression:
-        df.to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='', compression='gzip')
+        df.to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
+                  quoting=QUOTE_NONE,  escapechar='', compression='gzip',
+                  mode=mode, header=header)
     else:
-        df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f', quoting=QUOTE_NONE,  escapechar='')
+        df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
+                  quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)
