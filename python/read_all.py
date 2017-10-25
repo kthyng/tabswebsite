@@ -78,39 +78,4 @@ if __name__ == "__main__":
 
         for table in tables:  # loop through tables for each buoy
 
-            longterm(buoy, table=table, dstart=pd.Timestamp('2017-8-1', tz='utc'))
-
-            # # get base of table name
-            # if '-' in table:
-            #     table = table.split('-')[0]
-            # tools.read(table, buoy, dstart, end)
-
-            # q = query_setup(engine, buoy, table)
-            # df = tools.read([q, engine])
-            # if table != 'ndbc':
-            #     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
-            # elif table == 'ndbc':
-            #     fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
-            # # write daily data file, for whatever most recent time period
-            # # data was available
-            # rd.make_text(df, fname, compression=True)  # .gz
-            # rd.make_text(df, fname, compression=False) # not .gz
-    # # inactive buoys
-    # for buoy in bd.buoys(kind='inactive'):
-    #     for table in bd.tables():  # loop through tables for each buoy
-    #
-    #         if not buoy in bd.avail(table):
-    #             continue  # instrument not available for this buoy
-    #         else:
-    #             if table != 'ndbc':
-    #                 fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table + '_all')
-    #             elif table == 'ndbc':
-    #                 fname = path.join('..', 'daily', 'ndbc_' + buoy + '_all')
-    #             # only remake files if they don't exist since they aren't changing
-    #             if path.exists(fname):
-    #                 continue
-    #             else:
-    #                 q = query_setup(engine, buoy, table)
-    #                 df = tools.read([q, engine])
-    #                 rd.make_text(df, fname, compression=True)  # .gz
-    #                 rd.make_text(df, fname, compression=False) # not .gz
+            longterm(buoy, table=table, dstart=pd.Timestamp('2017-6-1', tz='utc'))
