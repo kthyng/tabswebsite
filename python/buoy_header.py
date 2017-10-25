@@ -2,7 +2,7 @@
 Set up header and save to file.
 '''
 
-import buoy_data as bd
+import buoy_properties as bp
 import pandas as pd
 import tools
 import os
@@ -63,16 +63,14 @@ def make(buoy):
             wperiod = tail['MeanPeriod [s]'].values[0]
 
         # buoy specs
-        loc = bd.locs(buoy)['lat'][0] + '&deg; ' +\
-            bd.locs(buoy)['lat'][1] + '\'' +\
-            bd.locs(buoy)['lat'][2] + '&nbsp;&nbsp;' +\
-            bd.locs(buoy)['lon'][0] + '&deg; ' +\
-            bd.locs(buoy)['lon'][1] + '\'' +\
-            bd.locs(buoy)['lon'][2]
-        kind = bd.kind(buoy)
-        sensor = bd.sensor(buoy)
-        d = bd.depth(buoy)
-        a = bd.anemometer(buoy)  # 0 if doesn't exist
+        lat = tools.dd2dm(bys[buoy]['lat'])
+        lon = tools.dd2dm(bys[buoy]['lon'])
+        ll = str(lat[0]) + '&deg; ' + str(lat[1]) + '\'N' + '&nbsp;&nbsp;' \
+                + str(abs(lon[0])) + '&deg; ' + str(lon[1]) + '\'W'
+        kind = bys[buoy]['kind']
+        sensor = bys[buoy]['sensor']
+        d = bys[buoy]['depth']
+        a = bys[buoy]['anemometer']  # nan if doesn't exist
         doeng = True
         dosensor = True
         dodepth = True
@@ -99,19 +97,17 @@ def make(buoy):
         humid = tail['RelH [%]'].values[0]
         wheight = tail['Wave Ht [m]'].values[0]
         wperiod = tail['Wave Pd [s]'].values[0]
-        loc = bd.locs(buoy)['lat'][0] + '&deg; ' +\
-            bd.locs(buoy)['lat'][1] + '\'' +\
-            bd.locs(buoy)['lat'][2] + '&nbsp;&nbsp;' +\
-            bd.locs(buoy)['lon'][0] + '&deg; ' +\
-            bd.locs(buoy)['lon'][1] + '\'' +\
-            bd.locs(buoy)['lon'][2]
+        lat = tools.dd2dm(bys[buoy]['lat'])
+        lon = tools.dd2dm(bys[buoy]['lon'])
+        ll = str(lat[0]) + '&deg; ' + str(lat[1]) + '\'N' + '&nbsp;&nbsp;' \
+                + str(abs(lon[0])) + '&deg; ' + str(lon[1]) + '\'W'
         # kind = bd.kind(buoy)
         try:
-            d = bd.depth(buoy)
+            d = bys[buoy]['depth']
             dodepth = True
         except:
             dodepth = False
-        a = bd.anemometer(buoy)  # 0 if doesn't exist
+        a = bys[buoy]['anemometer']  # 0 if doesn't exist
         doeng = False
         domet = True
         dohum = True
@@ -143,19 +139,17 @@ def make(buoy):
             wdirect = tail['Dir from [deg T]'].values[0]
             if not isnan(wdirect):
                 domet = True
-        loc = bd.locs(buoy)['lat'][0] + '&deg; ' +\
-            bd.locs(buoy)['lat'][1] + '\'' +\
-            bd.locs(buoy)['lat'][2] + '&nbsp;&nbsp;' +\
-            bd.locs(buoy)['lon'][0] + '&deg; ' +\
-            bd.locs(buoy)['lon'][1] + '\'' +\
-            bd.locs(buoy)['lon'][2]
+        lat = tools.dd2dm(bys[buoy]['lat'])
+        lon = tools.dd2dm(bys[buoy]['lon'])
+        ll = str(lat[0]) + '&deg; ' + str(lat[1]) + '\'N' + '&nbsp;&nbsp;' \
+                + str(abs(lon[0])) + '&deg; ' + str(lon[1]) + '\'W'
         # kind = bd.kind(buoy)
         try:
-            d = bd.depth(buoy)
+            d = bys[buoy]['depth']
             dodepth = True
         except:
             dodepth = False
-        a = bd.anemometer(buoy)  # 0 if doesn't exist
+        a = bys[buoy]['anemometer']  # 0 if doesn't exist
         doeng = False
         dohum = False
         dowave = False
@@ -167,7 +161,7 @@ def make(buoy):
     head.append('<table id=header width=750px>')  # id is for test_tabsquery.py
     # this is to buffer the left side
     head.append('<tr>')
-    head.append('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, loc))
+    head.append('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, ll))
     head.append('<TD colspan=3 style="text-align:right"><b>' + time + '</b> (' + time2 + ')</td>')
     head.append('</TR>')
     head.append('<tr></tr>')  # blank row

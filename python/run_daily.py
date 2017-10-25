@@ -12,9 +12,11 @@ import plot_buoy
 from os import path
 from matplotlib.pyplot import close
 import tools
-import buoy_data as bd
+import buoy_properties as bp
 import buoy_header as bh
 import read
+
+bys = bp.load() # load in buoy data
 
 
 if __name__ == "__main__":
@@ -22,10 +24,10 @@ if __name__ == "__main__":
     engine = tools.setup_engine()
 
     # loop through buoys: query, make text file, make plot
-    for buoy in ['B']: #bd.buoys():
-        for table in bd.tables():  # loop through tables for each buoy
+    for buoy in ['B']: #bys.keys(): UPDATE BUOY PROPS
+        for table in bp.tables():  # loop through tables for each buoy
 
-            if not buoy in bd.avail(table):
+            if not buoy in bp.avail(table):
                 continue  # instrument not available for this buoy
             else:
                 # if not 'tcoon' in table:

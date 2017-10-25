@@ -121,11 +121,14 @@ if ($datepicker == "recent") {
         $tempaccess = "../daily/tabs_".$Buoyname."_".$table;
     }
     else if ($table == 'ndbc') {
-        $tempaccess = "../daily/ndbc_".$Buoyname;
+        $tempaccess = "../daily/".$Buoyname;
     }
-    else if (strpos($table, 'tcoon') !== false) {
-        $tempaccess = "../daily/tcoon_".$Buoyname;
-    }
+    // else if ($table == 'ndbc') {
+    //     $tempaccess = "../daily/ndbc_".$Buoyname;
+    // }
+    // else if (strpos($table, 'tcoon') !== false) {
+    //     $tempaccess = "../daily/tcoon_".$Buoyname;
+    // }
     // command to show table
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
@@ -150,12 +153,15 @@ else{
     if (strlen($Buoyname) == 1) {
         $tempfile=tempnam("../tmp","tabs_".$Buoyname."_".$table."_");  // full file location
     }
-    else if ($table == 'ndbc') {
-        $tempfile=tempnam("../tmp", "ndbc_".$Buoyname."_");  // full file location
+    else {
+        $tempfile=tempnam("../tmp", $Buoyname."_");  // full file location
     }
-    else if (strpos($table, 'tcoon') !== false) {
-        $tempfile=tempnam("../tmp", "tcoon_".$Buoyname."_");  // full file location
-    }
+    // else if ($table == 'ndbc') {
+    //     $tempfile=tempnam("../tmp", "ndbc_".$Buoyname."_");  // full file location
+    // }
+    // else if (strpos($table, 'tcoon') !== false) {
+    //     $tempfile=tempnam("../tmp", "tcoon_".$Buoyname."_");  // full file location
+    // }
     // $tempfile=tempnam("/home/woody/htdocs/Tglo/tmp",$Buoyname . $table);
     $tempout=basename($tempfile);  // just file name itself
     $tempaccess = "../tmp/".$tempout;  // relative path to buoy
@@ -235,12 +241,15 @@ if ($datepicker=="recent") {
         if (strlen($Buoyname) == 1) {
             echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
         }
-        else if ($table == 'ndbc') {
-            echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
-        }
-        else if (strpos($table, 'tcoon') !== false) {
-            echo file_get_contents( "../daily/tcoon_".$Buoyname."_header" );
-        }
+        // else {
+        //     echo file_get_contents( "../daily/".$Buoyname."_header" );
+        // }
+        // else if ($table == 'ndbc') {
+        //     echo file_get_contents( "../daily/ndbc_".$Buoyname."_header" );
+        // }
+        // else if (strpos($table, 'tcoon') !== false) {
+        //     echo file_get_contents( "../daily/tcoon_".$Buoyname."_header" );
+        // }
     }
 }
 

@@ -7,6 +7,7 @@ from math import sin, cos
 from sqlalchemy import create_engine
 import pandas as pd
 from csv import QUOTE_NONE
+from numpy import sign
 
 
 def setup_engine():
@@ -90,6 +91,12 @@ def degrees_to_cardinal(d):
             "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
     ix = int((d + 11.25)/22.5)
     return dirs[ix % 16]
+
+def dd2dm(dd):
+    '''Convert from decimal degrees to degrees/decimal minutes.'''
+
+    deg, dm = divmod(abs(dd)*60,60)
+    return int(sign(dd)*deg), round(dm, 3)
 
 
 def convert_units(df, units=None, tz=None):

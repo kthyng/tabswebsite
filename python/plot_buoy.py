@@ -10,7 +10,7 @@ if platform == 'linux':
     mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import buoy_data as bd
+import buoy_properties as bp
 from datetime import datetime, timedelta
 import tools
 from matplotlib.dates import date2num
@@ -25,6 +25,8 @@ wmax = 15  # m/s, max wind arrow value
 lw = 1.5
 c2 = 'cornflowerblue'
 c1 = '#3F5D94'  # darker shade of cornflowerblue
+
+bys = bp.load() # load in buoy data
 
 
 def df_init(df):
@@ -314,12 +316,12 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
         ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(bd.angle(buoy)) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(bys[buoy]['angle']) + '˚T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
         ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(bd.angle(buoy)-90) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.91, str(bys[buoy]['angle']-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
@@ -561,9 +563,10 @@ def setup(nsubplots, table=None, buoy=None):
     fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
     # title
     if buoy is not None:
-        ll = bd.locs(buoy)['lat'][0] + r'$\!^\circ$' + bd.locs(buoy)['lat'][1] + '\'' + bd.locs(buoy)['lat'][2]\
-                + '  ' + bd.locs(buoy)['lon'][0] + r'$\!^\circ$' + bd.locs(buoy)['lon'][1]\
-                + '\'' + bd.locs(buoy)['lon'][2]
+        lat = tools.dd2dm(bys[buoy]['lat'])
+        lon = tools.dd2dm(bys[buoy]['lon'])
+        ll = str(lat[0]) + r'$\!^\circ$' + str(lat[1]) + '\'N' + '  ' \
+                + str(abs(lon[0])) + r'$\!^\circ$' + str(lon[1]) + '\'W'
         if len(buoy) == 1:
             title = 'TGLO TABS Buoy ' + buoy + ': ' + ll
         elif len(buoy) == 5:  # NDBC
@@ -579,12 +582,15 @@ def setup(nsubplots, table=None, buoy=None):
     return fig, axes
 
 
-def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
+def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
     Optional df1 (hindcast), df2 (nowcast), df3 (forecast). If given, also plot on each axis.
     '''
+
+    if which is None:  # can read in table if not tabs buoy
+        which = bys[buoy]['table1']
 
     if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
         nsubplots = 4
@@ -819,7 +825,7 @@ def plot(df, buoy, which, df1=None, df2=None, df3=None, tlims=None):
     # add grid lines
     for ax in axes:
         ax.grid(which='major', lw=0.7, color='k', alpha=0.1)
-        ax.grid(which='minor', lw=0.5, color='k', alpha=0.05)
+        ax.grid(which='minor', lw=0.5, color='k', alpha=0.1)
 
     return fig
 

@@ -51,12 +51,12 @@ if model == 'False':
 elif model == 'True':
     model = True
 
-if 'tabs_' in fname:
-    buoy = fname.split('/')[-1].split('_')[1]
+if 'tabs_' in fname:  # only need table name for tabs
     table = fname.split('/')[-1].split('_')[2]
-elif 'ndbc_' in fname or 'tcoon_' in fname or 'ports_' in fname:
     buoy = fname.split('/')[-1].split('_')[1]
-    table = fname.split('/')[-1].split('_')[0]
+else:
+    table = None
+    buoy = fname.split('/')[-1].split('_')[0]
 
 ## Read in data ##
 # from daily file
@@ -70,7 +70,7 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
-    df = read.read(table, buoy, dstart, dend, units=None, tz=None)
+    df = read.read(buoy, dstart, dend, table=table, units=None, tz=None)
 
     # # from mysql database
     # if 'tabs' in table or 'ndbc' in table:
@@ -86,8 +86,8 @@ else:
     #     df = tools.read([query, engine], units=units, tz=tz)
     # elif 'tcoon' in table:
     #     df = read.read_tcoon(buoy, dstart, dend)
-    # if df is not None:  # won't work if data isn't available in this time period
-    #     run_daily.make_text(df, fname)
+    if df is not None:  # won't work if data isn't available in this time period
+        tools.write_file(df, fname)
 
 
     ## Read model ##
@@ -103,7 +103,6 @@ else:
 
 
 
-
 if datatype == 'data':
     # print('<br><br>')
     tools.present(df)  # print data table to screen
@@ -115,6 +114,7 @@ elif datatype == 'pic':
             tlims = [date2num(pd.to_datetime(dstart).to_pydatetime()), date2num(pd.to_datetime(dend).to_pydatetime())]
         else:
             tlims = None
-        fig = plot_buoy.plot(df, buoy, table, dfmodelhindcast, dfmodelrecent, dfmodelforecast, tlims)
+        fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
+                             df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
         fig.savefig(fname + '.pdf')
         fig.savefig(fname + '.png')
