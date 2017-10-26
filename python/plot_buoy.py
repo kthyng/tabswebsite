@@ -749,7 +749,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        tlims=tlims, dolegend=True)
 
     elif which == 'ndbc-nowave':
-        import pdb; pdb.set_trace()
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',

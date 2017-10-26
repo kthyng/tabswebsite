@@ -32,13 +32,15 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     if 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
         df = read_nos(buoy, dstart, dend)
     elif 'ports' in bys[buoy]['table1']:
-        df = read_ports(buoy, dstart, dend, usemodel=usemodel)
+        df, dfm = read_ports(buoy, dstart, dend, usemodel=usemodel)
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
         df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
         df = read_tabs(table, buoy, dstart, dend)
 
     df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
+    if not dfm.empty:
+        dfm = tools.convert_units(dfm, units=units, tz=tz)  # change units if necessary
 
     # return None instead of just header if no data for time period
     if len(df) == 0:
@@ -59,33 +61,68 @@ def read_ports(buoy, dstart, dend, usemodel=True):
     Can explicitly say not to use model output with usemodel=False.
     '''
 
-    df = None  # initialize for checking what has happened later
 
-    # Read in whatever data is available within time window from the past.
-    # If time is in the future for a forecast, data will be read in as much is available.
-    # WHAT IF BOTH DATES ARE IN THE FUTURE?
-    # WHAT IF LONG REQUEST?
-    # IS time zonE IMPORTANT?
-    # MODEL ALSO WON'T GO FOR TOO LONG BEFORE CUT OFF
-    if dstart < pd.Timestamp('now', tz='utc'):
-        base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?id='
-        suffix = '&bin=0&bdate=' + dstart.strftime('%Y%m%d') + '&edate=' + dend.strftime('%Y%m%d') + '&unit=0&timeZone=UTC&view=csv'
-        url = base + buoy + suffix
-        df = read_ports_df(url)
+    date = dstart
+    df = pd.DataFrame(); dfm = pd.DataFrame()  # initialize
+    while date < dend:
 
-    # use tidal prediction if the end of the dataset is before the time we requested.
-    # THIS WILL BE A PROBLEM IF THERE IS DATA MISSING BUT IT IS NOT WITHIN 2 YEARS OF NOW
-    if df is None:
-    # if df is None or df.index[-1] < dend:
-        # tidal prediction (only goes back and forward in time 2 years)
-        base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-        options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ dstart.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
-        url = base + options + buoy
-        # url to download data file starting the day before this sat data, week of data
-        # import pdb; pdb.set_trace()
-        dfnew = pd.read_csv(url, parse_dates=True, index_col=0)
-        dfnew.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-        df = dfnew.copy()
+        if date < pd.Timestamp('now', tz='utc'):  # data
+            daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
+
+            base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
+            suffix = '&bin=0&bdate=' + date.strftime('%Y%m%d') + '&edate=' + (date+daystoread).strftime('%Y%m%d')
+            url = base + buoy + suffix
+            dftemp = read_ports_df(url)
+            df = df.append(dftemp)
+            date += pd.Timedelta(daystoread + '1 day')
+
+        else:  # model
+            daystoread = min(pd.Timedelta('7 days'), dend-date)
+
+            # tidal prediction (only goes back and forward in time 2 years)
+            base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
+            options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ (date - pd.Timedelta('1 day')).strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
+            url = base + options + buoy
+
+            dftemp = pd.read_csv(url, parse_dates=True, index_col=0)
+            dftemp.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
+            dfm = dfm.append(dftemp)
+            date += pd.Timedelta(daystoread + '1 day')
+
+    if not df.empty:
+        df = df[dstart:dend]
+    if not dfm.empty:
+        dfm = dfm[dstart:dend]
+
+    return df, dfm
+
+    # df = None  # initialize for checking what has happened later
+    #
+    # # Read in whatever data is available within time window from the past.
+    # # If time is in the future for a forecast, data will be read in as much is available.
+    # # WHAT IF BOTH DATES ARE IN THE FUTURE?
+    # # WHAT IF LONG REQUEST?
+    # # IS time zonE IMPORTANT?
+    # # MODEL ALSO WON'T GO FOR TOO LONG BEFORE CUT OFF
+    # if dstart < pd.Timestamp('now', tz='utc'):
+    #     base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?id='
+    #     suffix = '&bin=0&bdate=' + dstart.strftime('%Y%m%d') + '&edate=' + dend.strftime('%Y%m%d') + '&unit=0&timeZone=UTC&view=csv'
+    #     url = base + buoy + suffix
+    #     df = read_ports_df(url)
+    #
+    # # use tidal prediction if the end of the dataset is before the time we requested.
+    # # THIS WILL BE A PROBLEM IF THERE IS DATA MISSING BUT IT IS NOT WITHIN 2 YEARS OF NOW
+    # if df is None:
+    # # if df is None or df.index[-1] < dend:
+    #     # tidal prediction (only goes back and forward in time 2 years)
+    #     base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
+    #     options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ dstart.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
+    #     url = base + options + buoy
+    #     # url to download data file starting the day before this sat data, week of data
+    #     # import pdb; pdb.set_trace()
+    #     dfnew = pd.read_csv(url, parse_dates=True, index_col=0)
+    #     dfnew.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
+    #     df = dfnew.copy()
     # if df is None or df.index[-1] < dend:
         # # tidal prediction (only goes back and forward in time 2 years)
         # base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
@@ -122,7 +159,7 @@ def read_ports(buoy, dstart, dend, usemodel=True):
     #     #     df = None
     #     #     return
 
-    return df_init(df)#, df_init(dfnew[df.index[-1]:dend.strftime('%Y%m%d')])
+    # return df_init(df)#, df_init(dfnew[df.index[-1]:dend.strftime('%Y%m%d')])
 
 
 def read_ports_df(dataname):
