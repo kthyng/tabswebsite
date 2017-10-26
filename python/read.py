@@ -16,7 +16,8 @@ import requests
 email = 'kthyng@tamu.edu'
 bys = bp.load() # load in buoy data
 
-def read(buoy, dstart, dend, table=None, units=None, tz=None, usemodel=True):
+def read(buoy, dstart, dend, table=None, units=None, tz=None,
+         usemodel=True, userecent=True):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are datetime objects.
@@ -33,7 +34,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None, usemodel=True):
     elif 'ports' in bys[buoy]['table1']:
         df = read_ports(buoy, dstart, dend, usemodel=usemodel)
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
-        df = read_ndbc(buoy, dstart, dend)
+        df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
         df = read_tabs(table, buoy, dstart, dend)
 
@@ -229,10 +230,12 @@ def read_nos_df(dataname):
     return df
 
 
-def read_ndbc(buoy, dstart, dend):
+def read_ndbc(buoy, dstart, dend, userecent=True):
     '''Set up to read in NDBC buoy data (from mysql or website).
 
-    Call to read_ndbc_df to do actually reading in.'''
+    Call to read_ndbc_df to do actually reading in.
+    userecent=True will use recent 45 days of data. userecent=False will not.
+    '''
 
     if bys[buoy]['inmysql']:  # mysql
 
@@ -251,7 +254,7 @@ def read_ndbc(buoy, dstart, dend):
 
             # check if desired time window is within the last 45 days, in which case
             # use the "realtime" data from ndbc
-            if pd.Timestamp('now', tz='utc') - pd.Timedelta('45 days') < date:
+            if (pd.Timestamp('now', tz='utc') - pd.Timedelta('45 days') < date) and userecent:
                 url = 'http://www.ndbc.noaa.gov/data/realtime2/' + buoy + '.txt'
                 date = dend
 
@@ -294,16 +297,18 @@ def read_ndbc_df(dataname):
         df[df == -99.0] = np.nan  # replace missing values
 
     elif isinstance(dataname, str):  # go to ndbc
-        df = pd.read_table(dataname, header=0, skiprows=[1],
-                           delim_whitespace=True,
-                           na_values=['MM',-99.0, 999.00, 9999.00],
-                           parse_dates=[[0,1,2,3]], index_col=0)
         try:
-            df.index = pd.to_datetime(df.index, format='%Y %m %d %H')
-            if 'mm' in df.keys():
-                df = df.drop(['mm'], axis=1)
+            df = pd.read_table(dataname, header=0, skiprows=[1],
+                               delim_whitespace=True,
+                               na_values=['MM',-99.0, 999.00, 9999.00],
+                               parse_dates=[[0,1,2,3,4]], index_col=0)
+            df.index = pd.to_datetime(df.index, format='%Y %m %d %H %M')
         except:
-            # this catches the 2 digit year case
+            df = pd.read_table(dataname, header=0, skiprows=[1],
+                               delim_whitespace=True,
+                               na_values=['MM',-99.0, 999.00, 9999.00],
+                               parse_dates=[[0,1,2,3]], index_col=0)
+            # this catches the 2 digit year with no minutes case
             df.index = pd.to_datetime(df.index, format='%y %m %d %H')
         df = df.drop(['WVHT', 'DPD', 'APD', 'MWD', 'VIS', 'PTDY', 'TIDE'], axis=1, errors='ignore')
         # rename to match mysql because using below
@@ -447,8 +452,8 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
     # if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
     #    pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
     #     df = None
-    if dend <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
-       dstart >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
+    if dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
+       dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
         df = None
     else:
         dstart = dstart.strftime("%Y-%m-%d")

@@ -90,7 +90,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 // this list should match the "active" buoy list in python/buoy_data.py
 $blet=array("B","D","F","J","K","R","V","W","X",
             '42001', '42002', '42019','42020','42035', '42036', '42039', '42040',
-            'SRST2', 'PTAT2',
+            'SRST2', 'PTAT2', 'BURL1', 'GISL1', 'AMRL1', 'PSTL1',
             '8770475','8770520', '8770733', '8770777', '8770808',
             '8770822','8770971', '8771486', '8771972', '8772985', '8773037',
             '8773146', '8773259', '8773701', '8774230', '8774513', '8775237',
@@ -103,13 +103,13 @@ foreach ($blet as $f) {
     	$venfile="daily/tabs_".$f."_ven";
         $table = "ven";
     }
-    else if (strlen($f) == 5) {
-    	$venfile="daily/ndbc_".$f;
-        $table = "ndbc";
-    }
-    else if (strlen($f) == 7) {
-    	$venfile="daily/tcoon_".$f;
-        $table = "tcoon";
+    else {
+    	$venfile="daily/".$f;
+    //     $table = "ndbc";
+    // }
+    // else if (strlen($f) == 7) {
+    // 	$venfile="daily/tcoon_".$f;
+    //     $table = "tcoon";
     }
 
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
@@ -173,7 +173,7 @@ foreach ($blet as $f) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>NDBC</i></td></tr>";  // Label between TABS and NDBC buoys
     }
-    if ($f == "PTAT2") {
+    if ($f == "PSTL1") {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>TCOON</i></td></tr>";
     }

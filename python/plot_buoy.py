@@ -491,6 +491,22 @@ def add_xlabels(ax, df, fig, tlims=None):
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
+    # elif xlim <= 28:  # less than or equal to 28 days
+    #     # hourly minor ticks
+    #     minor = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
+    #     ax.xaxis.set_minor_locator(minor)
+    #     major = mpl.dates.DayLocator(byday=np.arange(0,31,5))
+    #     ax.xaxis.set_major_locator(major)
+    #     ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+    #     # turn off every other tick label but will still get grid lines
+    #     # at all major ticks
+    #     plt.setp(ax.get_xticklabels()[1::2], visible=False)
+    #     if df.index[0].year != df.index[-1].year:
+    #         ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+    #                 transform=ax.transAxes, rotation=30)
+    #     else:
+    #         ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+    #                 transform=ax.transAxes, rotation=30)
     elif xlim < 12*30:  # less than 12 months
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
         if df.index[0].year != df.index[-1].year:
@@ -733,6 +749,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        tlims=tlims, dolegend=True)
 
     elif which == 'ndbc-nowave':
+        import pdb; pdb.set_trace()
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
