@@ -330,6 +330,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
 
     # this catches when TCOON data is temporarily unavailable
     if df is not None:
+        # this is to write about data missing instead of plotting
         if key not in df.keys() or df[key].isnull().sum() == len(df):
             ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
             ax1.get_yaxis().set_ticks([])
@@ -664,18 +665,29 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
 
     if df is not None:
         df = df_init(df)
+    if df2 is not None and not df2.empty:
+        df2 = df_init(df2)
+    if df3 is not None:
+        df3 = df_init(df3)
 
     # change length of df2 if df1 overlaps with it to prioritize df1
     if df1 is not None and df2 is not None:
         if df1.index[-1] > df2.index[0]:
-            stemp = df1.index[-1] + timedelta(minutes=30)
+            stemp = df1.index[-1] + pd.Timedelta('10 minutes')
             df2 = df_init(df2[stemp:])
 
     # change length of df3 if df2 overlaps with it to prioritize df2
     if df2 is not None and df3 is not None:
         if df2.index[-1] > df3.index[0]:
-            stemp = df2.index[-1] + timedelta(minutes=30)
+            stemp = df2.index[-1] + pd.Timedelta('10 minutes')
             df3 = df_init(df3[stemp:])
+
+    # # change length of df3 if df overlaps with it to prioritize df (ports)
+    # if df is not None and df3 is not None and which=='ports':
+    #     if df.index[-1] > df3.index[0]:
+    #         stemp = df.index[-1] + pd.Timedelta('10 minutes')
+    #         df3 = df_init(df3[stemp:])
+
 
     fig, axes = setup(nsubplots=nsubplots, table=which, buoy=buoy)
 
@@ -814,7 +826,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
-                       'cps2kts', '[knots]', ymaxrange=[-150,150], df3=df3,
+                       'cps2kts', '[knots]', ymaxrange=[-150,150],
+                       df1=df1, df2=df2, df3=df3,
                        dolegend=True, add0=True)
         # turn off other subplots, but keep the space white
         axes[1].axis('off')

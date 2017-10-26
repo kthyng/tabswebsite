@@ -17,7 +17,7 @@ email = 'kthyng@tamu.edu'
 bys = bp.load() # load in buoy data
 
 def read(buoy, dstart, dend, table=None, units=None, tz=None,
-         usemodel=True, userecent=True):
+         usemodel=False, userecent=True):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are datetime objects.
@@ -32,15 +32,13 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     if 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
         df = read_nos(buoy, dstart, dend)
     elif 'ports' in bys[buoy]['table1']:
-        df, dfm = read_ports(buoy, dstart, dend, usemodel=usemodel)
+        df = read_ports(buoy, dstart, dend, usemodel=usemodel)
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
         df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
         df = read_tabs(table, buoy, dstart, dend)
 
     df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
-    if not dfm.empty:
-        dfm = tools.convert_units(dfm, units=units, tz=tz)  # change units if necessary
 
     # return None instead of just header if no data for time period
     if len(df) == 0:
@@ -49,26 +47,22 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
         return df
 
 
-def read_ports(buoy, dstart, dend, usemodel=True):
-    '''Set up urls and then read from them to get PORTS current data and/or
-    forecast model output.
+def read_ports(buoy, dstart, dend, usemodel=False):
+    '''Set up urls and read from them to get PORTS currents.
 
-    If dstart and dend are both in the past, data should be return.
-    If dstart is in the past and dend is in the future, data will be returned
-    for as long as it is available and then model output will be used afterward.
-    If dstart and dend are both in the future, model output will be returned.
-
-    Can explicitly say not to use model output with usemodel=False.
+    Only data or model is read in during a single call to this function.
     '''
 
-
     date = dstart
-    df = pd.DataFrame(); dfm = pd.DataFrame()  # initialize
+    df = pd.DataFrame()
     while date < dend:
 
-        if date < pd.Timestamp('now', tz='utc'):  # data
+        if not usemodel:  # data
+            # if we are using data, dend cannot be in the future
+            dend = pd.Timestamp('now', tz='utc')
             daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
-
+            # if daystoread < 0:
+            #     return df
             base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
             suffix = '&bin=0&bdate=' + date.strftime('%Y%m%d') + '&edate=' + (date+daystoread).strftime('%Y%m%d')
             url = base + buoy + suffix
@@ -81,20 +75,18 @@ def read_ports(buoy, dstart, dend, usemodel=True):
 
             # tidal prediction (only goes back and forward in time 2 years)
             base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-            options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ (date - pd.Timedelta('1 day')).strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
+            options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ date.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
             url = base + options + buoy
 
             dftemp = pd.read_csv(url, parse_dates=True, index_col=0)
             dftemp.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-            dfm = dfm.append(dftemp)
-            date += pd.Timedelta(daystoread + '1 day')
+            df = df.append(dftemp)
+            date += pd.Timedelta(daystoread)
 
     if not df.empty:
         df = df[dstart:dend]
-    if not dfm.empty:
-        dfm = dfm[dstart:dend]
 
-    return df, dfm
+    return df
 
     # df = None  # initialize for checking what has happened later
     #
@@ -164,7 +156,11 @@ def read_ports(buoy, dstart, dend, usemodel=True):
 
 def read_ports_df(dataname):
 
-    df = pd.read_csv(dataname, parse_dates=True, index_col=0, error_bad_lines=False)
+    df = pd.read_csv(dataname, parse_dates=True, index_col=0,
+                     error_bad_lines=False, warn_bad_lines=False)
+    # this catches if data wasn't returned properly
+    if df.empty:
+        return None
 
     # find buoy name
     buoy = dataname.split('id=')[1].split('&')[0]
@@ -174,8 +170,7 @@ def read_ports_df(dataname):
     theta[theta<0] += 360
     # tidal data needs to be converted into along-channel direction
     # along-channel flood direction (from website for data), converted from compass to math angle
-    angles = {'g06010': 267, 'mc0101': 40}
-    diralong = 90 - angles[buoy] + 360
+    diralong = 90 - bys[buoy]['angle'] + 360
 
     # first convert to east/west, north/south
     # all speeds in cm/s

@@ -19,8 +19,10 @@ from os import path
 import pandas as pd
 from matplotlib.dates import date2num
 import read
-from dateutil.parser import parse
+import buoy_properties as bp
 
+bys = bp.load() # load in buoy properties
+now = pd.Timestamp('now', tz='utc')
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
@@ -47,9 +49,9 @@ tz = args.tz
 model = args.model
 # can't figure out how to have variable from php a boolean so sending string
 if model == 'False':
-    model = False
+    usemodel = False
 elif model == 'True':
-    model = True
+    usemodel = True
 
 if 'tabs_' in fname:  # only need table name for tabs
     table = fname.split('/')[-1].split('_')[2]
@@ -71,31 +73,22 @@ if dstart is None:
 else:
     ## Read data ##
     df = read.read(buoy, dstart, dend, table=table, units=None, tz=None)
-
-    # # from mysql database
-    # if 'tabs' in table or 'ndbc' in table:
-    #     engine = tools.engine()
-    #     # buoy C doesn't have date and time listed separately which is mostly fine except for when querying for one day
-    #     if buoy == 'C':
-    #         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (obs_time BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    #     # NOAA data stations have a different table name
-    #     elif table == 'ndbc':
-    #         query = 'SELECT * FROM ndbc_' + buoy + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    #     else:
-    #         query = 'SELECT * FROM tabs_' + buoy + "_" + table + ' WHERE (date BETWEEN "' + dstart + '" AND "' + dend + '") order by obs_time'
-    #     df = tools.read([query, engine], units=units, tz=tz)
-    # elif 'tcoon' in table:
-    #     df = read.read_tcoon(buoy, dstart, dend)
     if df is not None:  # won't work if data isn't available in this time period
         tools.write_file(df, fname)
 
-
     ## Read model ##
-    if model and (table == 'ven' or table == 'met' or table == 'salt' or table == 'ndbc'):
+    tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
+              'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
+    if usemodel and bys[buoy]['table1'] in tables:
         # import pdb; pdb.set_trace()
-        dfmodelhindcast = tools.read_model(query, timing='hindcast')
-        dfmodelrecent = tools.read_model(query, timing='recent')
-        dfmodelforecast = tools.read_model(query, timing='forecast')
+        dfmodelhindcast = read.read_model(query, timing='hindcast')
+        dfmodelrecent = read.read_model(query, timing='recent')
+        dfmodelforecast = read.read_model(query, timing='forecast')
+    elif usemodel and bys[buoy]['table1'] == 'ports':
+        dfmodelhindcast = None
+        dftemp = read.read(buoy, dstart, dend, usemodel=True)
+        dfmodelrecent = dftemp[:now] if dstart<now else None
+        dfmodelforecast = dftemp[now:] if dend>now else None
     else:
         dfmodelhindcast = None
         dfmodelrecent = None

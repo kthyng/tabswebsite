@@ -29,7 +29,7 @@ if __name__ == "__main__":
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
         for table in tables:  # loop through tables for each buoy
-            # if not 'tcoon' in table:
+            # if not 'ports' in table:
             #     continue
             print(buoy)
             # read in data
@@ -40,19 +40,11 @@ if __name__ == "__main__":
 
             # start 6 days earlier from last data
             dstart = dend - pd.Timedelta('6 days')
-            df = read.read(buoy, dstart, dend, table=table)
+            df = read.read(buoy, dstart, dend, table=table, usemodel=False)
             if len(buoy) == 1:
                 fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
             else:
                 fname = path.join('..', 'daily', buoy)
-            # elif 'ndbc' in table:
-            #     fname = path.join('..', 'daily', 'ndbc_' + buoy)
-            # elif 'tcoon' in table:
-            #     fname = path.join('..', 'daily', 'tcoon_' + buoy)
-            # elif 'nos' in table:
-            #     fname = path.join('..', 'daily', 'nos_' + buoy)
-            # elif 'ports' in table:
-            #     fname = path.join('..', 'daily', 'ports_' + buoy)
             # write daily data file, for whatever most recent time period
             # data was available
             if df is not None:
@@ -75,7 +67,7 @@ if __name__ == "__main__":
             elif table == 'ports':
                 # use tidal current prediction at these sites, from NOAA
                 dfmodelrecent = None
-                dfmodelforecast = read.read_ports(buoy, now)
+                dfmodelforecast = read.read(buoy, now - pd.Timedelta('1 day'), future, usemodel=True)
             else:
                 dfmodelrecent = None
                 dfmodelforecast = None
