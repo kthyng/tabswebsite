@@ -143,7 +143,7 @@ def present(df):
     print(PrettyPandas(df).render())
 
 
-def write_file(df, fname, compression=False, mode='w'):
+def write_file(df, fname, filetype='txt', compression=False, mode='w'):
     '''Write text file of data.
 
     mode is 'w' to write a new file and 'a' to append to existing file.'''
@@ -153,10 +153,16 @@ def write_file(df, fname, compression=False, mode='w'):
     else:
         header = True
 
-    if compression:
-        df.to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
-                  quoting=QUOTE_NONE,  escapechar='', compression='gzip',
-                  mode=mode, header=header)
-    else:
-        df.to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
-                  quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)
+    # Remove the time zone offset from the datetimes before saving and put
+    # time zone information in the header instead.
+    if filetype == 'hdf':
+        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, format='table', complib='zlib')
+
+    elif filetype == 'txt':
+        if compression:
+            df.tz_localize(None).to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
+                      quoting=QUOTE_NONE,  escapechar='', compression='gzip',
+                      mode=mode, header=header)
+        else:
+            df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
+                      quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)

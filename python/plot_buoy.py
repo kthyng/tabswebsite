@@ -29,17 +29,6 @@ c1 = '#3F5D94'  # darker shade of cornflowerblue
 bys = bp.load() # load in buoy data
 
 
-def df_init(df):
-    '''Return dataframe df with indices idx added.
-
-    Can't use datetime index directly unfortunately here, so can't use pandas later either
-    '''
-
-    df['idx'] = date2num(df.index.to_pydatetime())  # in units of days
-
-    return df
-
-
 def shifty(ax, N=0.05, which='both'):
     '''Shift y limit to give some space to data in plot.
 
@@ -129,7 +118,6 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
     shifty(ax, N=N, which='bottom')  # most functions already have one of these, do another for space
     # note don't do this if df is None or there is no data
     if df is not None and (df1 is not None or df2 is not None or df3 is not None):
-
         # https://github.com/pandas-dev/pandas/issues/14297
         dfnew = pd.concat([df1, df2, df3])  # combine model output
         # interpolate on union of old and new index
@@ -684,9 +672,9 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         # df = df.resample('60T', base=base).asfreq()
 
     # set up datetime number indices since quiver doesn't work otherwise
-    for dftemp in [df, df1, df2, df3]:
-        if dftemp is not None:
-            dftemp = df_init(dftemp)
+    for dft in [df, df1, df2, df3]:
+        if dft is not None:
+            dft.insert(0, 'idx', date2num(dft.index.to_pydatetime()))
 
     # change length of df2 if df1 overlaps with it to prioritize df1
     if df1 is not None and df2 is not None:

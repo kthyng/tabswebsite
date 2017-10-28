@@ -32,17 +32,10 @@ parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
 parser.add_argument('--tz', type=str, help='time zone', default='UTC')
-parser.add_argument('--model', type=str, help='plot model output', default='False')
+parser.add_argument('--model', type=str, help='plot model output', default='True')
 args = parser.parse_args()
 
 fname = args.fname
-# change dstart and dend to datetime objects
-dstart = pd.Timestamp(args.dstart, tz='utc')
-dend = pd.Timestamp(args.dend, tz='utc')
-
-if dend is not None:
-    # make it so dend time is at end of the day
-    dend += pd.Timedelta('23 hours')
 datatype = args.datatype
 units = args.units
 tz = args.tz
@@ -52,6 +45,14 @@ if model == 'False':
     usemodel = False
 elif model == 'True':
     usemodel = True
+
+# change dstart and dend to datetime objects
+dstart = pd.Timestamp(args.dstart, tz=tz)
+dend = pd.Timestamp(args.dend, tz=tz)
+
+if dend is not None:
+    # add a day to dend time so that desired day is included
+    dend += pd.Timedelta('1 day')
 
 if 'tabs_' in fname:  # only need table name for tabs
     table = fname.split('/')[-1].split('_')[2]

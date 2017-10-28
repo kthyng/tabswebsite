@@ -10,7 +10,6 @@ import xarray as xr
 import gsw
 from os import system, path
 import tools
-# from plot_buoy import df_init
 import requests
 
 email = 'kthyng@tamu.edu'
@@ -44,6 +43,8 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     if len(df) == 0:
         return None
     else:
+        if df.index.tz is None:
+            df = df.tz_localize('utc')  # all files are read in utc
         return df
 
 
@@ -52,23 +53,28 @@ def read_ports(buoy, dstart, dend, usemodel=False):
 
     Only data or model is read in during a single call to this function.
     '''
-
+    usefile = True  # initially True, set to False once we've read from the file
     date = dstart
     df = pd.DataFrame()
-    while date < dend:
+    # check that we are within data frequency
+    while date + pd.Timedelta('10 minutes') < dend:
 
         if not usemodel:  # data
             # if we are using data, dend cannot be in the future
             dend = min(dend, pd.Timestamp('now', tz='utc'))
-            daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
-            # if daystoread < 0:
-            #     return df
-            base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
-            suffix = '&bin=0&bdate=' + date.strftime('%Y%m%d') + '&edate=' + (date+daystoread).strftime('%Y%m%d')
-            url = base + buoy + suffix
-            dftemp = read_ports_df(url)
-            df = df.append(dftemp)
-            date += pd.Timedelta(daystoread + '1 day')
+            fname = '../daily/' + buoy + '_all.hdf'
+            if path.exists(fname) and usefile:
+                df = read_ports_df('../daily/' + buoy + '_all.hdf', [dstart, dend])
+                date = df.index[-1].normalize() + pd.Timedelta('1 day')  # bump up to start of next day
+                usefile = False
+            else:
+                daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
+                base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
+                suffix = '&bin=0&bdate=' + date.strftime('%Y%m%d') + '&edate=' + (date+daystoread).strftime('%Y%m%d')
+                url = base + buoy + suffix
+                dftemp = read_ports_df(url)
+                df = df.append(dftemp)
+                date += pd.Timedelta(daystoread + '1 day')
 
         else:  # model
             daystoread = min(pd.Timedelta('7 days'), dend-date)
@@ -78,46 +84,57 @@ def read_ports(buoy, dstart, dend, usemodel=False):
             options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ date.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
             url = base + options + buoy
 
-            dftemp = pd.read_csv(url, parse_dates=True, index_col=0)
-            dftemp.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
+            dftemp = read_ports_df(url)
+            # dftemp = pd.read_csv(url, parse_dates=True, index_col=0)
             df = df.append(dftemp)
             date += pd.Timedelta(daystoread)
 
     if not df.empty:
-        df = df[dstart:dend]
+        df = df.loc[(df.index > dstart) & (df.index < dend)]
 
     return df
 
 
-def read_ports_df(dataname):
+def read_ports_df(dataname, dates=None):
 
-    df = pd.read_csv(dataname, parse_dates=True, index_col=0,
-                     error_bad_lines=False, warn_bad_lines=False)
+    if 'http' in dataname:  # reading from website
+        df = pd.read_csv(dataname, parse_dates=True, index_col=0,
+                         error_bad_lines=False, warn_bad_lines=False)
+    else:
+        assert dates is not None, 'input start and end dates for reading from existing file'
+        df = pd.read_hdf(dataname, where='index>=dates[0]&index<=dates[1]')
+
     # this catches if data wasn't returned properly
     if df.empty:
         return None
+    elif df.index.tz is None:
+        df = df.tz_localize('utc')
 
-    # find buoy name
-    buoy = dataname.split('id=')[1].split('&')[0]
+    if 'http' and 'Predictions' in dataname:  # website, model predictions
+        df.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
+        df.index.rename = 'Dates [UTC]'
+    elif 'http' and 'DataPlot' in dataname:  # reading from website, data
+        # find buoy name
+        buoy = dataname.split('id=')[1].split('&')[0]
 
-    # angle needs to be in math convention for trig and between 0 and 360
-    theta = 90 - df[' Dir (true)']
-    theta[theta<0] += 360
-    # tidal data needs to be converted into along-channel direction
-    # along-channel flood direction (from website for data), converted from compass to math angle
-    diralong = 90 - bys[buoy]['angle'] + 360
+        # angle needs to be in math convention for trig and between 0 and 360
+        theta = 90 - df[' Dir (true)']
+        theta[theta<0] += 360
+        # tidal data needs to be converted into along-channel direction
+        # along-channel flood direction (from website for data), converted from compass to math angle
+        diralong = 90 - bys[buoy]['angle'] + 360
 
-    # first convert to east/west, north/south
-    # all speeds in cm/s
-    east = df[' Speed (cm/sec)']*np.cos(np.deg2rad(theta))
-    north = df[' Speed (cm/sec)']*np.sin(np.deg2rad(theta))
-    # then convert to along-channel (mean ebb and mean flood)
-    # this is overwriting speed (magnitude) with speed (alongchannel)
-    df['Along (cm/sec)'] = -(east*np.cos(diralong) - north*np.sin(diralong))
+        # first convert to east/west, north/south
+        # all speeds in cm/s
+        east = df[' Speed (cm/sec)']*np.cos(np.deg2rad(theta))
+        north = df[' Speed (cm/sec)']*np.sin(np.deg2rad(theta))
+        # then convert to along-channel (mean ebb and mean flood)
+        # this is overwriting speed (magnitude) with speed (alongchannel)
+        df['Along (cm/sec)'] = -(east*np.cos(diralong) - north*np.sin(diralong))
 
-    df.rename(columns={' Speed (cm/sec)': 'Speed (cm/sec)',
-                       ' Dir (true)': 'Dir (true)'}, inplace=True)
-    df.index.name = 'Dates [UTC]'
+        df.rename(columns={' Speed (cm/sec)': 'Speed (cm/sec)',
+                           ' Dir (true)': 'Dir (true)'}, inplace=True)
+        df.index.rename = 'Dates [UTC]'
 
     return df
 
@@ -191,7 +208,7 @@ def read_nos_df(dataname):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df
+    return df.tz_localize('utc')
 
 
 def read_ndbc(buoy, dstart, dend, userecent=True):
@@ -295,7 +312,7 @@ def read_ndbc_df(dataname):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df
+    return df.tz_localize('utc')
 
 
 def read_tabs(table, buoy, dstart, dend):
@@ -351,7 +368,7 @@ def read_tabs(table, buoy, dstart, dend):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df
+    return df.tz_localize('utc')
 
 
 def read_model(buoy, which, dstart, dend, timing='recent'):
@@ -481,4 +498,4 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
         # # can't use datetime index directly unfortunately here, so can't use pandas later either
         # df.idx = date2num(df.index.to_pydatetime())  # in units of days
 
-    return df
+    return df.tz_localize('utc')
