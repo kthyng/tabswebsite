@@ -131,15 +131,14 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
     shifty(ax, N=N, which='bottom')  # most functions already have one of these, do another for space
     # note don't do this if df is None or there is no data
     if df is not None and (df1 is not None or df2 is not None or df3 is not None):
-        # account for if df1, df2, and df3 overlap
-        # resample to data frequency and base minute so they match for reindexing
-        # not using infer_freq because want the units to be in minutes like base
-        datafreq = (df.index[1] - df.index[0]).seconds/60.  # pd.infer_freq(df.index)
-        datafreq = str(int(datafreq)) + 'T'  # changing to string
-        database = df.index[0].minute
-        dfnew = pd.concat([df1, df2, df3]).resample(datafreq, base=database).interpolate()  # in case there is a df3
-        # reindex model dfnew to match data df for calculations
-        dfnew = dfnew.reindex_like(df)#.interpolate()
+
+        # https://github.com/pandas-dev/pandas/issues/14297
+        dfnew = pd.concat([df1, df2, df3])  # combine model output
+        # interpolate on union of old and new index
+        dfnew = dfnew.reindex(dfnew.index.union(df.index)).interpolate(method='time')
+        # reindex to the new index
+        dfnew = dfnew.reindex(df.index)
+
         if df[key].sum() and dfnew[key].sum():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
             ax.text(0.85, 0.015, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
@@ -433,6 +432,12 @@ def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
 def add_xlabels(ax, df, fig, tlims=None):
     '''Add date labels to bottom x axis'''
 
+    # tighten only x axis
+    if tlims is not None:
+        ax.set_xlim(tlims[0], tlims[1])
+    else:
+        plt.autoscale(enable=True, axis='x', tight=True)
+
     # use this because includes forecast model output along with data
     xlim = np.diff(ax.get_xlim())  # x limit length in days
 
@@ -476,8 +481,8 @@ def add_xlabels(ax, df, fig, tlims=None):
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
-    elif xlim <=18:  # less than or equal to 18 days
-        # hourly minor ticks
+    elif xlim <=20:  # less than or equal to 20 days
+        # 12 hourly minor ticks
         minor = mpl.dates.HourLocator(byhour=np.arange(0,24,12))
         ax.xaxis.set_minor_locator(minor)
         major = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
@@ -492,23 +497,50 @@ def add_xlabels(ax, df, fig, tlims=None):
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
-    # elif xlim <= 28:  # less than or equal to 28 days
-    #     # hourly minor ticks
-    #     minor = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
-    #     ax.xaxis.set_minor_locator(minor)
-    #     major = mpl.dates.DayLocator(byday=np.arange(0,31,5))
-    #     ax.xaxis.set_major_locator(major)
-    #     ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
-    #     # turn off every other tick label but will still get grid lines
-    #     # at all major ticks
-    #     plt.setp(ax.get_xticklabels()[1::2], visible=False)
-    #     if df.index[0].year != df.index[-1].year:
-    #         ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
-    #                 transform=ax.transAxes, rotation=30)
-    #     else:
-    #         ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
-    #                 transform=ax.transAxes, rotation=30)
-    elif xlim < 12*30:  # less than 12 months
+    elif xlim <= 80:
+        # daily minor ticks
+        minor = mpl.dates.DayLocator(bymonthday=range(1,32))
+        ax.xaxis.set_minor_locator(minor)
+        # weekly major ticks
+        major = mpl.dates.DayLocator(interval=7)
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <= 90:
+        # weekly major ticks
+        major = mpl.dates.DayLocator(interval=7)
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim < 6*30:  # less than 8 months
+        # weekly minor ticks
+        minor = mpl.dates.DayLocator(interval=7)
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.DayLocator(interval=14)
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim < 366:  # less than 12 months
+        # weekly minor ticks
+        minor = mpl.dates.MonthLocator(interval=1, bymonthday=15)
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.MonthLocator(interval=1, bymonthday=1)
+        ax.xaxis.set_major_locator(major)
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
         if df.index[0].year != df.index[-1].year:
             ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
@@ -519,65 +551,83 @@ def add_xlabels(ax, df, fig, tlims=None):
     else:
         ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %Y'))
 
-    # put in GMT as time zone
-    ax.text(1.05, -0.35, 'UTC', transform=ax.transAxes, fontsize=10)
-
-    # tighten only x axis
-    if tlims is not None:
-        ax.set_xlim(tlims[0], tlims[1])
+    # this gives number of rows or subplots since always one column
+    nsubplots = fig.get_axes()[0].numRows
+    if nsubplots == 1:
+        textlocUTC = 1.05, -0.25
+        textloc1 = 0.95, 0.06
+        textloc2 = 0.08, 0.075
+    elif nsubplots == 2:
+        textlocUTC = 1.05, -0.35
+        textloc1 = 0.95, 0.025
+        textloc2 = 0.08, 0.035
     else:
-        plt.autoscale(enable=True, axis='x', tight=True)
+        textlocUTC = 1.05, -0.35
+        textloc1 = 0.95, 0.025
+        textloc2 = 0.08, 0.035
+
+    # put in GMT as time zone
+    ax.text(*textlocUTC, 'UTC', transform=ax.transAxes, fontsize=10)
 
     # rotates and right aligns the x labels, and moves the bottom of the
     # axes up to make room for them
-    if ax.is_last_row():
-        fig.autofmt_xdate(bottom=0.125)
-    else:
-        # do most of this separately for the single subplot case
-        # necessary to keep labels on a subplot in subplot location 1
-        plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
+    # if ax.is_last_row():
+    #     fig.autofmt_xdate()  # bottom=0.125)
+    # else:
+    # do most of this separately for the single subplot case
+    # necessary to keep labels on a subplot in subplot location 1
+    plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
 
     # text at bottom
     # right hand side
     text = 'Oceanography and GERG at Texas A&M University\n' \
            + datetime.utcnow().strftime('%a %b %d, %Y %H:%M UTC')
-    fig.text(0.95, 0.025, text, fontsize=8, transform=fig.transFigure,
+    fig.text(*textloc1, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='right', verticalalignment='top')
     # left hand side
-    text = 'TGLO, GERG, Oceanography, and Texas A&M make no representations\n' \
-           + 'or any other warranty with regard to this data.\n' \
-           + 'These data are not suitable for navigation purposes.'
-    fig.text(0.08, 0.035, text, fontsize=8, transform=fig.transFigure,
+    text = '''TGLO, GERG, Oceanography, and Texas A&M make no representations
+or any other warranty with regard to this data
+These data are not suitable for navigation purposes.'''
+    fig.text(*textloc2, text, fontsize=8, transform=fig.transFigure,
              horizontalalignment='left', verticalalignment='top')
 
 
 def setup(nsubplots, table=None, buoy=None):
     '''Set up plot'''
 
-    # plot
-    if buoy is None:
-        fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
-    elif table == 'tcoon-nomet' or table == 'ndbc-nowave-nowtemp-nopress':  # only need 2 subplots
-        # don't sharex for degenerative case so that dates are shown on top subplot
-        # Axes that share the x-axis
-        fig = plt.figure(figsize=(8.5,11))
-        ax = fig.add_subplot(nsubplots, 1, 1)
-        axes = [ax] + [fig.add_subplot(nsubplots, 1, 2, sharex=ax)]
-        plt.setp(axes[0].get_xticklabels(), visible=False)
-        # The bottom independent axes
-        axes.append(fig.add_subplot(nsubplots, 1, 3))
-    elif table == 'ports':  # only need 1 subplot
-        # don't sharex for degenerative case so that dates are shown on top subplot
-        # Axes that share the x-axis
-        fig = plt.figure(figsize=(8.5,11))
-        axes = [fig.add_subplot(nsubplots, 1, 1)]
-        # The bottom independent axes
-        axes.append(fig.add_subplot(nsubplots, 1, 2))
-        axes.append(fig.add_subplot(nsubplots, 1, 3))
+    if nsubplots == 1:
+        figsize = (8.5, 5)
+        props = {'top': 0.92, 'right': 0.92, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.25}
+    elif nsubplots == 2:
+        figsize = (8.5, 8)
     else:
-        fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
+        figsize = (8.5, 11)
+        props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.125}
+
+    # plot
+    # if buoy is None:
+    fig, axes = plt.subplots(nsubplots, 1, figsize=figsize, sharex=True)
+    # elif table == 'tcoon-nomet' or table == 'ndbc-nowave-nowtemp-nopress':  # only need 2 subplots
+    #     # don't sharex for degenerative case so that dates are shown on top subplot
+    #     # Axes that share the x-axis
+    #     fig = plt.figure(figsize=(8.5,11))
+    #     ax = fig.add_subplot(nsubplots, 1, 1)
+    #     axes = [ax] + [fig.add_subplot(nsubplots, 1, 2, sharex=ax)]
+    #     plt.setp(axes[0].get_xticklabels(), visible=False)
+    #     # The bottom independent axes
+    #     axes.append(fig.add_subplot(nsubplots, 1, 3))
+    # elif table == 'ports':  # only need 1 subplot
+    #     # don't sharex for degenerative case so that dates are shown on top subplot
+    #     # Axes that share the x-axis
+    #     fig = plt.figure(figsize=(8.5,11))
+    #     axes = [fig.add_subplot(nsubplots, 1, 1)]
+    #     # The bottom independent axes
+    #     axes.append(fig.add_subplot(nsubplots, 1, 2))
+    #     axes.append(fig.add_subplot(nsubplots, 1, 3))
+    # else:
+    #     fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
     # bottom controlled later
-    fig.subplots_adjust(top=0.96, right=0.88, left=0.15, hspace=0.1)
+    fig.subplots_adjust(**props)
     # title
     if buoy is not None:
         lat = tools.dd2dm(bys[buoy]['lat'])
@@ -594,6 +644,7 @@ def setup(nsubplots, table=None, buoy=None):
             title = 'NOS Station ' + buoy + ': ' + ll
         elif 'ports' in table:
             title = 'PORTS Station ' + buoy + ': ' + ll
+            axes = [axes]  # change to list to be consistent with others
         axes[0].set_title(title, fontsize=18)
 
     return fig, axes
@@ -620,13 +671,13 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ndbc-nowave-nowtemp':
         nsubplots = 3
     elif which == 'ndbc-nowave-nowtemp-nopress':
-        nsubplots = 3  # but only use 2
+        nsubplots = 2 #  3  # but only use 2
     elif which == 'tcoon-nomet':
-        nsubplots = 3  # but only use 2
+        nsubplots = 2 #  3  # but only use 2
     elif which == 'tcoon':
         nsubplots = 5
     elif which == 'ports':
-        nsubplots = 3
+        nsubplots = 1  # 3
 
     if len(buoy) == 1 and which != 'wave':
         # for TABS buoys
@@ -792,8 +843,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, dolegend=True, tlims=tlims)
-        # turn off other subplots, but keep the space white
-        axes[2].axis('off')
 
     elif which == 'tcoon-nomet':
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, datum]',
@@ -802,8 +851,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
-        # turn off other subplots, but keep the space white
-        axes[2].axis('off')
 
     elif which == 'tcoon':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
@@ -829,9 +876,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df1=df1, df2=df2, df3=df3,
                        dolegend=True, add0=True)
-        # turn off other subplots, but keep the space white
-        axes[1].axis('off')
-        axes[2].axis('off')
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
@@ -842,14 +886,14 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         if dfm.dT > df.dT:
             df = dfm  # use the longer dataframe for labeling x axis
 
-    if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
-        # has only two actual subplots, and want to label that one
-        add_xlabels(axes[1], df, fig, tlims=tlims)
-    elif which == 'ports':
-        # has only one actual subplot, and want to label that one
-        add_xlabels(axes[0], df, fig, tlims=tlims)
-    else:
-        add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
+    # if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
+    #     # has only two actual subplots, and want to label that one
+    #     add_xlabels(axes[1], df, fig, tlims=tlims)
+    # elif which == 'ports':
+    #     # has only one actual subplot, and want to label that one
+    #     add_xlabels(axes[0], df, fig, tlims=tlims)
+    # else:
+    add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
 
     # add grid lines
     for ax in axes:

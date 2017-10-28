@@ -59,7 +59,7 @@ def read_ports(buoy, dstart, dend, usemodel=False):
 
         if not usemodel:  # data
             # if we are using data, dend cannot be in the future
-            dend = pd.Timestamp('now', tz='utc')
+            dend = min(dend, pd.Timestamp('now', tz='utc'))
             daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
             # if daystoread < 0:
             #     return df
