@@ -80,10 +80,9 @@ else:
     tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
               'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
     if usemodel and bys[buoy]['table1'] in tables:
-        # import pdb; pdb.set_trace()
-        dfmodelhindcast = read.read_model(query, timing='hindcast')
-        dfmodelrecent = read.read_model(query, timing='recent')
-        dfmodelforecast = read.read_model(query, timing='forecast')
+        dfmodelhindcast = read.read_model(buoy, table, dstart, dend, timing='hindcast')
+        dfmodelrecent = read.read_model(buoy, table, dstart, dend, timing='recent')
+        dfmodelforecast = read.read_model(buoy, table, dstart, dend, timing='forecast')
     elif usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None
         dftemp = read.read(buoy, dstart, dend, usemodel=True)

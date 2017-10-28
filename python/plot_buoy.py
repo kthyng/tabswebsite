@@ -558,9 +558,9 @@ def add_xlabels(ax, df, fig, tlims=None):
         textloc1 = 0.95, 0.06
         textloc2 = 0.08, 0.075
     elif nsubplots == 2:
-        textlocUTC = 1.05, -0.35
-        textloc1 = 0.95, 0.025
-        textloc2 = 0.08, 0.035
+        textlocUTC = 1.05, -0.3
+        textloc1 = 0.95, 0.035
+        textloc2 = 0.08, 0.045
     else:
         textlocUTC = 1.05, -0.35
         textloc1 = 0.95, 0.025
@@ -569,13 +569,7 @@ def add_xlabels(ax, df, fig, tlims=None):
     # put in GMT as time zone
     ax.text(*textlocUTC, 'UTC', transform=ax.transAxes, fontsize=10)
 
-    # rotates and right aligns the x labels, and moves the bottom of the
-    # axes up to make room for them
-    # if ax.is_last_row():
-    #     fig.autofmt_xdate()  # bottom=0.125)
-    # else:
-    # do most of this separately for the single subplot case
-    # necessary to keep labels on a subplot in subplot location 1
+    # rotates and right aligns the x labels
     plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
 
     # text at bottom
@@ -599,33 +593,14 @@ def setup(nsubplots, table=None, buoy=None):
         figsize = (8.5, 5)
         props = {'top': 0.92, 'right': 0.92, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.25}
     elif nsubplots == 2:
-        figsize = (8.5, 8)
+        figsize = (8.5, 8.5)
+        props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.08, 'bottom': 0.175}
     else:
         figsize = (8.5, 11)
         props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.125}
 
     # plot
-    # if buoy is None:
     fig, axes = plt.subplots(nsubplots, 1, figsize=figsize, sharex=True)
-    # elif table == 'tcoon-nomet' or table == 'ndbc-nowave-nowtemp-nopress':  # only need 2 subplots
-    #     # don't sharex for degenerative case so that dates are shown on top subplot
-    #     # Axes that share the x-axis
-    #     fig = plt.figure(figsize=(8.5,11))
-    #     ax = fig.add_subplot(nsubplots, 1, 1)
-    #     axes = [ax] + [fig.add_subplot(nsubplots, 1, 2, sharex=ax)]
-    #     plt.setp(axes[0].get_xticklabels(), visible=False)
-    #     # The bottom independent axes
-    #     axes.append(fig.add_subplot(nsubplots, 1, 3))
-    # elif table == 'ports':  # only need 1 subplot
-    #     # don't sharex for degenerative case so that dates are shown on top subplot
-    #     # Axes that share the x-axis
-    #     fig = plt.figure(figsize=(8.5,11))
-    #     axes = [fig.add_subplot(nsubplots, 1, 1)]
-    #     # The bottom independent axes
-    #     axes.append(fig.add_subplot(nsubplots, 1, 2))
-    #     axes.append(fig.add_subplot(nsubplots, 1, 3))
-    # else:
-    #     fig, axes = plt.subplots(nsubplots, 1, figsize=(8.5,11), sharex=True)
     # bottom controlled later
     fig.subplots_adjust(**props)
     # title
@@ -671,13 +646,13 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ndbc-nowave-nowtemp':
         nsubplots = 3
     elif which == 'ndbc-nowave-nowtemp-nopress':
-        nsubplots = 2 #  3  # but only use 2
+        nsubplots = 2 
     elif which == 'tcoon-nomet':
-        nsubplots = 2 #  3  # but only use 2
+        nsubplots = 2
     elif which == 'tcoon':
         nsubplots = 5
     elif which == 'ports':
-        nsubplots = 1  # 3
+        nsubplots = 1
 
     if len(buoy) == 1 and which != 'wave':
         # for TABS buoys
@@ -732,13 +707,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         if df2.index[-1] > df3.index[0]:
             stemp = df2.index[-1] + pd.Timedelta('10 minutes')
             df3 = df_init(df3[stemp:])
-
-    # # change length of df3 if df overlaps with it to prioritize df (ports)
-    # if df is not None and df3 is not None and which=='ports':
-    #     if df.index[-1] > df3.index[0]:
-    #         stemp = df.index[-1] + pd.Timedelta('10 minutes')
-    #         df3 = df_init(df3[stemp:])
-
 
     fig, axes = setup(nsubplots=nsubplots, table=which, buoy=buoy)
 
@@ -845,7 +813,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        df3=df3, dolegend=True, tlims=tlims)
 
     elif which == 'tcoon-nomet':
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, datum]',
+        add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3])
         add_var_2units(axes[1], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
@@ -863,7 +831,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3)
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MLLW]',
+        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3])
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',

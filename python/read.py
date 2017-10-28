@@ -88,71 +88,6 @@ def read_ports(buoy, dstart, dend, usemodel=False):
 
     return df
 
-    # df = None  # initialize for checking what has happened later
-    #
-    # # Read in whatever data is available within time window from the past.
-    # # If time is in the future for a forecast, data will be read in as much is available.
-    # # WHAT IF BOTH DATES ARE IN THE FUTURE?
-    # # WHAT IF LONG REQUEST?
-    # # IS time zonE IMPORTANT?
-    # # MODEL ALSO WON'T GO FOR TOO LONG BEFORE CUT OFF
-    # if dstart < pd.Timestamp('now', tz='utc'):
-    #     base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?id='
-    #     suffix = '&bin=0&bdate=' + dstart.strftime('%Y%m%d') + '&edate=' + dend.strftime('%Y%m%d') + '&unit=0&timeZone=UTC&view=csv'
-    #     url = base + buoy + suffix
-    #     df = read_ports_df(url)
-    #
-    # # use tidal prediction if the end of the dataset is before the time we requested.
-    # # THIS WILL BE A PROBLEM IF THERE IS DATA MISSING BUT IT IS NOT WITHIN 2 YEARS OF NOW
-    # if df is None:
-    # # if df is None or df.index[-1] < dend:
-    #     # tidal prediction (only goes back and forward in time 2 years)
-    #     base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-    #     options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ dstart.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
-    #     url = base + options + buoy
-    #     # url to download data file starting the day before this sat data, week of data
-    #     # import pdb; pdb.set_trace()
-    #     dfnew = pd.read_csv(url, parse_dates=True, index_col=0)
-    #     dfnew.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-    #     df = dfnew.copy()
-    # if df is None or df.index[-1] < dend:
-        # # tidal prediction (only goes back and forward in time 2 years)
-        # base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-        # options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ df.index[-1].strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
-        # url = base + options + buoy
-        # # url to download data file starting the day before this sat data, week of data
-        # # import pdb; pdb.set_trace()
-        # dfnew = pd.read_csv(url, parse_dates=True, index_col=0)
-        # dfnew.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-    # # keep data where data and add model on the end
-    # df = df.append(dfnew[df.index[-1]:]).drop_duplicates(keep='first')
-
-    # # if end date is in the future (more than time zone differences between Texas and GMT)
-    # # use forecast model output
-    # if dend is None:
-    #
-    #     # tidal prediction (only goes back and forward in time 2 years)
-    #     base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-    #     options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ dstart.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
-    #     url = base + options + buoy
-    #     # url to download data file starting the day before this sat data, week of data
-    #     df = pd.read_csv(url, parse_dates=True, index_col=0)
-    #     df.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-
-    # # data (not forecast)
-    # else:
-    #
-    #     base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?id='
-    #     suffix = '&bin=0&bdate=' + dstart.strftime('%Y%m%d') + '&edate=' + dend.strftime('%Y%m%d') + '&unit=0&timeZone=UTC&view=csv'
-    #     url = base + buoy + suffix
-    #     # try:  # if there is no data, this call doesn't work
-    #     df = read_ports_df(url)
-    #     # except:
-    #     #     df = None
-    #     #     return
-
-    # return df_init(df)#, df_init(dfnew[df.index[-1]:dend.strftime('%Y%m%d')])
-
 
 def read_ports_df(dataname):
 
@@ -194,9 +129,6 @@ def read_nos(buoy, dstart, dend):
     This calls to read_tcoon_df() to do the reading and rearranging.
     dstart and dend are datetime objects.'''
 
-    # if dend - dstart > 30:
-    #     for dstar
-
     # tide, met, and phys data
     prefixes = ['https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station=',
                 'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id=',
@@ -204,7 +136,7 @@ def read_nos(buoy, dstart, dend):
     # dstart and dend need to be in format YYYYMMDD
     dstarts = dstart.strftime('%Y%m%d')
     dends = dend.strftime('%Y%m%d')
-    suffixes = ['&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MLLW&units=metric&time_zone=GMT&format=csv',
+    suffixes = ['&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MSL&units=metric&time_zone=GMT&format=csv',
                 '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6',
                 '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6']
     dfs = []
