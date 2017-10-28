@@ -30,14 +30,12 @@ bys = bp.load() # load in buoy data
 
 
 def df_init(df):
-    '''Return dataframe df with indices idx and time length dT added.
+    '''Return dataframe df with indices idx added.
 
     Can't use datetime index directly unfortunately here, so can't use pandas later either
-    idx and dT are deleted by the resample command
     '''
 
-    df.idx = date2num(df.index.to_pydatetime())  # in units of days
-    df.dT = df.idx[-1] - df.idx[0]  # length of dataset in days
+    df['idx'] = date2num(df.index.to_pydatetime())  # in units of days
 
     return df
 
@@ -101,7 +99,7 @@ def setylimsintlims(ax, df, df1, df2, df3, key, tlims):
             # 1st: if nothing in df is larger than the first tlims value, or
             # 2nd: if nothing in df is smaller than the last tlims value,
             # use df to set y range since df is contained in tlims
-            if not ((df.idx >= tlims[0]).sum() == 0) or ((df.idx <= tlims[-1]).sum() == 0):
+            if not ((df['idx'] >= tlims[0]).sum() == 0) or ((df['idx'] <= tlims[-1]).sum() == 0):
                 # then range also set by df
                 ymins.append(df[key].min())
                 ymaxs.append(df[key].max())
@@ -185,11 +183,10 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     if df is not None and (df.index[1] - df.index[0]).seconds/60. < 30:
         # want 30 min
         df = df.resample('30T').asfreq()
-        df = df_init(df)
 
     # if data is None, use model output
     if df is None:
-        df = df_init(pd.concat([df1, df2, df3]))  # in case there is a df3
+        df = pd.concat([df1, df2, df3])  # in case there is a df3
         color = c2
     # this catches when TCOON data is temporarily unavailable
     if east not in df.keys() or df[east].isnull().sum() == len(df):
@@ -198,65 +195,62 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
         return
     # if data is not within input time range, use model output instead
     if tlims is not None:
-        if df.idx[-1] < tlims[0] or df.idx[0] > tlims[-1]:
-            df = df_init(pd.concat([df1, df2, df3]))  # in case there is a df3
+        if df['idx'][-1] < tlims[0] or df['idx'][0] > tlims[-1]:
+            df = pd.concat([df1, df2, df3])  # in case there is a df3
             color = c2
 
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
-    if df.dT <=2:  # less than or equal to two days
+    xlim = np.diff(ax.get_xlim())  # x limit length in days
+    if xlim <=2:  # less than or equal to two days
         width = 1.0
         if which == 'wind':
             width /= 3
-    elif df.dT <=6:  # less than or equal to 6 days
+    elif xlim <=6:  # less than or equal to 6 days
         width = 0.5
         if which == 'wind':
             width /= 3
     else:
         width = 0.2
     # decimate temporally
-    if df.dT < 5*30:
+    if xlim < 5*30:
         ddt = 1
-    elif df.dT < 7*30:
+    elif xlim < 7*30:
         ddt = 2
-    elif df.dT < 11*30:
+    elif xlim < 11*30:
         ddt = 3
-    elif df.dT < 15*30:
+    elif xlim < 15*30:
         ddt = 4
     else:
         ddt = 5
 
     # replace
-    ax.quiver(df.idx[::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
+    ax.quiver(df['idx'][::ddt], np.zeros(len(df[::ddt])), df[::ddt][east], df[::ddt][north], headaxislength=0,
               headlength=0, width=width, units='y', scale_units='y', scale=1, color=color)
 
     # use hindcast currents to fill in before data (in case there has been a gap)
     if df1 is not None and tlims is not None:
-        if (df.idx[0] - tlims[0]) > 3600:  # more than an hour
+        if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
             stemp = df.index[0] - timedelta(minutes=30)
-            df4 = df_init(df1[:stemp])
-            ax.quiver(df4.idx[::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
+            df4 = df1[:stemp]
+            ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
                       headlength=0, width=width, units='y', scale_units='y', scale=1, color=c1)
     # use nowcast currents to fill in before data (in case there has been a gap)
     if df2 is not None and tlims is not None:
-        if (df.idx[0] - tlims[0]) > 3600:  # more than an hour
+        if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
             stemp = df.index[0] - timedelta(minutes=30)
-            df4 = df_init(df2[:stemp])
-            ax.quiver(df4.idx[::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
+            df4 = df2[:stemp]
+            ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
                       headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
     # use forecast currents to fill in after data
     if df3 is not None and not df[df3.index[0]:].equals(df3):
         # fill in after data with model
         if df.index[-1] > df3.index[0] and df.index[-1] < df3.index[-1]:
             stemp = df.index[-1] + timedelta(minutes=30)
-            df3 = df_init(df3[stemp:])
-            ax.quiver(df3.idx[::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
+            df3 = df3[stemp:]
+            ax.quiver(df3['idx'][::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
                       headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
 
-    # if df2 is not None:  # 2nd set of arrows
-    #     ax.quiver(df2.idx[::ddt], np.zeros(len(df2[::ddt])), df2[::ddt][east], df2[::ddt][north], headaxislength=0,
-    #               headlength=0, width=width, units='y', scale_units='y', scale=1,
-    #               color=c2)
     if which == 'water':
         varmax = cmax
         label = 'Currents\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
@@ -287,13 +281,13 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     '''
 
     if df is not None:
-        ax.plot(df.idx, df[which], 'k', lw=lw)
+        ax.plot(df['idx'], df[which], 'k', lw=lw)
     if df1 is not None:
-        ax.plot(df1.idx, df1[which], color=c1, lw=lw)
+        ax.plot(df1['idx'], df1[which], color=c1, lw=lw)
     if df2 is not None:
-        ax.plot(df2.idx, df2[which], color=c2, lw=lw)
+        ax.plot(df2['idx'], df2[which], color=c2, lw=lw)
     if df3 is not None:
-        ax.plot(df3.idx, df3[which], color=c2, lw=lw, ls='--')
+        ax.plot(df3['idx'], df3[which], color=c2, lw=lw, ls='--')
     # add line at zero for reference.
     add_zero(ax)
     # add r^2 to subplot
@@ -335,13 +329,13 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
             ax1.get_yaxis().set_ticks([])
             return
         else:
-            ax1.plot(df.idx, df[key], lw=lw, color='k', linestyle='-')
+            ax1.plot(df['idx'], df[key], lw=lw, color='k', linestyle='-')
     if df1 is not None:
-        ax1.plot(df1.idx, df1[key], lw=lw, color=c1, linestyle='-')
+        ax1.plot(df1['idx'], df1[key], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
-        ax1.plot(df2.idx, df2[key], lw=lw, color=c2, linestyle='-')
+        ax1.plot(df2['idx'], df2[key], lw=lw, color=c2, linestyle='-')
     if df3 is not None:
-        ax1.plot(df3.idx, df3[key], lw=lw, color=c2, linestyle='--')
+        ax1.plot(df3['idx'], df3[key], lw=lw, color=c2, linestyle='--')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     # set y range by signal within tlims (in case data off-screen changing it)
@@ -366,13 +360,13 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
     '''Add basic var to plot as line plot with no extra space.'''
 
     if df is not None:
-        ax.plot(df.idx, df[var], lw=lw, color='k', linestyle='-')
+        ax.plot(df['idx'], df[var], lw=lw, color='k', linestyle='-')
     if df1 is not None:
-        ax.plot(df1.idx, df1[var], lw=lw, color=c1, linestyle='-')
+        ax.plot(df1['idx'], df1[var], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
-        ax.plot(df2.idx, df2[var], lw=lw, color=c2, linestyle='-')
+        ax.plot(df2['idx'], df2[var], lw=lw, color=c2, linestyle='-')
     if df3 is not None:
-        ax.plot(df3.idx, df3[var], lw=lw, color=c2, linestyle='--')
+        ax.plot(df3['idx'], df3[var], lw=lw, color=c2, linestyle='--')
     ax.set_ylabel(varlabel)
     ax.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for y limits
     # set y range by signal within tlims (in case data off-screen changing it)
@@ -392,7 +386,7 @@ def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False
 
     c1, c2 = '#559349', '#874993'
     # 1st var
-    ax1.plot(df.idx, df[var1], lw=lw, color=c1, linestyle='-')
+    ax1.plot(df['idx'], df[var1], lw=lw, color=c1, linestyle='-')
     ax1.set_ylabel(label1, color=c1)
     ax1.tick_params(axis='y', colors=c1)
     if ymaxrange is not None:  # Have max limits for y axis
@@ -400,7 +394,7 @@ def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False
     shifty(ax1)
     # 2nd var
     ax2 = ax1.twinx()
-    ax2.plot(df.idx, df[var2], lw=lw, color=c2, linestyle='--')
+    ax2.plot(df['idx'], df[var2], lw=lw, color=c2, linestyle='--')
     ax2.set_ylabel(label2 + ' [--]', color=c2)
     ax2.tick_params(axis='y', colors=c2)
     if ymaxrange is not None:  # Have max limits for y axis
@@ -415,9 +409,9 @@ def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
     '''2 variables, one on each y axis. same y limits if set True.'''
 
     if var1 in df.keys():
-        ax.plot(df.idx, df[var1], lw=lw, color='k', linestyle='-')
+        ax.plot(df['idx'], df[var1], lw=lw, color='k', linestyle='-')
     if var2 in df.keys():
-        ax.plot(df.idx, df[var2], lw=lw, color='k', linestyle='--')
+        ax.plot(df['idx'], df[var2], lw=lw, color='k', linestyle='--')
 
     if (var1 not in df.keys() and var2 not in df.keys()) or (df[var1].isnull().sum() == len(df) and df[var2].isnull().sum() == len(df)):
         ax.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax.transAxes)
@@ -646,7 +640,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     elif which == 'ndbc-nowave-nowtemp':
         nsubplots = 3
     elif which == 'ndbc-nowave-nowtemp-nopress':
-        nsubplots = 2 
+        nsubplots = 2
     elif which == 'tcoon-nomet':
         nsubplots = 2
     elif which == 'tcoon':
@@ -689,24 +683,22 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         # base = df.index[0].minute
         # df = df.resample('60T', base=base).asfreq()
 
-    if df is not None:
-        df = df_init(df)
-    if df2 is not None and not df2.empty:
-        df2 = df_init(df2)
-    if df3 is not None:
-        df3 = df_init(df3)
+    # set up datetime number indices since quiver doesn't work otherwise
+    for dftemp in [df, df1, df2, df3]:
+        if dftemp is not None:
+            dftemp = df_init(dftemp)
 
     # change length of df2 if df1 overlaps with it to prioritize df1
     if df1 is not None and df2 is not None:
         if df1.index[-1] > df2.index[0]:
             stemp = df1.index[-1] + pd.Timedelta('10 minutes')
-            df2 = df_init(df2[stemp:])
+            df2 = df2[stemp:]
 
     # change length of df3 if df2 overlaps with it to prioritize df2
     if df2 is not None and df3 is not None:
         if df2.index[-1] > df3.index[0]:
             stemp = df2.index[-1] + pd.Timedelta('10 minutes')
-            df3 = df_init(df3[stemp:])
+            df3 = df3[stemp:]
 
     fig, axes = setup(nsubplots=nsubplots, table=which, buoy=buoy)
 
@@ -847,11 +839,11 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
-        dfm = df_init(pd.concat([df1, df2, df3]))
+        dfm = pd.concat([df1, df2, df3])
 
         if df is None:  # if no data
             df = dfm
-        if dfm.dT > df.dT:
+        if (dfm.index[-1]-dfm.index[0]) > (df.index[-1]-df.index[0]):
             df = dfm  # use the longer dataframe for labeling x axis
 
     # if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
@@ -903,7 +895,7 @@ def currents(dfs, buoys):
 
         # save a df for labeling the bottom axis if it has at least 4 days of data
         # otherwise it squishes up the labels a lot
-        if df.dT > 4:
+        if df.index[-1] - df.index[0] > 4:
             dfsave = df  # save for using with bottom labeling
 
     add_xlabels(axes[len(dfs)-1], dfsave, fig)

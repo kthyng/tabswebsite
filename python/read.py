@@ -10,7 +10,7 @@ import xarray as xr
 import gsw
 from os import system, path
 import tools
-from plot_buoy import df_init
+# from plot_buoy import df_init
 import requests
 
 email = 'kthyng@tamu.edu'
@@ -478,7 +478,7 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
-        # can't use datetime index directly unfortunately here, so can't use pandas later either
-        df.idx = date2num(df.index.to_pydatetime())  # in units of days
+        # # can't use datetime index directly unfortunately here, so can't use pandas later either
+        # df.idx = date2num(df.index.to_pydatetime())  # in units of days
 
     return df
