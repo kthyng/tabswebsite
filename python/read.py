@@ -173,10 +173,9 @@ def read_nos_df(dataname):
     '''Read in individual tcoon datasets and arrange variables.'''
 
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
-
     if 'type=met' in dataname:
         names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
-        df = df.drop([' VIS'], axis=1)
+        df = df.drop([' VIS'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {'East [m/s]': 2, 'North [m/s]': 2}
 
@@ -189,13 +188,13 @@ def read_nos_df(dataname):
 
     elif 'product=water_level' in dataname:
         names = ['Water Level [m]']
-        df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1)
+        df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
     elif 'type=phys' in dataname:
         names = ['WaterT [deg C]']
-        df = df.drop(['CONDUCTIVITY'], axis=1)
+        df = df.drop(['CONDUCTIVITY'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
