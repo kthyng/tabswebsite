@@ -14,6 +14,7 @@ import tools
 import buoy_properties as bp
 import buoy_header as bh
 import read
+from matplotlib.dates import date2num
 
 bys = bp.load() # load in buoy data
 
@@ -29,8 +30,10 @@ if __name__ == "__main__":
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
         for table in tables:  # loop through tables for each buoy
-            # if not 'ports' in table:
-            #     continue
+            if not bys[buoy]['active']:  # only do this for active buoys
+                continue
+            if not 'g06010' in buoy:
+                continue
             print(buoy)
             # read in data
             if bys[buoy]['inmysql']:  # mysql tables
@@ -40,7 +43,7 @@ if __name__ == "__main__":
 
             # start 6 days earlier from last data
             dstart = dend - pd.Timedelta('6 days')
-            df = read.read(buoy, dstart, dend, table=table, usemodel=False)
+            df = read.read(buoy, dstart, dend, table=table, usemodel=False, userecent=True)
             if len(buoy) == 1:
                 fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
             else:
@@ -75,7 +78,13 @@ if __name__ == "__main__":
             if table == 'wave' or table == 'eng' or dfmodelrecent is None or dfmodelforecast is None:
                 tlims = None
             else:
-                tlims = [dfmodelrecent.idx[0], dfmodelforecast.idx[-1]]
+                # import pdb; pdb.set_trace()
+                # tlims = [dfmodelrecent['idx'].iloc[0], dfmodelforecast['idx'].iloc[-1]]
+                tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
+            # if dend is not None:
+            # tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
+            # else:
+            #     tlims = None
             # will plot model output from now if available, otherwise data regardless of how old
             fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
             fig.savefig(fname + '.pdf')

@@ -34,7 +34,8 @@ def load():
     '''
 
     import pandas as pd
-    buoys = pd.read_csv('../includes/buoys.csv', index_col=0)
+    buoys = pd.read_table('../includes/buoys.csv', index_col=0)
+    # buoys = pd.read_csv('../includes/buoys.csv', index_col=0)
     return buoys.to_dict('index')
 
 

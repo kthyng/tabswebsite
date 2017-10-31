@@ -22,7 +22,6 @@ import read
 import buoy_properties as bp
 
 bys = bp.load() # load in buoy properties
-now = pd.Timestamp('now', tz='utc')
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
@@ -31,24 +30,25 @@ parser.add_argument('--dstart', type=str, help='dstart', default=None)
 parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
-parser.add_argument('--tz', type=str, help='time zone', default='UTC')
-parser.add_argument('--model', type=str, help='plot model output', default='True')
+parser.add_argument('--tz', type=str, help='time zone: "UTC" or "US/Central"', default='UTC')
+parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
 args = parser.parse_args()
 
 fname = args.fname
 datatype = args.datatype
 units = args.units
 tz = args.tz
-model = args.model
+usemodel = args.usemodel
 # can't figure out how to have variable from php a boolean so sending string
-if model == 'False':
+if usemodel == 'False':
     usemodel = False
-elif model == 'True':
+elif usemodel == 'True':
     usemodel = True
 
 # change dstart and dend to datetime objects
 dstart = pd.Timestamp(args.dstart, tz=tz)
 dend = pd.Timestamp(args.dend, tz=tz)
+now = pd.Timestamp('now', tz='utc')
 
 if dend is not None:
     # add a day to dend time so that desired day is included
@@ -86,14 +86,15 @@ else:
         dfmodelforecast = read.read_model(buoy, table, dstart, dend, timing='forecast')
     elif usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None
-        dftemp = read.read(buoy, dstart, dend, usemodel=True)
-        dfmodelrecent = dftemp[:now] if dstart<now else None
-        dfmodelforecast = dftemp[now:] if dend>now else None
+        dfmodelrecent = None
+        dfmodelforecast = read.read(buoy, dstart, dend, usemodel=True, units=None,
+                                    tz=None, userecent=True)
+        # dfmodelrecent = dftemp.loc[(dftemp.index <= now)] if dstart<now else None
+        # dfmodelforecast = dftemp.loc[(dftemp.index > now)] if dend>now else None
     else:
         dfmodelhindcast = None
         dfmodelrecent = None
         dfmodelforecast = None
-
 
 
 if datatype == 'data':

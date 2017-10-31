@@ -23,6 +23,50 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     table is necessary if buoy is a TABS buoy (length=1).
     '''
 
+    if bys[buoy]['inmysql']:
+        # Call general read function to distribute to correct buoy read function
+        df = read_buoy(buoy, dstart, dend, table=table, units=units,
+                       tz=tz, usemodel=usemodel, userecent=userecent)
+        return df
+
+    usefile = True  # initially True, set to False once we've read from the file
+    fname = '../daily/' + buoy + '_all.hdf'
+    date = dstart
+    df = pd.DataFrame()
+    # check that we are within normal data frequency
+    while date + pd.Timedelta('60 minutes') < dend:
+
+        # # if we are using data, dend cannot be in the future
+        # dend = min(dend, pd.Timestamp('now', tz='utc'))
+        if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
+            df = pd.read_hdf(fname, where='index>=date&index<=dend')
+            # import pdb; pdb.set_trace()
+            usefile = False
+            # if dstart > when data in fname ends, just go to the else on the next while loop
+            if df is not None and not df.empty:
+                df = df.tz_localize('utc')
+                date = df.index[-1].normalize() + pd.Timedelta('1 day')  # bump up to start of next day
+        else:
+            td = pd.Timedelta('31 days')
+            if 'ports' in bys[buoy]['table1'] and usemodel:
+                td = pd.Timedelta('7 days')  # tidal model gives 7 days of output
+            daystoread = min(td, dend-date)
+            dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
+                               tz=tz, usemodel=usemodel, userecent=userecent)
+            if df is not None:
+                df = df.append(dftemp)
+            date += pd.Timedelta(daystoread) + pd.Timedelta('1 day')
+    if df is not None and not df.empty:
+        df = df.loc[(df.index > dstart) & (df.index < dend)]
+    else:
+        df = None
+
+    return df
+
+
+def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
+         usemodel=False, userecent=True):
+
     # need table if TABS buoy
     if len(buoy) == 1:
         assert table is not None, 'need to input table when using TABS buoy'
@@ -40,7 +84,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
 
     # return None instead of just header if no data for time period
-    if len(df) == 0:
+    if df is None or len(df) == 0:
         return None
     else:
         if df.index.tz is None:
@@ -53,62 +97,31 @@ def read_ports(buoy, dstart, dend, usemodel=False):
 
     Only data or model is read in during a single call to this function.
     '''
-    usefile = True  # initially True, set to False once we've read from the file
-    date = dstart
-    df = pd.DataFrame()
-    # check that we are within data frequency
-    while date + pd.Timedelta('10 minutes') < dend:
 
-        if not usemodel:  # data
-            # if we are using data, dend cannot be in the future
-            dend = min(dend, pd.Timestamp('now', tz='utc'))
-            fname = '../daily/' + buoy + '_all.hdf'
-            if path.exists(fname) and usefile:
-                df = read_ports_df('../daily/' + buoy + '_all.hdf', [dstart, dend])
-                date = df.index[-1].normalize() + pd.Timedelta('1 day')  # bump up to start of next day
-                usefile = False
-            else:
-                daystoread = min(pd.Timedelta('30 days'), dend-date, pd.Timestamp('now', tz='utc')-date)
-                base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
-                suffix = '&bin=0&bdate=' + date.strftime('%Y%m%d') + '&edate=' + (date+daystoread).strftime('%Y%m%d')
-                url = base + buoy + suffix
-                dftemp = read_ports_df(url)
-                df = df.append(dftemp)
-                date += pd.Timedelta(daystoread + '1 day')
+    if not usemodel:
+        base = 'https://tidesandcurrents.noaa.gov/cdata/DataPlot?&unit=0&timeZone=UTC&view=csv&id='
+        suffix = '&bin=0&bdate=' + dstart.strftime('%Y%m%d') + '&edate=' + (dend).strftime('%Y%m%d')
+        url = base + buoy + suffix
 
-        else:  # model
-            daystoread = min(pd.Timedelta('7 days'), dend-date)
+    else:  # model
+        # tidal prediction (only goes back and forward in time 2 years)
+        base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
+        options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ dstart.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
+        url = base + options + buoy
 
-            # tidal prediction (only goes back and forward in time 2 years)
-            base = 'https://tidesandcurrents.noaa.gov/noaacurrents/DownloadPredictions?'
-            options = 'fmt=csv&t=24hr&i=30min&i=30min&d='+ date.strftime('%Y-%m-%d') + '&r=2&tz=GMT&u=2&id='
-            url = base + options + buoy
-
-            dftemp = read_ports_df(url)
-            # dftemp = pd.read_csv(url, parse_dates=True, index_col=0)
-            df = df.append(dftemp)
-            date += pd.Timedelta(daystoread)
-
-    if not df.empty:
-        df = df.loc[(df.index > dstart) & (df.index < dend)]
+    df = read_ports_df(url)
 
     return df
 
 
 def read_ports_df(dataname, dates=None):
 
-    if 'http' in dataname:  # reading from website
-        df = pd.read_csv(dataname, parse_dates=True, index_col=0,
-                         error_bad_lines=False, warn_bad_lines=False)
-    else:
-        assert dates is not None, 'input start and end dates for reading from existing file'
-        df = pd.read_hdf(dataname, where='index>=dates[0]&index<=dates[1]')
+    df = pd.read_csv(dataname, parse_dates=True, index_col=0,
+                     error_bad_lines=False, warn_bad_lines=False)
 
     # this catches if data wasn't returned properly
     if df.empty:
         return None
-    elif df.index.tz is None:
-        df = df.tz_localize('utc')
 
     if 'http' and 'Predictions' in dataname:  # website, model predictions
         df.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
@@ -207,7 +220,7 @@ def read_nos_df(dataname):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df.tz_localize('utc')
+    return df
 
 
 def read_ndbc(buoy, dstart, dend, userecent=True):
@@ -256,8 +269,6 @@ def read_ndbc(buoy, dstart, dend, userecent=True):
                 if dftemp.index[-1] < dftemp.index[0]:  # backward order
                     dftemp = dftemp[::-1]
                 df = df.combine_first(dftemp)  # combine with preference for df if overlapping
-
-        df = df[dstart:dend]
 
     return df
 
@@ -326,6 +337,17 @@ def read_tabs(table, buoy, dstart, dend):
     df.drop(df.index[df.index.isnull()], inplace=True)  # drop bad rows
     df[df == -99.0] = np.nan  # replace missing values
 
+    if 'date' in df.keys():
+        df.drop(['date', 'time'], inplace=True, axis=1)
+    for key in df.keys():
+        if (df[key]==0).all():
+            df[key] = np.nan
+        # if more than a quarter of the entries are 0, must be wrong
+        elif (df[key][1::2]==0).sum() > len(df)/4:
+            df[key][1::2] = np.nan
+        elif (df[key][::2]==0).sum() > len(df)/4:
+            df[key][::2] = np.nan
+
     if table == 'ven':
         ind = df['tx']==-99
         df.drop(df.index[ind], inplace=True)  # drop bad rows
@@ -351,7 +373,7 @@ def read_tabs(table, buoy, dstart, dend):
         rdict = {'Speed [m/s]': 2, 'Dir from [deg T]': 0}
 
     elif table == 'salt':
-        names = ['Temp [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
+        names = ['WaterT [deg C]', 'Cond [ms/cm]', 'Salinity', 'Density [kg/m^3]', 'SoundVel [m/s]']
         rdict = {}
 
         # density is all 0s, so need to overwrite
@@ -361,8 +383,6 @@ def read_tabs(table, buoy, dstart, dend):
         names = ['WaveHeight [m]', 'MeanPeriod [s]', 'PeakPeriod [s]']
         rdict = {}
 
-    if 'date' in df.keys():
-        df.drop(['date', 'time'], inplace=True, axis=1)
     df.columns = names
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
@@ -435,9 +455,10 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
     if dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
        dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
         df = None
+        return
     else:
-        dstart = dstart.strftime("%Y-%m-%d")
-        dend = dend.strftime('%Y-%m-%d %H:%M')
+        # dstart = dstart.strftime("%Y-%m-%d")
+        # dend = dend.strftime('%Y-%m-%d %H:%M')
         # Initialize model dataframe with times
         df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
@@ -466,7 +487,10 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
                                     .isel(s_rho=-1, eta_v=j, xi_v=i)*100
                     # rotate from curvilinear to cartesian
                     anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
-                j, i = bp.model(buoy, 'rho')  # get model indices
+                if not bp.model(buoy, 'rho'):  # no model indices saved
+                    return None
+                else:
+                    j, i = bp.model(buoy, 'rho')  # get model indices
                 df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
                 if which == 'salt':
                     df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
@@ -479,13 +503,6 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
                 system(command)
                 return df
 
-        df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
-        df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
-        if which == 'met':
-            df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
-        if which == 'salt':
-            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
-
         # Project along- and across-shelf velocity rather than use from model
         # so that angle matches buoy
         if which == 'ven':
@@ -494,7 +511,22 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
-        # # can't use datetime index directly unfortunately here, so can't use pandas later either
-        # df.idx = date2num(df.index.to_pydatetime())  # in units of days
+    # check meteorological timing separately since can be different
+    if dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
+       dstart >= pd.Timestamp(dsf['time'].isel(time=-1).data, tz='utc'):
+        # fill in met keys so they exist
+        keys = ['AtmPr [MB]', 'AirT [deg C]']
+        if which == 'met': keys += ['RelH [%]']
+        for key in keys:
+            df[key] = np.nan
+        return df.tz_localize('utc')
+    else:
+        j, i = bp.model(buoy, 'rho')  # get model indices
+        df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
+        df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
+        if which == 'met':
+            df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
+        if which == 'salt':
+            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
     return df.tz_localize('utc')

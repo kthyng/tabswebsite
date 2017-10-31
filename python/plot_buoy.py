@@ -125,7 +125,7 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
         # reindex to the new index
         dfnew = dfnew.reindex(df.index)
 
-        if df[key].sum() and dfnew[key].sum():
+        if not df[key].isnull().all() and dfnew[key].isnull().all():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
             ax.text(0.85, 0.015, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
 
@@ -172,12 +172,13 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
         # want 30 min
         df = df.resample('30T').asfreq()
 
-    # if data is None, use model output
-    if df is None:
+    # if data is None, use model output (if model output not all None)
+    if (df is None or east not in df.keys() or df[east].isnull().all()) and not all([dft is None for dft in [df1, df2, df3]]):
+        # now model output saved into df
         df = pd.concat([df1, df2, df3])  # in case there is a df3
         color = c2
-    # this catches when TCOON data is temporarily unavailable
-    if east not in df.keys() or df[east].isnull().sum() == len(df):
+    # this catches when TCOON data is temporarily unavailable and model output is not available
+    if (east not in df.keys() or df[east].isnull().all()) and all([dft is None for dft in [df1, df2, df3]]):
         ax.text(0.1, 0.5, 'Wind data not available at this time.', transform=ax.transAxes)
         ax.get_yaxis().set_ticks([])
         return
@@ -189,25 +190,31 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
 
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
-    xlim = np.diff(ax.get_xlim())  # x limit length in days
-    if xlim <=2:  # less than or equal to two days
+    # collect dataframes that are not None
+    dfs = [dft for dft in [df, df1, df2, df3] if dft is not None]
+    tmin = min([min(dft.index) for dft in dfs])
+    tmax = max([max(dft.index) for dft in dfs])
+    dT = tmax - tmin
+    if dT <= pd.Timedelta('2 days'):  # less than or equal to two days
         width = 1.0
         if which == 'wind':
             width /= 3
-    elif xlim <=6:  # less than or equal to 6 days
+    elif dT <= pd.Timedelta('6 days'):  # less than or equal to 6 days
         width = 0.5
         if which == 'wind':
             width /= 3
     else:
         width = 0.2
+        if which == 'wind':
+            width /= 3
     # decimate temporally
-    if xlim < 5*30:
+    if dT < pd.Timedelta('150 days'):
         ddt = 1
-    elif xlim < 7*30:
+    elif dT < pd.Timedelta('210 days'):
         ddt = 2
-    elif xlim < 11*30:
+    elif dT < pd.Timedelta(str(11*30) + ' days'):
         ddt = 3
-    elif xlim < 15*30:
+    elif dT < pd.Timedelta(str(15*30) + ' days'):
         ddt = 4
     else:
         ddt = 5
@@ -309,15 +316,14 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, tlims=None, dolegend=False, add0=False):
     '''Plot with units on both left and right sides of plot.'''
 
-    # this catches when TCOON data is temporarily unavailable
-    if df is not None:
-        # this is to write about data missing instead of plotting
-        if key not in df.keys() or df[key].isnull().sum() == len(df):
-            ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
-            ax1.get_yaxis().set_ticks([])
-            return
-        else:
-            ax1.plot(df['idx'], df[key], lw=lw, color='k', linestyle='-')
+    if df is not None and not df[key].isnull().all():
+        ax1.plot(df['idx'], df[key], lw=lw, color='k', linestyle='-')
+    # this catches when TCOON data is temporarily unavailable and model output is not available
+    if (df is None or key not in df.keys() or df[key].isnull().all()) \
+         and all([dft is None for dft in [df1, df2, df3]]):
+        ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
+        ax1.get_yaxis().set_ticks([])
+        return
     if df1 is not None:
         ax1.plot(df1['idx'], df1[key], lw=lw, color=c1, linestyle='-')
     if df2 is not None:
@@ -347,7 +353,13 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
             dolegend=False, tlims=None):
     '''Add basic var to plot as line plot with no extra space.'''
 
-    if df is not None:
+    # this catches when data is temporarily unavailable and model output is not available
+    if (df is None or var not in df.keys() or df[var].isnull().all()) \
+         and all([dft is None for dft in [df1, df2, df3]]):
+        ax.text(0.1, 0.5, varlabel.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax.transAxes)
+        ax.get_yaxis().set_ticks([])
+        return
+    if df is not None and not df[var].isnull().all():
         ax.plot(df['idx'], df[var], lw=lw, color='k', linestyle='-')
     if df1 is not None:
         ax.plot(df1['idx'], df1[var], lw=lw, color=c1, linestyle='-')
@@ -573,7 +585,7 @@ def setup(nsubplots, table=None, buoy=None):
 
     if nsubplots == 1:
         figsize = (8.5, 5)
-        props = {'top': 0.92, 'right': 0.92, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.25}
+        props = {'top': 0.92, 'right': 0.92, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.275}
     elif nsubplots == 2:
         figsize = (8.5, 8.5)
         props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.08, 'bottom': 0.175}
@@ -583,6 +595,8 @@ def setup(nsubplots, table=None, buoy=None):
 
     # plot
     fig, axes = plt.subplots(nsubplots, 1, figsize=figsize, sharex=True)
+    if not isinstance(axes, np.ndarray):
+        axes = [axes]  # change to list when 1 subplot to be consistent with others
     # bottom controlled later
     fig.subplots_adjust(**props)
     # title
@@ -601,7 +615,6 @@ def setup(nsubplots, table=None, buoy=None):
             title = 'NOS Station ' + buoy + ': ' + ll
         elif 'ports' in table:
             title = 'PORTS Station ' + buoy + ': ' + ll
-            axes = [axes]  # change to list to be consistent with others
         axes[0].set_title(title, fontsize=18)
 
     return fig, axes
@@ -629,44 +642,56 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         nsubplots = 3
     elif which == 'ndbc-nowave-nowtemp-nopress':
         nsubplots = 2
-    elif which == 'tcoon-nomet':
-        nsubplots = 2
+    elif which == 'tcoon-tide':
+        nsubplots = 1
     elif which == 'tcoon':
         nsubplots = 5
     elif which == 'ports':
         nsubplots = 1
 
-    if len(buoy) == 1 and which != 'wave':
+    if len(buoy) == 1 and which != 'wave' and df is not None:
         # for TABS buoys
         # fill in missing data at 30 min frequency as nans so not plotted
-        if df is not None:
-            df = df.resample('30T').asfreq()
-    elif which == 'wave':
-        idx = df.index
-        # check for gap over an hour. factor 1e9 due to nanoseconds.
-        ind = (np.diff(idx)/1e9).astype(float) > 3700
-        # if big gap, insert nan
-        addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
-        # reindex dataframe with added entries for nans, and sort back into order
-        df = df.reindex(np.hstack((idx, addidx))).sort_index()
-    elif 'ndbc' in which:
-        # Resample and interpolate to catch the case where wind data is at
-        # higher frequency than wave data so wave data is plotted with holes.
-        if df is not None:
-            # only interpolate wave data
-            for key in ['Wave Ht [m]', 'Wave Pd [s]']:
-                idx = df.index
-                base = idx[0].minute
-                datafreq = (idx[1] - idx[0]).seconds/60.
-                if key in df.columns:
-                    df[key] = df[key].resample(str(datafreq) + 'T', base=base).interpolate()
-                    # but then need to check for data gap that should not be connected
-                    # check for gap over an hour. factor 1e9 due to nanoseconds.
-                    ind = (np.diff(idx)/1e9).astype(float) > 3700
-                    # if big gap, insert nan
-                    addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
-                    # reindex dataframe with added entries for nans, and sort back into order
-                    df = df.reindex(np.hstack((idx, addidx))).sort_index()
+        # if df is not None:
+        # interpolate to 30 min for TABS so that small gaps are filled
+        # only 1 time point will be interpolated into
+        df = df.resample('30T').interpolate(method='time', limit=1)
+            # df = df.resample('30T').asfreq()
+    elif which == 'wave':  # TABS
+        # import pdb; pdb.set_trace()
+        # fill in missing data with nan's so not plotted across.
+        base = df.index[0].minute*60 + df.index[0].second
+        df = df.resample('3600 S', base=base).interpolate(method='time', limit=1)
+        # df = df.resample('3600 S', base=base).asfreq()
+        # idx = df.index
+        # # check for gap over an hour. factor 1e9 due to nanoseconds.
+        # ind = (np.diff(idx)/1e9).astype(float) > 3700
+        # # if big gap, insert nan
+        # addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
+        # # reindex dataframe with added entries for nans, and sort back into order
+        # df = df.reindex(np.hstack((idx, addidx))).sort_index()
+    elif 'ndbc' in which and not 'nowave' in which:  # NDBC with wave
+        # fill in missing data with nan's so not plotted across.
+        base = 50
+        df = df.resample('60 T', base=base).interpolate(method='time', limit=1)
+    # elif 'ndbc' in which and not 'nowave' in which:
+    #     # Resample and interpolate to catch the case where wind data is at
+    #     # higher frequency than wave data so wave data is plotted with holes.
+    #     if df is not None:
+    #         # only interpolate wave data
+    #         for key in ['Wave Ht [m]', 'Wave Pd [s]']:
+    #             idx = df.index
+    #             base = idx[0].minute
+    #             datafreq = (idx[1] - idx[0]).seconds/60.
+    #             if key in df.columns:
+    #                 df[key] = df[key].resample(str(datafreq) + 'T', base=base).interpolate()
+    #                 # but then need to check for data gap that should not be connected
+    #                 # check for gap over an hour. factor 1e9 due to nanoseconds.
+    #                 ind = (np.diff(idx)/1e9).astype(float) > 3700
+    #                 # if big gap, insert nan
+    #                 addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
+    #                 # reindex dataframe with added entries for nans, and sort back into order
+    #                 df = df.reindex(np.hstack((idx, addidx))).sort_index()
         # # fill in missing data at 60 min frequency as nans so not plotted
         # base = df.index[0].minute
         # df = df.resample('60T', base=base).asfreq()
@@ -792,13 +817,13 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, dolegend=True, tlims=tlims)
 
-    elif which == 'tcoon-nomet':
+    elif which == 'tcoon-tide':
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3])
-        add_var_2units(axes[1], df, 'WaterT [deg C]',
-                       'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
-                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
+        # add_var_2units(axes[1], df, 'WaterT [deg C]',
+        #                'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+        #                'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+        #                ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
 
     elif which == 'tcoon':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,

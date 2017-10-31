@@ -120,10 +120,10 @@ def convert_units(df, units=None, tz=None):
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
 
-    if tz == 'central':  # time zone
+    if tz == 'US/Central':  # time zone
         # need to first establish a time zone (which it is already in) to change it
         df = df.tz_localize('UTC')  # timezone is UTC
-        df.index = df.index.tz_convert('US/Central')
+        df.index = df.index.tz_convert(tz)
         df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
 
     return df

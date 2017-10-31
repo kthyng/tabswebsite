@@ -21,7 +21,7 @@ def longterm(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
 
     # bring data in file up through yesterday. This way files are
     # consistent regardless of what time of day script is run.
-    dend = pd.Timestamp('now', tz='utc').normalize() - pd.Timedelta('1 day')
+    dend = pd.Timestamp('now', tz='utc').normalize()
     # file write flag
     mode = 'w'
 
@@ -35,43 +35,41 @@ def longterm(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
     if path.exists(fname):
         dstart = pd.Timestamp(open(fname).readlines()[-1][:10], tz='utc') + pd.Timedelta('1 days')
         mode = 'a'  # overwrite write mode
+    df = read.read(buoy, dstart, dend, table=table, units='M', tz='UTC',
+                   usemodel=False, userecent=False)
 
-    # do cases by file type
-
-    # if buoy data is in mysql database, can read in all dates at once
-    if bys[buoy]['inmysql'] or 'ndbc' in bys[buoy]['table1']:
-        df = read.read(buoy, dstart, dend, table=table)
-        # if len(buoy) == 1:
-        #     df = read.read_tabs(table, buoy, dstart, dend)
-        # else:
-        #     df = read.read_ndbc(buoy, dstart, dend)
-
-    # if tcoon, nos, or ports, can only read 30 days at once from website
-    # usemodel=False so that model output is not saved into file
-    elif bys[buoy]['table1'] in ['tcoon', 'tcoon-nomet', 'nos', 'ports']:
-
-        # case when difference is short
-        if (dend-dstart) < pd.Timedelta('30 days'):
-            df = read.read(buoy, dstart, dend, table=table, usemodel=False)
-            # if df is not None:
-            #     tools.write_file(df, fname, compression=False, mode=mode)
-            #     tools.write_file(df, fname, compression=True, mode=mode)
-            # else:
-            #     print('No new data has been read in for buoy ' + buoy + ' table ' + table)
-
-        else:  # time difference is long
-
-            date = dstart
-            df = pd.DataFrame()  # initialize
-            while date < dend:
-                daystoread = min(pd.Timedelta('30 days'), dend-date)
-                dftemp = read.read(buoy, date, date + daystoread, table=table, usemodel=False)
-                df = df.append(dftemp)
-                date += pd.Timedelta('31 days')
-
-    # elif 'ndbc' in bys[buoy]['table1']:
-    #     # userecent=False so that realtime data is not saved into file
-    #     df = read.read_ndbc(buoy, dstart, dend, userecent=False)
+    # # do cases by file type
+    #
+    # # if buoy data is in mysql database, can read in all dates at once
+    # if bys[buoy]['inmysql'] or 'ndbc' in bys[buoy]['table1']:
+    #     df = read.read(buoy, dstart, dend, table=table)
+    #     # if len(buoy) == 1:
+    #     #     df = read.read_tabs(table, buoy, dstart, dend)
+    #     # else:
+    #     #     df = read.read_ndbc(buoy, dstart, dend)
+    #
+    # # if tcoon, nos, or ports, can only read 30 days at once from website
+    # # usemodel=False so that model output is not saved into file
+    # elif bys[buoy]['table1'] in ['tcoon', 'tcoon-nomet', 'nos', 'ports']:
+    #
+    #     # case when difference is short
+    #     if (dend-dstart) < pd.Timedelta('30 days'):
+    #         df = read.read(buoy, dstart, dend, table=table, usemodel=False)
+    #         # if df is not None:
+    #         #     tools.write_file(df, fname, compression=False, mode=mode)
+    #         #     tools.write_file(df, fname, compression=True, mode=mode)
+    #         # else:
+    #         #     print('No new data has been read in for buoy ' + buoy + ' table ' + table)
+    #
+    #     else:  # time difference is long
+    #
+    #         date = dstart
+    #         df = pd.DataFrame()  # initialize
+    #         while date < dend:
+    #             daystoread = min(pd.Timedelta('30 days'), dend-date)
+    #             dftemp = read.read(buoy, date, date + daystoread, table=table, usemodel=False)
+    #             df = df.append(dftemp)
+    #             date += pd.Timedelta('31 days')
 
 
 
@@ -84,35 +82,6 @@ def longterm(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
 
 
 
-    # # case when difference is short
-    # if (dend-dstart) < pd.Timedelta('30 days'):
-    #     df = read.read(buoy, dstart, dend, table=table, usemodel=False)
-    #     if df is not None:
-    #         tools.write_file(df, fname, compression=False, mode=mode)
-    #         tools.write_file(df, fname, compression=True, mode=mode)
-    #     else:
-    #         print('No new data has been read in for buoy ' + buoy + ' table ' + table)
-    #
-    # else:  # time difference is long
-    #
-    #     # if buoy data is in mysql database, can read in all dates at once
-    #     if bys[buoy]['inmysql']:
-    #         if len(buoy) == 1:
-    #             df = read.read_tabs(table, buoy, dstart, dend)
-    #         else:
-    #             df = read.read_ndbc(buoy, dstart, dend)
-    #     else:
-    #         date = dstart
-    #         df = pd.DataFrame()  # initialize
-    #         while date < dend:
-    #             daystoread = min(pd.Timedelta('30 days'), dend-date)
-    #             dftemp = read.read(buoy, date, date + daystoread, table=table)
-    #             df = df.append(dftemp)
-    #             date += pd.Timedelta('31 days')
-    #
-    #     tools.write_file(df, fname, compression=False, mode=mode)
-    #     tools.write_file(df, fname, compression=True, mode=mode)
-
 
 if __name__ == "__main__":
 
@@ -121,7 +90,7 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        if buoy != 'g06010':
+        if buoy != '8770777':
             continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
