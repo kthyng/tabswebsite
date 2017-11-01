@@ -75,7 +75,9 @@ if __name__ == "__main__":
                 dfmodelrecent = None
                 dfmodelforecast = None
 
-            if table == 'wave' or table == 'eng':
+            # none of these use model output, so no forecast and therefore no
+            # extra time needed in x direction
+            if table == 'wave' or table == 'eng' or not bp.model(buoy, 'rho'):
                 tlims = None
             else:
                 # import pdb; pdb.set_trace()
