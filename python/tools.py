@@ -156,7 +156,10 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w'):
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
     if filetype == 'hdf':
-        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, format='table', complib='zlib')
+        if fname.split('/')[-1].split('_')[0] == '8773259':
+            import pdb; pdb.set_trace()
+        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode,
+                                    format='table', complib='zlib', dropna=True)
 
     elif filetype == 'txt':
         if compression:

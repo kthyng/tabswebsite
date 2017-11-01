@@ -82,7 +82,12 @@ else:
               'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
     if usemodel and bys[buoy]['table1'] in tables:
         dfmodelhindcast = read.read_model(buoy, table, dstart, dend, timing='hindcast')
-        dfmodelrecent = read.read_model(buoy, table, dstart, dend, timing='recent')
+        # only look for nowcast model output if hindcast doesn't cover it
+        # sometimes the two times overlap but hindcast output is better
+        if (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
+            dfmodelrecent = None
+        else:
+            dfmodelrecent = read.read_model(buoy, table, dstart, dend, timing='recent')
         dfmodelforecast = read.read_model(buoy, table, dstart, dend, timing='forecast')
     elif usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None

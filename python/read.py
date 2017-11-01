@@ -49,7 +49,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
         else:
             td = pd.Timedelta('31 days')
             if 'ports' in bys[buoy]['table1'] and usemodel:
-                td = pd.Timedelta('7 days')  # tidal model gives 7 days of output
+                td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
             daystoread = min(td, dend-date)
             dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
                                tz=tz, usemodel=usemodel, userecent=userecent)

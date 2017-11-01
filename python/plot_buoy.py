@@ -24,7 +24,7 @@ cmax = 65  # cm/s, max water arrow value
 wmax = 15  # m/s, max wind arrow value
 lw = 1.5
 c2 = 'cornflowerblue'
-c1 = '#3F5D94'  # darker shade of cornflowerblue
+c1 = '#4B70B2'  # darker shade of cornflowerblue
 
 bys = bp.load() # load in buoy data
 
@@ -191,7 +191,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # arrows with no heads for lines
     # http://stackoverflow.com/questions/37154071/python-quiver-plot-without-head
     # collect dataframes that are not None
-    dfs = [dft for dft in [df, df1, df2, df3] if dft is not None]
+    dfs = [dft for dft in [df, df1, df2, df3] if dft is not None and not dft.empty]
     tmin = min([min(dft.index) for dft in dfs])
     tmax = max([max(dft.index) for dft in dfs])
     dT = tmax - tmin
@@ -224,27 +224,58 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
               headlength=0, width=width, units='y', scale_units='y', scale=1, color=color)
 
     # use hindcast currents to fill in before data (in case there has been a gap)
-    if df1 is not None and tlims is not None:
-        if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
-            stemp = df.index[0] - timedelta(minutes=30)
-            df4 = df1[:stemp]
-            ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
-                      headlength=0, width=width, units='y', scale_units='y', scale=1, color=c1)
-    # use nowcast currents to fill in before data (in case there has been a gap)
-    if df2 is not None and tlims is not None:
-        if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
-            stemp = df.index[0] - timedelta(minutes=30)
-            df4 = df2[:stemp]
-            ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
-                      headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
-    # use forecast currents to fill in after data
-    if df3 is not None and not df[df3.index[0]:].equals(df3):
-        # fill in after data with model
-        if df.index[-1] > df3.index[0] and df.index[-1] < df3.index[-1]:
-            stemp = df.index[-1] + timedelta(minutes=30)
-            df3 = df3[stemp:]
-            ax.quiver(df3['idx'][::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
-                      headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
+    # import pdb; pdb.set_trace()
+    if tlims is not None:
+        dfs = []; colors = []
+        for dft, c in zip([df1, df2, df3], [c1, c2, c2]):
+            if dft is not None and not dft.empty:
+                dfs.append(dft); colors.append(c)
+        # dfs = [dft for dft in [df1, df2, df3] if dft is not None and not dft.empty]
+        # min and max datetime values for non-nan data
+        idxmin = df.loc[(~df[east].isnull())]['idx'].min()
+        idxmax = df.loc[(~df[east].isnull())]['idx'].max()
+        # fill in before the data if more than an hour gap
+        if (idxmin - tlims[0]) > 1./24:  # more than an hour
+            plotmodel = True
+            for dft, c in zip(dfs, colors):
+                dft = dft.loc[(dft['idx'] > tlims[0]) & (dft['idx'] < idxmin - 0.5/24)]
+                if plotmodel and not dft[east].isnull().all():  # only plot model in this area once
+                    ax.quiver(dft['idx'][::ddt], np.zeros(len(dft[::ddt])), dft[::ddt][east], dft[::ddt][north], headaxislength=0,
+                              headlength=0, width=width, units='y', scale_units='y', scale=1, color=c)
+                    plotmodel = False
+        # fill in after the data if more than an hour gap
+        if (tlims[1] - idxmax) > 1./24:  # more than an hour
+            plotmodel = True
+            for dft, c in zip(dfs, colors):
+                dft = dft.loc[(dft['idx'] < tlims[1]) & (dft['idx'] > idxmax + 0.5/24)]
+                if plotmodel and not dft[east].isnull().all():  # only plot model in this area once
+                    ax.quiver(dft['idx'][::ddt], np.zeros(len(dft[::ddt])), dft[::ddt][east], dft[::ddt][north], headaxislength=0,
+                              headlength=0, width=width, units='y', scale_units='y', scale=1, color=c)
+                    plotmodel = False
+
+        # if df['idx'].min() > df3.index[0] and df.index[-1] < df3.index[-1]:
+
+    # if df1 is not None and tlims is not None:
+    #     if (df['idx'].min() - tlims[0]) > 3600:  # more than an hour
+    #         stemp = df.index[0] - timedelta(minutes=30)
+    #         df4 = df1[:stemp]
+    #         ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
+    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c1)
+    # # use nowcast currents to fill in before data (in case there has been a gap)
+    # if df2 is not None and tlims is not None:
+    #     if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
+    #         stemp = df.index[0] - timedelta(minutes=30)
+    #         df4 = df2[:stemp]
+    #         ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
+    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
+    # # use forecast currents to fill in after data
+    # if df3 is not None and not df[df3.index[0]:].equals(df3):
+    #     # fill in after data with model
+    #     if df.index[-1] > df3.index[0] and df.index[-1] < df3.index[-1]:
+    #         stemp = df.index[-1] + timedelta(minutes=30)
+    #         df3 = df3[stemp:]
+    #         ax.quiver(df3['idx'][::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
+    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
 
     if which == 'water':
         varmax = cmax
@@ -585,7 +616,7 @@ def setup(nsubplots, table=None, buoy=None):
 
     if nsubplots == 1:
         figsize = (8.5, 5)
-        props = {'top': 0.92, 'right': 0.92, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.275}
+        props = {'top': 0.92, 'right': 0.9, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.275}
     elif nsubplots == 2:
         figsize = (8.5, 8.5)
         props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.08, 'bottom': 0.175}
@@ -819,7 +850,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
 
     elif which == 'tcoon-tide':
         add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, MSL]',
-                       'm2ft', '[ft]', ymaxrange=[-3,3])
+                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, dolegend=True)
         # add_var_2units(axes[1], df, 'WaterT [deg C]',
         #                'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
         #                'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
@@ -827,28 +858,29 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
 
     elif which == 'tcoon':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
-                     df2=df2, df3=df3)
+                     df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
-                       df2=df2, df3=df3)
+                       df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
                        'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
-                       df3=df3)
+                       df3=df3, tlims=tlims)
         add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
-                       'm2ft', '[ft]', ymaxrange=[-3,3])
+                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3)
+                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
 
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df1=df1, df2=df2, df3=df3,
-                       dolegend=True, add0=True)
+                       dolegend=True, add0=True, tlims=tlims)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
@@ -870,8 +902,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
 
     # add grid lines
     for ax in axes:
-        ax.grid(which='major', lw=0.7, color='k', alpha=0.1)
-        ax.grid(which='minor', lw=0.5, color='k', alpha=0.1)
+        ax.grid(which='major', lw=1.5, color='k', alpha=0.05)
+        ax.grid(which='minor', lw=1, color='k', alpha=0.05)
+        # ax.grid(which='major', lw=0.7, color='k', alpha=0.1)
+        # ax.grid(which='minor', lw=0.5, color='k', alpha=0.1)
 
     return fig
 

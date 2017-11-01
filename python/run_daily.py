@@ -32,7 +32,7 @@ if __name__ == "__main__":
         for table in tables:  # loop through tables for each buoy
             if not bys[buoy]['active']:  # only do this for active buoys
                 continue
-            if not 'g06010' in buoy:
+            if not 'B' in buoy:
                 continue
             print(buoy)
             # read in data
@@ -56,9 +56,9 @@ if __name__ == "__main__":
             if df is not None and len(df) < 2:
                 df = None
             # no model output for stations in bays or outside domain
-            now = pd.Timestamp('now', tz='utc')
+            now = pd.Timestamp('now', tz='utc').normalize()
             past = now - pd.Timedelta('5 days')
-            future = pd.Timestamp('now', tz='utc') + pd.Timedelta('5 days')
+            future = now + pd.Timedelta('4 days')
             if bp.model(buoy, 'rho'):
                 # read in recent model output, not tied to when data output was found
                 dfmodelrecent = read.read_model(buoy, table, past, now,
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 dfmodelrecent = None
                 dfmodelforecast = None
 
-            if table == 'wave' or table == 'eng' or dfmodelrecent is None or dfmodelforecast is None:
+            if table == 'wave' or table == 'eng':
                 tlims = None
             else:
                 # import pdb; pdb.set_trace()
