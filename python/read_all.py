@@ -32,13 +32,14 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
         fname = path.join('..', 'daily', buoy + '_all')
 
     # if file already exists, overwrite dstart with day after day from last line of file
-    if path.exists(fname):
+    if path.exists(fname + '.hdf') and path.exists(fname):
         dstart = pd.Timestamp(open(fname).readlines()[-1][:10], tz='utc') + pd.Timedelta('1 days')
         mode = 'a'  # overwrite write mode
     df = read.read(buoy, dstart, dend, table=table, units='M', tz='UTC',
                    usemodel=False, userecent=False)
 
     if df is not None:
+        import pdb; pdb.set_trace()
         tools.write_file(df, fname, filetype='txt', compression=False, mode=mode)
         tools.write_file(df, fname, filetype='txt', compression=True, mode=mode)
         tools.write_file(df, fname, filetype='hdf', mode=mode)
