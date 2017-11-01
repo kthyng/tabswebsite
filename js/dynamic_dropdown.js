@@ -36,6 +36,7 @@ var data = {
     "GISL1": ["ndbc"],
     "AMRL1": ["ndbc"],
     "PSTL1": ["ndbc"],
+    "g06010": ["ports"],
     '8770475': ["tcoon"],
     '8770520': ["tcoon"],
     '8770733': ["tcoon"],
@@ -98,6 +99,9 @@ http://jsfiddle.net/NaUAL/
         else if (valorig == "ndbc"){
           valnameorig = "NDBC buoy"
         }
+        else if (valorig == "ports"){
+          valnameorig = "PORTS buoy"
+        }
         else if (valorig == "tcoon"){
           valnameorig = "TCOON buoy"
         }
@@ -129,6 +133,9 @@ http://jsfiddle.net/NaUAL/
               }
               else if (val == "ndbc"){
                 valname = "NDBC buoy"
+              }
+              else if (val == "ports"){
+                valname = "PORTS buoy"
               }
               else if (val == "tcoon"){
                 valname = "TCOON buoy"

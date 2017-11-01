@@ -80,6 +80,7 @@ print "<OPTION value='BURL1'>BURL1</option>\n";
 print "<OPTION value='GISL1'>GISL1</option>\n";
 print "<OPTION value='AMRL1'>AMRL1</option>\n";
 print "<OPTION value='PSTL1'>PSTL1</option>\n";
+print "<OPTION value='g06010'>g06010</option>\n";
 print "<OPTION value='8770475'>8770475</option>\n";
 print "<OPTION value='8770520'>8770520</option>\n";
 print "<OPTION value='8770733'>8770733</option>\n";

@@ -13,7 +13,7 @@ import numpy as np
 import buoy_properties as bp
 from datetime import datetime, timedelta
 import tools
-from matplotlib.dates import date2num
+from matplotlib.dates import date2num, num2date
 import pandas as pd
 
 
@@ -224,7 +224,6 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
               headlength=0, width=width, units='y', scale_units='y', scale=1, color=color)
 
     # use hindcast currents to fill in before data (in case there has been a gap)
-    # import pdb; pdb.set_trace()
     if tlims is not None:
         dfs = []; colors = []
         for dft, c in zip([df1, df2, df3], [c1, c2, c2]):
@@ -252,30 +251,6 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
                     ax.quiver(dft['idx'][::ddt], np.zeros(len(dft[::ddt])), dft[::ddt][east], dft[::ddt][north], headaxislength=0,
                               headlength=0, width=width, units='y', scale_units='y', scale=1, color=c)
                     plotmodel = False
-
-        # if df['idx'].min() > df3.index[0] and df.index[-1] < df3.index[-1]:
-
-    # if df1 is not None and tlims is not None:
-    #     if (df['idx'].min() - tlims[0]) > 3600:  # more than an hour
-    #         stemp = df.index[0] - timedelta(minutes=30)
-    #         df4 = df1[:stemp]
-    #         ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
-    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c1)
-    # # use nowcast currents to fill in before data (in case there has been a gap)
-    # if df2 is not None and tlims is not None:
-    #     if (df['idx'][0] - tlims[0]) > 3600:  # more than an hour
-    #         stemp = df.index[0] - timedelta(minutes=30)
-    #         df4 = df2[:stemp]
-    #         ax.quiver(df4['idx'][::ddt], np.zeros(len(df4[::ddt])), df4[::ddt][east], df4[::ddt][north], headaxislength=0,
-    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
-    # # use forecast currents to fill in after data
-    # if df3 is not None and not df[df3.index[0]:].equals(df3):
-    #     # fill in after data with model
-    #     if df.index[-1] > df3.index[0] and df.index[-1] < df3.index[-1]:
-    #         stemp = df.index[-1] + timedelta(minutes=30)
-    #         df3 = df3[stemp:]
-    #         ax.quiver(df3['idx'][::ddt], np.zeros(len(df3[::ddt])), df3[::ddt][east], df3[::ddt][north], headaxislength=0,
-    #                   headlength=0, width=width, units='y', scale_units='y', scale=1, color=c2)
 
     if which == 'water':
         varmax = cmax
@@ -453,6 +428,18 @@ def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
         setymaxrange(ax, ymaxrange)
     shifty(ax)
 
+def majorformatter(date, y):
+    date = num2date(date)
+    if date.hour == 0:  # use full date for start of day
+        return date.strftime('%b %d, %H:%M')
+    else:  # return only time
+        return date.strftime('%H:%M')
+def majorformatter_only0hour(date, y):
+    date = num2date(date)
+    if date.hour == 0:  # use full date for start of day
+        return date.strftime('%b %d, %H:%M')
+    else:  # return only time
+        return ''
 
 def add_xlabels(ax, df, fig, tlims=None):
     '''Add date labels to bottom x axis'''
@@ -473,7 +460,7 @@ def add_xlabels(ax, df, fig, tlims=None):
         ax.xaxis.set_minor_locator(hours)
         sixthdays = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
         ax.xaxis.set_major_locator(sixthdays)
-        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+        ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(majorformatter))
         if df.index[0].year != df.index[-1].year:
             ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
@@ -486,20 +473,67 @@ def add_xlabels(ax, df, fig, tlims=None):
         ax.xaxis.set_minor_locator(hours)
         quarterdays = mpl.dates.HourLocator(byhour=np.arange(0,24,6))
         ax.xaxis.set_major_locator(quarterdays)
-        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+        ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(majorformatter))
         if df.index[0].year != df.index[-1].year:
             ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
         else:
             ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
-    elif xlim <=9:  # less than or equal to 9 days
-        # hourly minor ticks
+    elif xlim <=3:
+        hours = mpl.dates.HourLocator(byhour=np.arange(0,24,2))
+        ax.xaxis.set_minor_locator(hours)
+        halfdays = mpl.dates.HourLocator(byhour=np.arange(0,24,8))
+        ax.xaxis.set_major_locator(halfdays)
+        ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(majorformatter))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <=4:
+        hours = mpl.dates.HourLocator(byhour=np.arange(0,24,3))
+        ax.xaxis.set_minor_locator(hours)
+        halfdays = mpl.dates.HourLocator(byhour=np.arange(0,24,12))
+        ax.xaxis.set_major_locator(halfdays)
+        ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(majorformatter))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <=5:
         minor = mpl.dates.HourLocator(byhour=np.arange(0,24,4))
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.HourLocator(byhour=np.arange(0,24,12))
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.ticker.FuncFormatter(majorformatter_only0hour))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <=8:
+        minor = mpl.dates.HourLocator(byhour=np.arange(0,24,6))
         ax.xaxis.set_minor_locator(minor)
         major = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
         ax.xaxis.set_major_locator(major)
-        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d, %H:%M'))
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
+        if df.index[0].year != df.index[-1].year:
+            ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+        else:
+            ax.text(0.98, -0.15, df.index.strftime("%Y")[-1],
+                    transform=ax.transAxes, rotation=30)
+    elif xlim <=10:
+        minor = mpl.dates.HourLocator(byhour=np.arange(0,24,12))
+        ax.xaxis.set_minor_locator(minor)
+        major = mpl.dates.HourLocator(byhour=np.arange(0,24,24))
+        ax.xaxis.set_major_locator(major)
+        ax.xaxis.set_major_formatter(mpl.dates.DateFormatter('%b %d'))
         if df.index[0].year != df.index[-1].year:
             ax.text(0.98, -0.05, df.index.strftime("%Y")[0] + '-' + df.index.strftime("%Y")[-1],
                     transform=ax.transAxes, rotation=30)
