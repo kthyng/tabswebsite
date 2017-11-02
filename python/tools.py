@@ -103,6 +103,7 @@ def dd2dm(dd):
 def convert_units(df, units=None, tz=None):
     '''Convert units.'''
 
+    df = df.copy()  # to avoid editing original df
     if units == 'E':
         units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
         conversions = ['cps2kts', 'mps2kts', 'c2f', 'mb2hg', 'm2ft']
@@ -115,15 +116,13 @@ def convert_units(df, units=None, tz=None):
 
             # convert all columns that need converting for unit
             for col in cols_to_change:
-                df[col] = convert(df[col], conversion)
+                df.loc[:,col] = convert(df.loc[:,col], conversion)
                 newname = col.replace(unit, newunit)
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
 
     if tz == 'US/Central':  # time zone
-        # need to first establish a time zone (which it is already in) to change it
-        df = df.tz_localize('UTC')  # timezone is UTC
-        df.index = df.index.tz_convert(tz)
+        df = df.tz_convert(tz)
         df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
 
     return df
@@ -153,6 +152,7 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w'):
     else:
         header = True
 
+    # import pdb; pdb.set_trace()
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
     if filetype == 'hdf':
@@ -160,7 +160,6 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w'):
         #     import pdb; pdb.set_trace()
         df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode,
                                     format='table', complib='zlib')#, dropna=True)
-
     elif filetype == 'txt':
         if compression:
             df.tz_localize(None).to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',

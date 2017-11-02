@@ -39,7 +39,6 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
                    usemodel=False, userecent=False)
 
     if df is not None:
-        import pdb; pdb.set_trace()
         tools.write_file(df, fname, filetype='txt', compression=False, mode=mode)
         tools.write_file(df, fname, filetype='txt', compression=True, mode=mode)
         tools.write_file(df, fname, filetype='hdf', mode=mode)
@@ -54,7 +53,7 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        # if buoy != '8770777':
+        # if buoy != '8770475':
         #     continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]

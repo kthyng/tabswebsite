@@ -32,7 +32,7 @@ if __name__ == "__main__":
         for table in tables:  # loop through tables for each buoy
             if not bys[buoy]['active']:  # only do this for active buoys
                 continue
-            if not 'B' in buoy:
+            if not '8770475' in buoy:
                 continue
             print(buoy)
             # read in data
@@ -95,9 +95,9 @@ if __name__ == "__main__":
             fig.savefig(fname + '_low.png', dpi=60)
             close(fig)
 
-    # for buoy in bd.buoys():  # loop through buoys separately for buoy headers
-    #     # write header
-    #     bh.make(buoy)
+    for buoy in bys.keys():  # loop through buoys separately for buoy headers
+        # write header
+        bh.make(buoy)
 
     # # separate for making currents summaries
     # # use data that was calculated previously in this script

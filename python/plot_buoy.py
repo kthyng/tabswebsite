@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 import tools
 from matplotlib.dates import date2num, num2date
 import pandas as pd
+import pytz
 
 
 mpl.rcParams.update({'font.size': 14})
@@ -613,20 +614,23 @@ def add_xlabels(ax, df, fig, tlims=None):
     # this gives number of rows or subplots since always one column
     nsubplots = fig.get_axes()[0].numRows
     if nsubplots == 1:
-        textlocUTC = 1.05, -0.25
+        textlocUTC = 1.03, -0.25
         textloc1 = 0.95, 0.06
         textloc2 = 0.08, 0.075
     elif nsubplots == 2:
-        textlocUTC = 1.05, -0.3
+        textlocUTC = 1.03, -0.3
         textloc1 = 0.95, 0.035
         textloc2 = 0.08, 0.045
     else:
-        textlocUTC = 1.05, -0.35
+        textlocUTC = 1.03, -0.35
         textloc1 = 0.95, 0.025
         textloc2 = 0.08, 0.035
 
     # put in GMT as time zone
-    ax.text(*textlocUTC, 'UTC', transform=ax.transAxes, fontsize=10)
+    if df.index.tz == pytz.UTC:
+        ax.text(*textlocUTC, 'UTC', transform=ax.transAxes, fontsize=10)
+    elif df.index.tz == pytz.timezone('US/Central'):
+        ax.text(*textlocUTC, 'CDT/CST', transform=ax.transAxes, fontsize=10)
 
     # rotates and right aligns the x labels
     plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
@@ -764,7 +768,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
     # set up datetime number indices since quiver doesn't work otherwise
     for dft in [df, df1, df2, df3]:
         if dft is not None:
-            dft.insert(0, 'idx', date2num(dft.index.to_pydatetime()))
+            # have to implement timezone to get shift into idx
+            dft.insert(0, 'idx', date2num(dft.index.tz_localize(None).to_pydatetime()))
 
     # change length of df2 if df1 overlaps with it to prioritize df1
     if df1 is not None and df2 is not None:

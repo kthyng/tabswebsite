@@ -48,7 +48,7 @@ elif usemodel == 'True':
 # change dstart and dend to datetime objects
 dstart = pd.Timestamp(args.dstart, tz=tz)
 dend = pd.Timestamp(args.dend, tz=tz)
-now = pd.Timestamp('now', tz='utc')
+now = pd.Timestamp('now', tz=tz)
 
 if dend is not None:
     # add a day to dend time so that desired day is included
@@ -73,7 +73,7 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
-    df = read.read(buoy, dstart, dend, table=table, units=None, tz=None)
+    df = read.read(buoy, dstart, dend, table=table, units=units, tz=tz)
     if df is not None:  # won't work if data isn't available in this time period
         tools.write_file(df, fname)
 
@@ -81,19 +81,23 @@ else:
     tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
               'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
     if usemodel and bys[buoy]['table1'] in tables:
-        dfmodelhindcast = read.read_model(buoy, table, dstart, dend, timing='hindcast')
+        dfmodelhindcast = read.read_model(buoy, table, dstart, dend,
+                                          timing='hindcast', tz=tz, units=units)
         # only look for nowcast model output if hindcast doesn't cover it
         # sometimes the two times overlap but hindcast output is better
-        if (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
+        # import pdb; pdb.set_trace()
+        if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
             dfmodelrecent = None
         else:
-            dfmodelrecent = read.read_model(buoy, table, dstart, dend, timing='recent')
-        dfmodelforecast = read.read_model(buoy, table, dstart, dend, timing='forecast')
+            dfmodelrecent = read.read_model(buoy, table, dstart, dend,
+                                            timing='recent', tz=tz, units=units)
+        dfmodelforecast = read.read_model(buoy, table, dstart, dend,
+                                          timing='forecast', tz=tz, units=units)
     elif usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None
         dfmodelrecent = None
-        dfmodelforecast = read.read(buoy, dstart, dend, usemodel=True, units=None,
-                                    tz=None, userecent=True)
+        dfmodelforecast = read.read(buoy, dstart, dend, usemodel=True,
+                                    userecent=True, tz=tz, units=units)
         # dfmodelrecent = dftemp.loc[(dftemp.index <= now)] if dstart<now else None
         # dfmodelforecast = dftemp.loc[(dftemp.index > now)] if dend>now else None
     else:
@@ -110,7 +114,7 @@ elif datatype == 'pic':
     if not path.exists(fname + '.png'):
         print('<br><br>')
         if dend is not None:
-            tlims = [date2num(pd.to_datetime(dstart).to_pydatetime()), date2num(pd.to_datetime(dend).to_pydatetime())]
+            tlims = [date2num(pd.to_datetime(dstart.tz_localize(None)).to_pydatetime()), date2num(pd.to_datetime(dend.tz_localize(None)).to_pydatetime())]
         else:
             tlims = None
         fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,

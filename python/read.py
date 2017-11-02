@@ -33,6 +33,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
     fname = '../daily/' + buoy + '_all.hdf'
     date = dstart
     df = pd.DataFrame()
+    # import pdb; pdb.set_trace()
     # check that we are within normal data frequency
     while date + pd.Timedelta('60 minutes') < dend:
 
@@ -44,8 +45,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
             usefile = False
             # if dstart > when data in fname ends, just go to the else on the next while loop
             if df is not None and not df.empty:
-                df = df.tz_localize('utc')
-                date = df.index[-1].normalize() + pd.Timedelta('1 day')  # bump up to start of next day
+                date = df.index[-1].tz_localize('utc').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
         else:
             td = pd.Timedelta('31 days')
             if 'ports' in bys[buoy]['table1'] and usemodel:
@@ -56,7 +56,11 @@ def read(buoy, dstart, dend, table=None, units=None, tz=None,
             if df is not None:
                 df = df.append(dftemp)
             date += pd.Timedelta(daystoread) + pd.Timedelta('1 day')
+
+    # return None instead of just header if no data for time period
     if df is not None and not df.empty:
+        df = df.tz_localize('utc')  # all files are read in utc
+        df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
         df = df.loc[(df.index > dstart) & (df.index < dend)]
     else:
         df = None
@@ -81,15 +85,7 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
     elif len(buoy) == 1:  # tabs buoys
         df = read_tabs(table, buoy, dstart, dend)
 
-    df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
-
-    # return None instead of just header if no data for time period
-    if df is None or len(df) == 0:
-        return None
-    else:
-        if df.index.tz is None:
-            df = df.tz_localize('utc')  # all files are read in utc
-        return df
+    return df
 
 
 def read_ports(buoy, dstart, dend, usemodel=False):
@@ -125,7 +121,7 @@ def read_ports_df(dataname, dates=None):
 
     if 'http' and 'Predictions' in dataname:  # website, model predictions
         df.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
-        df.index.rename = 'Dates [UTC]'
+
     elif 'http' and 'DataPlot' in dataname:  # reading from website, data
         # find buoy name
         buoy = dataname.split('id=')[1].split('&')[0]
@@ -147,7 +143,8 @@ def read_ports_df(dataname, dates=None):
 
         df.rename(columns={' Speed (cm/sec)': 'Speed (cm/sec)',
                            ' Dir (true)': 'Dir (true)'}, inplace=True)
-        df.index.rename = 'Dates [UTC]'
+
+    df.index.rename('Dates [UTC]', inplace=True)
 
     return df
 
@@ -322,7 +319,7 @@ def read_ndbc_df(dataname):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df.tz_localize('utc')
+    return df
 
 
 def read_tabs(table, buoy, dstart, dend):
@@ -341,12 +338,12 @@ def read_tabs(table, buoy, dstart, dend):
         df.drop(['date', 'time'], inplace=True, axis=1)
     for key in df.keys():
         if (df[key]==0).all():
-            df[key] = np.nan
+            df.loc[:, key] = np.nan
         # if more than a quarter of the entries are 0, must be wrong
         elif (df[key][1::2]==0).sum() > len(df)/4:
-            df[key][1::2] = np.nan
+            df.loc[1::2, key] = np.nan
         elif (df[key][::2]==0).sum() > len(df)/4:
-            df[key][::2] = np.nan
+            df.loc[::2, key] = np.nan
 
     if table == 'ven':
         ind = df['tx']==-99
@@ -387,10 +384,10 @@ def read_tabs(table, buoy, dstart, dend):
     df.index.name = 'Dates [UTC]'
     df = df.round(rdict)
 
-    return df.tz_localize('utc')
+    return df
 
 
-def read_model(buoy, which, dstart, dend, timing='recent'):
+def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='utc'):
     '''Read in model output.
 
     dstart and dend are datetime objects.'''
@@ -519,7 +516,7 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
         if which == 'met': keys += ['RelH [%]']
         for key in keys:
             df[key] = np.nan
-        return df.tz_localize('utc')
+        return df
     else:
         j, i = bp.model(buoy, 'rho')  # get model indices
         df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
@@ -529,4 +526,13 @@ def read_model(buoy, which, dstart, dend, timing='recent'):
         if which == 'salt':
             df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
-    return df.tz_localize('utc')
+    # return None instead of just header if no data for time period
+    if df is not None and not df.empty:
+        df = df.loc[(df.index > dstart) & (df.index < dend)]
+        df = df.tz_localize('utc')  # all files are read in utc
+    else:
+        df = None
+
+    df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
+
+    return df
