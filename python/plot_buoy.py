@@ -323,7 +323,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, tlims=None, dolegend=False, add0=False,
-                   doebbflood=False):
+                   doebbflood=False, dodepth=False):
     '''Plot with units on both left and right sides of plot.'''
 
     if df is not None and not df[key].isnull().all():
@@ -346,7 +346,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     setylimsintlims(ax1, df, df1, df2, df3, key, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
-    shifty(ax1)
+    shifty(ax1, N=0.07)
     # add r^2 to subplot
     add_r2(ax1, df, df1, df2, df3, key, N=0.1)
     # add data/model legend
@@ -361,6 +361,9 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     if doebbflood:
         ax1.text(0.02, 0.93, 'FLOOD', fontsize=10, transform=ax1.transAxes)
         ax1.text(0.02, 0.03, 'EBB', fontsize=10, transform=ax1.transAxes)
+    if not dodepth == False:
+        ax1.text(0.85, 0.95, 'Depth: %2.1fm' % dodepth, fontsize=10, transform=ax1.transAxes)
+
 
 
 def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
@@ -925,7 +928,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df1=df1, df2=df2, df3=df3,
-                       dolegend=True, add0=True, tlims=tlims, doebbflood=True)
+                       dolegend=True, add0=True, tlims=tlims, doebbflood=True,
+                       dodepth=bys[buoy]['depth'])
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
