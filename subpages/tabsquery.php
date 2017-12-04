@@ -31,12 +31,12 @@ if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 if (! $model) {$model = 'False';}
 
-if ($tz == 'UTC') {
-    $tzname = 'UTC';
-}
-else if ($tz == 'central') {
-    $tzname = 'US/Central';
-}
+// if ($tz == 'UTC') {
+//     $tzname = 'UTC';
+// }
+// else if ($tz == 'central') {
+//     $tzname = 'US/Central';
+// }
 
 if ($units == 'M') {
     $unitsname = 'Metric';
@@ -99,11 +99,11 @@ if ($datepicker == "recent") {
     else {
         $tempaccess = "../daily/".$Buoyname;
     }
-    // command to show table
+    // command to show table (not used for pic)
     if (php_uname('n') == 'barataria.tamu.edu') {
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
-    else if (php_uname('n') == 'tahoma.local') {
+    else if (strpos(php_uname(), 'Darwin') !== false) {
         $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
 }
@@ -131,12 +131,12 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
+        $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --usemodel "'.$model.'"');
     }
-    else if (strpos(php_uname('n'), 'tahoma') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --model "'.$model.'"');
+    # checks for Mac and assumes Kristen's mac
+    else if (strpos(php_uname(), 'Darwin') !== false) {
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --usemodel "'.$model.'"');
     }
-
     chmod($tempfile, 0644);
 
 }
@@ -199,12 +199,6 @@ if ($datepicker=="recent") {
             $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         }
     }
-    else {
-        // show header file contents for "recent" data, above table
-        if (strlen($Buoyname) == 1) {
-            echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
-        }
-    }
 }
 
 // Show results of query
@@ -249,6 +243,19 @@ if ($datatype=="pic" && !$norecentdata){
     }
 }
 print "</TD></TR></TABLE>\n";
+
+if ($datepicker=="recent") {
+    if ($intervalstr<=2){
+        // show header file contents for "recent" data, below table
+        if (strlen($Buoyname) == 1) {
+            echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
+        }
+        else {
+            echo file_get_contents( "../daily/".$Buoyname."_header" );
+        }
+    }
+}
+
 
 // show bottom control options
 include("../includes/control.php");

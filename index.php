@@ -92,7 +92,7 @@ $blet=array("B","D","F","J","K","R","V","W","X",
             '42001', '42002', '42019','42020','42035', '42036', '42039', '42040',
             'SRST2', 'PTAT2', 'BURL1', 'GISL1', 'AMRL1', 'PSTL1',
             'g06010',
-            '8770475','8770520', '8770733', '8770777', '8770808',
+            '8770475','8770520', '8770777', '8770808',
             '8770822','8770971', '8771486', '8771972', '8772985', '8773037',
             '8773146', '8773259', '8773701', '8774230', '8775237',
             '8775241', '8775244', '8775296', '8775792', '8776139',
@@ -124,31 +124,36 @@ foreach ($blet as $f) {
             $datestr=$data[0];
     		$timestr=substr($data[1],0,5);
 
-            // tabs datetime in UTC and Texas time (CST/CDT)
-            // set up date and time together with UTC timezone (which is what the data is in)
-            $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
-            // save formatted string
-            // http://php.net/manual/en/datetime.formats.date.php
-            $dtUTCstr = $dtUTC->format('M d, Y H:i');
-            // find time zone abbreviation
-            // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
-            $dtUTCtz = $dtUTC->format('T');
+            // // tabs datetime in UTC and Texas time (CST/CDT)
+            // // set up date and time together with UTC timezone (which is what the data is in)
+            // $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
+            // // save formatted string
+            // // http://php.net/manual/en/datetime.formats.date.php
+            // $dtUTCstr = $dtUTC->format('M d, Y H:i');
+            // // find time zone abbreviation
+            // // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
+            // $dtUTCtz = $dtUTC->format('T');
+            //
+            // // start from UTC datetime
+            // $dtTX = $dtUTC;
+            // // convert to TX
+            // // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
+            // $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
+            // $dtTXstr = $dtTX->format('M d, Y H:i');
+            // $dtTXtz = $dtTX->format('T');
+            // // # date range for the php call
+            // // $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
+            // // $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
+            // // $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
 
-            // start from UTC datetime
-            $dtTX = $dtUTC;
-            // convert to TX
-            // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
-            $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
+            $dtTX = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
             $dtTXstr = $dtTX->format('M d, Y H:i');
             $dtTXtz = $dtTX->format('T');
-            // # date range for the php call
-            // $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
-            // $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
-            // $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
 
             // check for if report is more than about 3 days old (ignoring time zones, etc)
-            $today = new DateTime('now', new DateTimeZone('UTC'));
-            $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
+            $today = new DateTime('now', new DateTimeZone('America/Chicago'));
+            $interval = date_diff($dtTX, $today);  # difference in days between now and most recent data
+            // $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
             if ($intervalstr>3){ // old report
                 $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz\n</div></td>";

@@ -26,33 +26,11 @@ print "<TD>Go to <a href=/tabswebsite/index.php>homepage</a></TR></TD>\n";
 print "</table>\n";
 
 
-print "<TABLE width=70%>";
+print "<TABLE width=90%>";
 print "<TR>";
 print "<td>Update results: </td>";
-print "<td>";
 // print "<br> &nbsp;\n";
 print "<br><form action=\"/tabswebsite/subpages/tabsquery.php\" method=\"get\">\n";
-
-if (($datatype == "data")) {
-    print "<Select Name=tz>\n";
-    // print "<option value=''>Time Zone</Option>\n";
-    print "<option selected value='$tz'>$tzname</option>\n";
-    print "<option value='UTC'>UTC</Option>\n";
-    print "<option value='central'>US/Central</option>\n</select></td><br>\n";
-}
-else {
-    print "<input NAME=tz TYPE=hidden value=$tz>\n";
-}
-if (($table != "eng") and ($datatype == "data")) {
-    print "<td><Select Name=units>\n";
-    // print "<option value=''>Units</Option>\n";
-    print "<option selected value='$units'>$unitsname</option>\n";
-    print "<option value='M'>Metric</Option>\n";
-    print "<option value='E'>English</option>\n</select></td>\n";
-}
-else {
-    print "<input NAME=units TYPE=hidden value=$units>\n";
-}
 
 // Change buoy
 print "<td><Select Name=Buoyname id=json-one>\n";
@@ -83,7 +61,6 @@ print "<OPTION value='PSTL1'>PSTL1</option>\n";
 print "<OPTION value='g06010'>g06010</option>\n";
 print "<OPTION value='8770475'>8770475</option>\n";
 print "<OPTION value='8770520'>8770520</option>\n";
-print "<OPTION value='8770733'>8770733</option>\n";
 print "<OPTION value='8770777'>8770777</option>\n";
 print "<OPTION value='8770808'>8770808</option>\n";
 print "<OPTION value='8770822'>8770822</option>\n";
@@ -113,17 +90,45 @@ print "<OPTION value='8779749'>8779749</option></select></td>\n";
 print "<td><select id=json-two name=table>";
 print "<option selected value='$table'>$table</option></select></td>";
 
+# Units
+if (($table != "eng") and ($datatype == "data")) {
+    print "<td><Select Name=units>\n";
+    // print "<option value=''>Units</Option>\n";
+    print "<option selected value='$units'>$unitsname</option>\n";
+    print "<option value='M'>Metric</Option>\n";
+    print "<option value='E'>English</option>\n</select></td>\n";
+}
+else {
+    print "<input NAME=units TYPE=hidden value=$units>\n";
+}
+
+# Calendar
 print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepicker'></TD>";
 
-// print "<input NAME=Buoyname TYPE=hidden value=$Buoyname>\n";
-// print "<input NAME=table TYPE=hidden value=$table>\n";
+# time zone
+print "<td>";
+print "<Select Name=tz>\n";
+print "<option selected value='$tz'>$tz</option>\n";
+print "<option value='UTC'>UTC</Option>\n";
+print "<option value='US/Central'>US/Central</option>\n</select></td>\n";
+
+
+# Model: yes or no
+if ($datepicker=="recent"){
+    $model = "True";
+}
+print "<td>";
+print "<Select Name=model>\n";
+print "<option value='$model'>Model: $model</Option>\n";
+print "<option value='True'>True</Option>\n";
+print "<option value='False'>False</option>\n</select></td>\n";
+
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
-print "<input NAME=model TYPE=hidden value='$model'>\n";
 // print "<input NAME=norecentdata TYPE=hidden value=$norecentdata>\n";
 // print "<input NAME=norecentdata TYPE=hidden value=$norecentdatabutmodel>\n";
 
 // print "<BR>";
-print "<td><input type=submit  value=Change></td>\n</form>\n";
+print "<td><input type=submit  value=Update></td>\n</form>\n";
 print "</font>\n";
 
 ?>

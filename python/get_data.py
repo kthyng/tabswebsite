@@ -4,11 +4,11 @@ Or, if dstart/dend are not provided, read in previously-created daily file
 and present as table or image.
 
 example (since dstart and dend are optional)
-run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'data' --model True
+run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'data' --usemodel True
 run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
-run get_data.py '../tmp/tcoon_8770475' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'pic' --model False
+run get_data.py '../tmp/tcoon_8770475' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'pic' --usemodel False
 '''
 
 import run_daily
@@ -39,6 +39,9 @@ datatype = args.datatype
 units = args.units
 tz = args.tz
 usemodel = args.usemodel
+dstart = args.dstart
+dend = args.dend
+
 # can't figure out how to have variable from php a boolean so sending string
 if usemodel == 'False':
     usemodel = False
@@ -46,8 +49,9 @@ elif usemodel == 'True':
     usemodel = True
 
 # change dstart and dend to datetime objects
-dstart = pd.Timestamp(args.dstart, tz=tz)
-dend = pd.Timestamp(args.dend, tz=tz)
+if dstart is not None:
+    dstart = pd.Timestamp(dstart, tz=tz)
+    dend = pd.Timestamp(dend, tz=tz)
 now = pd.Timestamp('now', tz=tz)
 
 if dend is not None:
@@ -62,10 +66,10 @@ else:
     buoy = fname.split('/')[-1].split('_')[0]
 
 ## Read in data ##
-# from daily file
+# from daily file, only for showing table since images created in run_daily.py
 if dstart is None:
 
-    df = tools.read(fname, units=units, tz=tz)
+    df = read.read(fname, dstart=None, dend=None, table=table, units=units, tz=tz)
     dfmodelhindcast = None
     dfmodelrecent = None
     dfmodelforecast = None
@@ -78,28 +82,28 @@ else:
         tools.write_file(df, fname)
 
     ## Read model ##
-    tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
-              'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
-    if usemodel and bys[buoy]['table1'] in tables:
-        dfmodelhindcast = read.read_model(buoy, table, dstart, dend,
-                                          timing='hindcast', tz=tz, units=units)
-        # only look for nowcast model output if hindcast doesn't cover it
-        # sometimes the two times overlap but hindcast output is better
-        # import pdb; pdb.set_trace()
-        if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
-            dfmodelrecent = None
-        else:
-            dfmodelrecent = read.read_model(buoy, table, dstart, dend,
-                                            timing='recent', tz=tz, units=units)
-        dfmodelforecast = read.read_model(buoy, table, dstart, dend,
-                                          timing='forecast', tz=tz, units=units)
-    elif usemodel and bys[buoy]['table1'] == 'ports':
+    # tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
+            #   'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
+    if usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None
         dfmodelrecent = None
         dfmodelforecast = read.read(buoy, dstart, dend, usemodel=True,
                                     userecent=True, tz=tz, units=units)
         # dfmodelrecent = dftemp.loc[(dftemp.index <= now)] if dstart<now else None
         # dfmodelforecast = dftemp.loc[(dftemp.index > now)] if dend>now else None
+    # using model but not ports buoy
+    elif usemodel: # and bys[buoy]['table1'] in tables:
+        dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
+                                          usemodel='hindcast', tz=tz, units=units)
+        # only look for nowcast model output if hindcast doesn't cover it
+        # sometimes the two times overlap but hindcast output is better
+        if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
+            dfmodelrecent = None
+        else:
+            dfmodelrecent = read.read(buoy, dstart, dend, table=table,
+                                            usemodel='recent', tz=tz, units=units)
+        dfmodelforecast = read.read(buoy, dstart, dend, table=table,
+                                          usemodel='forecast', tz=tz, units=units)
     else:
         dfmodelhindcast = None
         dfmodelrecent = None
@@ -111,13 +115,13 @@ if datatype == 'data':
     tools.present(df)  # print data table to screen
 elif datatype == 'pic':
     # does this get called from the front page or otherwise for "recent" data?
-    if not path.exists(fname + '.png'):
-        print('<br><br>')
-        if dend is not None:
-            tlims = [date2num(pd.to_datetime(dstart.tz_localize(None)).to_pydatetime()), date2num(pd.to_datetime(dend.tz_localize(None)).to_pydatetime())]
-        else:
-            tlims = None
-        fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
-                             df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
-        fig.savefig(fname + '.pdf')
-        fig.savefig(fname + '.png')
+    # if not path.exists(fname + '.png'):
+    print('<br><br>')
+    if dend is not None:
+        tlims = [date2num(pd.to_datetime(dstart.tz_localize(None)).to_pydatetime()), date2num(pd.to_datetime(dend.tz_localize(None)).to_pydatetime())]
+    else:
+        tlims = None
+    fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
+                         df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
+    fig.savefig(fname + '.pdf')
+    fig.savefig(fname + '.png')

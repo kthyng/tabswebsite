@@ -126,9 +126,11 @@ def add_r2(ax, df, df1, df2, df3, key, N=0.05):
         # reindex to the new index
         dfnew = dfnew.reindex(df.index)
 
-        if not df[key].isnull().all() and dfnew[key].isnull().all():
+        if not df[key].isnull().all() and not dfnew[key].isnull().all():
                 # ax.text(0.8, 0.04, 'skill score: %1.2f' % ss(df, dfnew)[which], color=c2, fontsize=10, transform=ax.transAxes)
-            ax.text(0.85, 0.015, 'r$^2$: %1.2f' % r2(df[key], dfnew[key]), color=c2, fontsize=12, transform=ax.transAxes)
+            r2_use = r2(df[key], dfnew[key])
+            if not np.isnan(r2_use):
+                ax.text(0.85, 0.015, 'r$^2$: %1.2f' % r2_use, color=c2, fontsize=12, transform=ax.transAxes)
 
 
 def add_rhs(ax1, label, con):
@@ -141,11 +143,12 @@ def add_rhs(ax1, label, con):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_legend(ax, df, df1, df2, df3):
+def add_legend(ax, df, df1, df2, df3, tlims):
     '''Add legend for data vs. model.'''
 
     if df is not None:
-        ax.text(0.21, 0.015, 'data', color='k', fontsize=12, transform=ax.transAxes)
+        if (tlims is not None and df['idx'].iloc[-1]>tlims[0]) or tlims is None:
+            ax.text(0.21, 0.015, 'data', color='k', fontsize=12, transform=ax.transAxes)
     if df1 is not None:
         ax.text(0.3, 0.015, "{}".format("\u2014 hindcast"), color=c1, fontsize=12, transform=ax.transAxes)
     if df2 is not None:
@@ -172,14 +175,13 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     if df is not None and (df.index[1] - df.index[0]).seconds/60. < 30:
         # want 30 min
         df = df.resample('30T').asfreq()
-
     # if data is None, use model output (if model output not all None)
     if (df is None or east not in df.keys() or df[east].isnull().all()) and not all([dft is None for dft in [df1, df2, df3]]):
         # now model output saved into df
         df = pd.concat([df1, df2, df3])  # in case there is a df3
         color = c2
     # this catches when TCOON data is temporarily unavailable and model output is not available
-    if (east not in df.keys() or df[east].isnull().all()) and all([dft is None for dft in [df1, df2, df3]]):
+    if (df is None or east not in df.keys() or df[east].isnull().all()) and all([dft is None for dft in [df1, df2, df3]]):
         ax.text(0.1, 0.5, 'Wind data not available at this time.', transform=ax.transAxes)
         ax.get_yaxis().set_ticks([])
         return
@@ -320,7 +322,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
-                   df2=None, df3=None, tlims=None, dolegend=False, add0=False):
+                   df2=None, df3=None, tlims=None, dolegend=False, add0=False,
+                   doebbflood=False):
     '''Plot with units on both left and right sides of plot.'''
 
     if df is not None and not df[key].isnull().all():
@@ -348,12 +351,16 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     add_r2(ax1, df, df1, df2, df3, key, N=0.1)
     # add data/model legend
     if dolegend:
-        add_legend(ax1, df, df1, df2, df3)
+        add_legend(ax1, df, df1, df2, df3, tlims)
     # add line at 0
     if add0:
         add_zero(ax1)
     # right side units
     add_rhs(ax1, label2, con)
+    # Add ebb/flood text labels
+    if doebbflood:
+        ax1.text(0.02, 0.93, 'FLOOD', fontsize=10, transform=ax1.transAxes)
+        ax1.text(0.02, 0.03, 'EBB', fontsize=10, transform=ax1.transAxes)
 
 
 def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
@@ -385,7 +392,7 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
     add_r2(ax, df, df1, df2, df3, var)
     # add data/model legend
     if dolegend:
-        add_legend(ax, df, df1, df2, df3)
+        add_legend(ax, df, df1, df2, df3, tlims)
 
 
 def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
@@ -727,7 +734,6 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         df = df.resample('30T').interpolate(method='time', limit=1)
             # df = df.resample('30T').asfreq()
     elif which == 'wave':  # TABS
-        # import pdb; pdb.set_trace()
         # fill in missing data with nan's so not plotted across.
         base = df.index[0].minute*60 + df.index[0].second
         df = df.resample('3600 S', base=base).interpolate(method='time', limit=1)
@@ -815,7 +821,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
                 ymaxrange=[0,110], df1=df1, df2=df2, df3=df3, dolegend=True, tlims=tlims)
@@ -843,7 +849,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
@@ -858,7 +864,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
@@ -870,7 +876,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
                        'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
@@ -899,7 +905,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
-                       'mb2hg', '[inHg]', ymaxrange=[1000,1040], df1=df1,
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
                        'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
@@ -919,7 +925,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df1=df1, df2=df2, df3=df3,
-                       dolegend=True, add0=True, tlims=tlims)
+                       dolegend=True, add0=True, tlims=tlims, doebbflood=True)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
@@ -930,21 +936,12 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         if (dfm.index[-1]-dfm.index[0]) > (df.index[-1]-df.index[0]):
             df = dfm  # use the longer dataframe for labeling x axis
 
-    # if which == 'tcoon-nomet' or which == 'ndbc-nowave-nowtemp-nopress':
-    #     # has only two actual subplots, and want to label that one
-    #     add_xlabels(axes[1], df, fig, tlims=tlims)
-    # elif which == 'ports':
-    #     # has only one actual subplot, and want to label that one
-    #     add_xlabels(axes[0], df, fig, tlims=tlims)
-    # else:
     add_xlabels(axes[nsubplots-1], df, fig, tlims=tlims)
 
     # add grid lines
     for ax in axes:
         ax.grid(which='major', lw=1.5, color='k', alpha=0.05)
         ax.grid(which='minor', lw=1, color='k', alpha=0.05)
-        # ax.grid(which='major', lw=0.7, color='k', alpha=0.1)
-        # ax.grid(which='minor', lw=0.5, color='k', alpha=0.1)
 
     return fig
 
@@ -957,7 +954,7 @@ def currents(dfs, buoys):
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):
 
-        if df is None:
+        if df is None or df.empty or df['East [cm/s]'].isnull().all():
             ax.text(0.2, 0.5, 'Data not available for buoy ' + buoy + ' at this time.', transform=ax.transAxes)
             ax.get_yaxis().set_ticks([])
             continue
@@ -969,10 +966,10 @@ def currents(dfs, buoys):
         elif len(dfs) == 4:
             ax.text(0.95, 0.8, buoy, transform=ax.transAxes,
                     horizontalalignment='center', fontsize=30, alpha=0.3)
-        # ax.text(0.97, 0.9, buoy, transform=ax.transAxes,
-        #         horizontalalignment='center', fontsize=14)
 
-        df = df_init(df)
+        # have to implement timezone to get shift into idx
+        df.insert(0, 'idx', date2num(df.index.tz_localize(None).to_pydatetime()))
+
         if first:
             add_currents(ax, df, 'water', 'East [cm/s]', 'North [cm/s]', compass=True)
             first = False
@@ -981,9 +978,14 @@ def currents(dfs, buoys):
 
         # save a df for labeling the bottom axis if it has at least 4 days of data
         # otherwise it squishes up the labels a lot
-        if df.index[-1] - df.index[0] > 4:
+        if df.index[-1] - df.index[0] > pd.Timedelta('4 days'):
             dfsave = df  # save for using with bottom labeling
 
     add_xlabels(axes[len(dfs)-1], dfsave, fig)
+
+    # add grid lines
+    for ax in axes:
+        ax.grid(which='major', lw=1.5, color='k', alpha=0.05)
+        ax.grid(which='minor', lw=1, color='k', alpha=0.05)
 
     return fig

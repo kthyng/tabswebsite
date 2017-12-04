@@ -15,53 +15,63 @@ import requests
 email = 'kthyng@tamu.edu'
 bys = bp.load() # load in buoy data
 
-def read(buoy, dstart, dend, table=None, units=None, tz=None,
+def read(buoy, dstart, dend, table=None, units=None, tz='utc',
          usemodel=False, userecent=True):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are datetime objects.
     table is necessary if buoy is a TABS buoy (length=1).
+    usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
     '''
 
-    if bys[buoy]['inmysql']:
+    # read from recent file
+    if dstart is None:
+        df = pd.read_table(buoy, index_col=0, parse_dates=True)
+    # read in model output but not ports model output
+    elif usemodel != False and bys[buoy]['table1'] != 'ports':
+        assert isinstance(usemodel, str), \
+            'usemodel should be a string containing "hindcast", "recent", or "forecast"'
+        df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
+    elif bys[buoy]['inmysql']:
         # Call general read function to distribute to correct buoy read function
         df = read_buoy(buoy, dstart, dend, table=table, units=units,
-                       tz=tz, usemodel=usemodel, userecent=userecent)
-        return df
+                       tz=tz, userecent=userecent)
+    else:
 
-    usefile = True  # initially True, set to False once we've read from the file
-    fname = '../daily/' + buoy + '_all.hdf'
-    date = dstart
-    df = pd.DataFrame()
-    # import pdb; pdb.set_trace()
-    # check that we are within normal data frequency
-    while date + pd.Timedelta('60 minutes') < dend:
-
-        # # if we are using data, dend cannot be in the future
-        # dend = min(dend, pd.Timestamp('now', tz='utc'))
-        if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
-            df = pd.read_hdf(fname, where='index>=date&index<=dend')
-            # import pdb; pdb.set_trace()
-            usefile = False
-            # if dstart > when data in fname ends, just go to the else on the next while loop
-            if df is not None and not df.empty:
-                date = df.index[-1].tz_localize('utc').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
-        else:
-            td = pd.Timedelta('31 days')
-            if 'ports' in bys[buoy]['table1'] and usemodel:
-                td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
-            daystoread = min(td, dend-date)
-            dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
-                               tz=tz, usemodel=usemodel, userecent=userecent)
-            if df is not None:
-                df = df.append(dftemp)
-            date += pd.Timedelta(daystoread) + pd.Timedelta('1 day')
+        usefile = True  # initially True, set to False once we've read from the file
+        fname = '../daily/' + buoy + '_all.hdf'
+        date = dstart
+        df = pd.DataFrame()
+        # check that we are within normal data frequency
+        while date + pd.Timedelta('60 minutes') < dend:
+            # print('reading buoy ' + buoy + ': date: ', date, ' dstart: ', dstart, 'dend: ', dend)
+            # # if we are using data, dend cannot be in the future
+            # dend = min(dend, pd.Timestamp('now', tz='utc'))
+            if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
+                df = pd.read_hdf(fname, where='index>=date&index<=dend')
+                usefile = False
+                # if dstart > when data in fname ends, just go to the else on the next while loop
+                if df is not None and not df.empty:
+                    date = df.index[-1].tz_localize('utc').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
+            else:
+                td = pd.Timedelta('31 days')
+                if 'ports' in bys[buoy]['table1'] and usemodel:
+                    td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
+                daystoread = min(td, dend-date)
+                dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
+                                   tz=tz, usemodel=usemodel, userecent=userecent)
+                if df is not None:
+                    df = df.append(dftemp)
+                else:  # if df is None, rename dftemp to df
+                    df = dftemp
+                date += pd.Timedelta(daystoread) + pd.Timedelta('1 day')
 
     # return None instead of just header if no data for time period
     if df is not None and not df.empty:
         df = df.tz_localize('utc')  # all files are read in utc
         df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
-        df = df.loc[(df.index > dstart) & (df.index < dend)]
+        if dstart is not None:
+            df = df.loc[(df.index > dstart) & (df.index < dend)]
     else:
         df = None
 
@@ -332,7 +342,7 @@ def read_tabs(table, buoy, dstart, dend):
                               dend.strftime("%Y-%m-%d %H:%M"))
     df = pd.read_sql_query(query, engine, index_col=['obs_time'])
     df.drop(df.index[df.index.isnull()], inplace=True)  # drop bad rows
-    df[df == -99.0] = np.nan  # replace missing values
+    df[(df == -99.0) | (df == -999.0) | (df == -999.00)] = np.nan  # replace missing values
 
     if 'date' in df.keys():
         df.drop(['date', 'time'], inplace=True, axis=1)
@@ -346,7 +356,7 @@ def read_tabs(table, buoy, dstart, dend):
             df.loc[::2, key] = np.nan
 
     if table == 'ven':
-        ind = df['tx']==-99
+        ind = df.tx.isnull()
         df.drop(df.index[ind], inplace=True)  # drop bad rows
         names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
         df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
@@ -526,13 +536,13 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         if which == 'salt':
             df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
-    # return None instead of just header if no data for time period
-    if df is not None and not df.empty:
-        df = df.loc[(df.index > dstart) & (df.index < dend)]
-        df = df.tz_localize('utc')  # all files are read in utc
-    else:
-        df = None
-
-    df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
+    # # return None instead of just header if no data for time period
+    # if df is not None and not df.empty:
+    #     df = df.tz_localize('utc')  # all files are read in utc
+    # else:
+    #     df = None
+    #
+    # df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
+    # # df = df.loc[(df.index > dstart) & (df.index < dend)]
 
     return df

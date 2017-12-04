@@ -139,10 +139,10 @@ def present(df):
     '''Present dataframe df nicely by printing to screen'''
 
     from prettypandas import PrettyPandas
-    print(PrettyPandas(df).render())
+    print(PrettyPandas(df.tz_localize(None)).render())
 
 
-def write_file(df, fname, filetype='txt', compression=False, mode='w'):
+def write_file(df, fname, filetype='txt', compression=False, mode='w', append=False):
     '''Write text file of data.
 
     mode is 'w' to write a new file and 'a' to append to existing file.'''
@@ -158,8 +158,13 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w'):
     if filetype == 'hdf':
         # if fname.split('/')[-1].split('_')[0] == '8773259':
         #     import pdb; pdb.set_trace()
+        # try:
         df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode,
-                                    format='table', complib='zlib')#, dropna=True)
+                                    format='table', complib='zlib', append=append)#, dropna=True)
+        # except:  # if can't save directly to hdf, read in text file and save that
+        #     df = pd.read_table(fname, na_values=-999, parse_dates=True, index_col=0)
+        #     df.tz_localize(None).to_hdf(fname + 'test.hdf', key='df', mode=mode,
+        #                                 format='table', complib='zlib')#, dropna=True)
     elif filetype == 'txt':
         if compression:
             df.tz_localize(None).to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
