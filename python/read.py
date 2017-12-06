@@ -28,9 +28,9 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
     if dstart is None:
         df = pd.read_table(buoy, index_col=0, parse_dates=True)
     # read in model output but not ports model output
-    elif usemodel != False and bys[buoy]['table1'] != 'ports':
-        assert isinstance(usemodel, str), \
-            'usemodel should be a string containing "hindcast", "recent", or "forecast"'
+    elif isinstance(usemodel,str):
+        # assert isinstance(usemodel, str), \
+        #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
         df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
     elif bys[buoy]['inmysql']:
         # Call general read function to distribute to correct buoy read function
@@ -87,7 +87,7 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
 
     # if/elif statements checking which table type buoy has
     if 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
-        df = read_nos(buoy, dstart, dend)
+        df = read_nos(buoy, dstart, dend, usemodel=usemodel)
     elif 'ports' in bys[buoy]['table1']:
         df = read_ports(buoy, dstart, dend, usemodel=usemodel)
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
@@ -159,32 +159,42 @@ def read_ports_df(dataname, dates=None):
     return df
 
 
-def read_nos(buoy, dstart, dend):
+def read_nos(buoy, dstart, dend, usemodel=False):
     '''Set up urls and then read from them to get TCOON and NOS data.
 
     Most stations have several data sources, so they are aggregated here.
     This calls to read_tcoon_df() to do the reading and rearranging.
     dstart and dend are datetime objects.'''
 
-    # tide, met, and phys data
-    prefixes = ['https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station=',
-                'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id=',
-                'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=']
-    # dstart and dend need to be in format YYYYMMDD
-    dstarts = dstart.strftime('%Y%m%d')
-    dends = dend.strftime('%Y%m%d')
-    suffixes = ['&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MSL&units=metric&time_zone=GMT&format=csv',
-                '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6',
-                '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6']
-    dfs = []
-    for prefix, suffix in zip(prefixes, suffixes):
+    if not usemodel:
+        # tide, met, and phys data
+        prefixes = ['https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station=',
+                    'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id=',
+                    'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=']
+        # dstart and dend need to be in format YYYYMMDD
+        dstarts = dstart.strftime('%Y%m%d')
+        dends = dend.strftime('%Y%m%d')
+        suffixes = ['&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MSL&units=metric&time_zone=GMT&format=csv',
+                    '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6',
+                    '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6']
+        dfs = []
+        for prefix, suffix in zip(prefixes, suffixes):
+            url = prefix + buoy + suffix
+            dft = read_nos_df(url)
+            if dft is not None:
+                dft = dft[~dft.index.duplicated(keep='first')]  # remove any duplicated indices
+            dfs.append(dft)
+        # combine the dataframes together
+        df = pd.concat([df for df in dfs], axis=1)
+
+    else:  # use model
+
+        prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&station='
+        dstarts = dstart.strftime('%Y%m%d')
+        dends = dend.strftime('%Y%m%d')
+        suffix = '&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MSL&time_zone=GMT&units=metric&interval=h&format=csv'
         url = prefix + buoy + suffix
-        dft = read_nos_df(url)
-        if dft is not None:
-            dft = dft[~dft.index.duplicated(keep='first')]  # remove any duplicated indices
-        dfs.append(dft)
-    # combine the dataframes together
-    df = pd.concat([df for df in dfs], axis=1)
+        df = read_nos_df(url)
 
     return df
 
@@ -215,6 +225,11 @@ def read_nos_df(dataname):
     elif 'type=phys' in dataname:
         names = ['WaterT [deg C]']
         df = df.drop(['CONDUCTIVITY'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
+        rdict = {}
+
+    elif 'prediction' in dataname:  # tidal height prediction
+        names = ['Water Level [m]']
         # dictionary for rounding decimal places
         rdict = {}
 

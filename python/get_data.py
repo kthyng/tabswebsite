@@ -84,13 +84,14 @@ else:
     ## Read model ##
     # tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
             #   'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
+    # To use NOAA-provided model predictions
     if usemodel and bys[buoy]['table1'] == 'ports':
         dfmodelhindcast = None
         dfmodelrecent = None
-        dfmodelforecast = read.read(buoy, dstart, dend, usemodel=True,
+        dfmodelforecast = None
+        dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                     userecent=True, tz=tz, units=units)
-        # dfmodelrecent = dftemp.loc[(dftemp.index <= now)] if dstart<now else None
-        # dfmodelforecast = dftemp.loc[(dftemp.index > now)] if dend>now else None
+
     # using model but not ports buoy
     elif usemodel: # and bys[buoy]['table1'] in tables:
         dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
@@ -104,10 +105,18 @@ else:
                                             usemodel='recent', tz=tz, units=units)
         dfmodelforecast = read.read(buoy, dstart, dend, table=table,
                                           usemodel='forecast', tz=tz, units=units)
+        if bys[buoy]['table2'] == 'tidepredict':
+            # import pdb; pdb.set_trace()
+            dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
+                                     userecent=True, tz=tz, units=units)
+        else:
+            dfmodeltides = None
+
     else:
         dfmodelhindcast = None
         dfmodelrecent = None
         dfmodelforecast = None
+        dfmodeltides = None
 
 
 if datatype == 'data':
@@ -122,6 +131,7 @@ elif datatype == 'pic':
     else:
         tlims = None
     fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
-                         df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
+                         df2=dfmodelrecent, df3=dfmodelforecast,
+                         df4=dfmodeltides, tlims=tlims)
     fig.savefig(fname + '.pdf')
     fig.savefig(fname + '.png')

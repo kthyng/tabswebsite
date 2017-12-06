@@ -28,13 +28,15 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
         # pulls out the non-nan table values to loop over valid table names
-        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
+        # exclude "tidepredict" since it is not a separate table
+        # if not '8770475' in buoy:
+        #     continue
+        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and bys[buoy][table] != 'tidepredict']
 
         for table in tables:  # loop through tables for each buoy
             if not bys[buoy]['active']:  # only do this for active buoys
                 continue
-            # if not '8770475' in buoy:
-            #     continue
+
             print(buoy)
             # read in data in UTC
             if bys[buoy]['inmysql']:  # mysql tables
@@ -82,6 +84,13 @@ if __name__ == "__main__":
                 dfmodelrecent = None
                 dfmodelforecast = None
 
+            if bys[buoy]['table2'] == 'tidepredict':
+                # import pdb; pdb.set_trace()
+                dfmodeltides = read.read(buoy, past, future, usemodel=True, tz=tz)
+            else:
+                dfmodeltides = None
+
+
             # none of these use model output, so no forecast and therefore no
             # extra time needed in x direction
             if dfmodelforecast is not None:  # catches PORTS
@@ -96,7 +105,9 @@ if __name__ == "__main__":
             # else:
             #     tlims = None
             # will plot model output from now if available, otherwise data regardless of how old
-            fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent, df3=dfmodelforecast, tlims=tlims)
+            fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent,
+                                 df3=dfmodelforecast, df4=dfmodeltides,
+                                 tlims=tlims)
             fig.savefig(fname + '.pdf')
             fig.savefig(fname + '.png')
             # save smaller for hover

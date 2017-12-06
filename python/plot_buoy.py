@@ -24,8 +24,9 @@ mpl.rcParams.update({'font.size': 14})
 cmax = 65  # cm/s, max water arrow value
 wmax = 15  # m/s, max wind arrow value
 lw = 1.5
-c2 = 'cornflowerblue'
+c2 = 'cornflowerblue'  # #6495ed
 c1 = '#4B70B2'  # darker shade of cornflowerblue
+c3 = '#7764ED'
 
 bys = bp.load() # load in buoy data
 
@@ -70,20 +71,21 @@ def setymaxrange(ax, ymaxrange):
     ax.set_ylim(ylim)
 
 
-def setylimsintlims(ax, df, df1, df2, df3, key, tlims):
+def setylimsintlims(ax, df, dfs, key, tlims):
     '''Adjusts ylimits to only account for plots visible in axes.'''
 
     if tlims is not None:
         ymins = []; ymaxs = []
-        if df1 is not None:
-            ymins.append(df1[key].min())
-            ymaxs.append(df1[key].max())
-        if df2 is not None:
-            ymins.append(df2[key].min())
-            ymaxs.append(df2[key].max())
-        if df3 is not None:
-            ymins.append(df3[key].min())
-            ymaxs.append(df3[key].max())
+        for dft in dfs:
+            if dft is not None:
+                ymins.append(dft[key].min())
+                ymaxs.append(dft[key].max())
+        # if df2 is not None:
+        #     ymins.append(df2[key].min())
+        #     ymaxs.append(df2[key].max())
+        # if df3 is not None:
+        #     ymins.append(df3[key].min())
+        #     ymaxs.append(df3[key].max())
         if df is not None:
             # check if data df is contained in tlims
             # 1st: if nothing in df is larger than the first tlims value, or
@@ -113,14 +115,15 @@ def r2(data, model):
     return df.corr().loc['data','model']
 
 
-def add_r2(ax, df, df1, df2, df3, key, N=0.05):
+def add_r2(ax, df, dfs, key, N=0.05):
     '''Make adjustments and add r^2 to subplot.'''
 
     shifty(ax, N=N, which='bottom')  # most functions already have one of these, do another for space
-    # note don't do this if df is None or there is no data
-    if df is not None and (df1 is not None or df2 is not None or df3 is not None):
+    # note don't do this if df is None or there is no model output
+    if df is not None and sum([dft is not None for dft in dfs]) > 0:
+    # if df is not None and (df1 is not None or df2 is not None or df3 is not None):
         # https://github.com/pandas-dev/pandas/issues/14297
-        dfnew = pd.concat([df1, df2, df3])  # combine model output
+        dfnew = pd.concat(dfs)  # combine model output
         # interpolate on union of old and new index
         dfnew = dfnew.reindex(dfnew.index.union(df.index)).interpolate(method='time')
         # reindex to the new index
@@ -143,7 +146,7 @@ def add_rhs(ax1, label, con):
     ax2.set_ylim(tools.convert(ylim[0], con), tools.convert(ylim[1], con))
 
 
-def add_legend(ax, df, df1, df2, df3, tlims):
+def add_legend(ax, df, df1, df2, df3, tlims, df4=None):
     '''Add legend for data vs. model.'''
 
     if df is not None:
@@ -155,6 +158,9 @@ def add_legend(ax, df, df1, df2, df3, tlims):
         ax.text(0.48, 0.015, "{}".format("\u2014 nowcast"), color=c2, fontsize=12, transform=ax.transAxes)
     if df3 is not None:
         ax.text(0.65, 0.015, '-- forecast', color=c2, fontsize=12, transform=ax.transAxes)
+    # df4 overlaps with other labels because won't be on at the same time
+    if df4 is not None:
+        ax.text(0.55, 0.015, "{}".format("\u2014 NOAA prediction"), color=c3, fontsize=12, transform=ax.transAxes)
 
 
 def add_zero(ax):
@@ -295,7 +301,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     # add line at zero for reference.
     add_zero(ax)
     # add r^2 to subplot
-    add_r2(ax, df, df1, df2, df3, which)
+    add_r2(ax, df, [df1, df2, df3], which)
     # Enforce max limits for y axis in case data is very large or small
     if ymaxrange is not None:
         setymaxrange(ax, ymaxrange)
@@ -322,8 +328,8 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
-                   df2=None, df3=None, tlims=None, dolegend=False, add0=False,
-                   doebbflood=False, dodepth=False):
+                   df2=None, df3=None, df4=None, tlims=None, dolegend=False,
+                   add0=False, doebbflood=False, dodepth=False):
     '''Plot with units on both left and right sides of plot.'''
 
     if df is not None and not df[key].isnull().all():
@@ -340,18 +346,20 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
         ax1.plot(df2['idx'], df2[key], lw=lw, color=c2, linestyle='-')
     if df3 is not None:
         ax1.plot(df3['idx'], df3[key], lw=lw, color=c2, linestyle='--')
+    if df4 is not None:
+        ax1.plot(df4['idx'], df4[key], lw=lw, color=c3, linestyle='-')
     ax1.set_ylabel(label1)
     ax1.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for pressure
     # set y range by signal within tlims (in case data off-screen changing it)
-    setylimsintlims(ax1, df, df1, df2, df3, key, tlims)
+    setylimsintlims(ax1, df, [df1, df2, df3, df4], key, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
     shifty(ax1, N=0.07)
     # add r^2 to subplot
-    add_r2(ax1, df, df1, df2, df3, key, N=0.1)
+    add_r2(ax1, df, [df1, df2, df3, df4], key, N=0.1)
     # add data/model legend
     if dolegend:
-        add_legend(ax1, df, df1, df2, df3, tlims)
+        add_legend(ax1, df, df1, df2, df3, tlims, df4=df4)
     # add line at 0
     if add0:
         add_zero(ax1)
@@ -387,12 +395,12 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
     ax.set_ylabel(varlabel)
     ax.get_yaxis().get_major_formatter().set_useOffset(False)  # no shift for y limits
     # set y range by signal within tlims (in case data off-screen changing it)
-    setylimsintlims(ax, df, df1, df2, df3, var, tlims)
+    setylimsintlims(ax, df, [df1, df2, df3], var, tlims)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax, ymaxrange)
     shifty(ax)
     # add r^2 to subplot
-    add_r2(ax, df, df1, df2, df3, var)
+    add_r2(ax, df, [df1, df2, df3], var)
     # add data/model legend
     if dolegend:
         add_legend(ax, df, df1, df2, df3, tlims)
@@ -699,7 +707,7 @@ def setup(nsubplots, table=None, buoy=None):
     return fig, axes
 
 
-def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
+def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=None):
     '''Plot data.
 
     Find data in dataname and save fig, both in /tmp.
@@ -775,7 +783,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         # df = df.resample('60T', base=base).asfreq()
 
     # set up datetime number indices since quiver doesn't work otherwise
-    for dft in [df, df1, df2, df3]:
+    for dft in [df, df1, df2, df3, df4]:
         if dft is not None:
             # have to implement timezone to get shift into idx
             dft.insert(0, 'idx', date2num(dft.index.tz_localize(None).to_pydatetime()))
@@ -915,8 +923,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
+        # df4 is an optional input containing NOAA tidal height prediction
         add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
-                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims)
+                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
+                       dolegend=True)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
@@ -927,7 +937,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, tlims=None):
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
-                       df1=df1, df2=df2, df3=df3,
+                       df4=df4, 
                        dolegend=True, add0=True, tlims=tlims, doebbflood=True,
                        dodepth=bys[buoy]['depth'])
 
