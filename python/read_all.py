@@ -32,7 +32,7 @@ def remake_hdf():
                 fname = path.join('..', 'daily', buoy + '_all')
             # read from text file, write to hdf
             df = pd.read_table(fname, na_values=-999, parse_dates=True, index_col=0)
-            df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode='w',
+            df.astype(float).tz_localize(None).to_hdf(fname + '.hdf', key='df', mode='w',
                                         format='table', complib='zlib')#, dropna=True)
 
 
@@ -82,11 +82,13 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        # if buoy != '8770475':
+        # if buoy != '8734673':
         #     continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
         for table in tables:  # loop through tables for each buoy
-
+            # if table != 'eng':
+            #     continue
+            print(buoy, table)
             readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='utc'))

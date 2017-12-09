@@ -75,16 +75,11 @@ if __name__ == "__main__":
                 dfmodelforecast = read.read(buoy, now - pd.Timedelta('1 day'),
                                             future, table=table,
                                             usemodel='forecast', tz=tz)
-            elif table == 'ports':
-                # use tidal current prediction at these sites, from NOAA
-                dfmodelrecent = None
-                dfmodelforecast = read.read(buoy, now - pd.Timedelta('1 day'),
-                                            future, usemodel=True, tz=tz)
             else:
                 dfmodelrecent = None
                 dfmodelforecast = None
 
-            if bys[buoy]['table2'] == 'tidepredict':
+            if bys[buoy]['table2'] == 'tidepredict' or bys[buoy]['table2'] == 'currentspredict':
                 # import pdb; pdb.set_trace()
                 dfmodeltides = read.read(buoy, past, future, usemodel=True, tz=tz)
             else:

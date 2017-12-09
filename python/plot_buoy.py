@@ -812,7 +812,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[3], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
     elif which == 'eng':
@@ -841,7 +841,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[0], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims)
         add_var(axes[1], df, 'Salinity', 'Salinity', ymaxrange=[12, 37], df1=df1,
                 df2=df2, df3=df3, tlims=tlims)
@@ -868,7 +868,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
     elif which == 'ndbc-nowave':
@@ -880,7 +880,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[2], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
     elif which == 'ndbc-nowave-nowtemp':
@@ -910,7 +910,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         # add_var_2units(axes[1], df, 'WaterT [deg C]',
         #                'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
         #                'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-        #                ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
+        #                ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
 
     elif which == 'tcoon':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
@@ -930,14 +930,14 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                       ymaxrange=[10, 32], df1=df1, df2=df2, df3=df3,
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
-                       df4=df4, 
+                       df4=df4,
                        dolegend=True, add0=True, tlims=tlims, doebbflood=True,
                        dodepth=bys[buoy]['depth'])
 

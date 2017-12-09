@@ -23,7 +23,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
     '''
-
+    # import pdb; pdb.set_trace()
     # read from recent file
     if dstart is None:
         df = pd.read_table(buoy, index_col=0, parse_dates=True)
@@ -72,6 +72,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
         df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
         if dstart is not None:
             df = df.loc[(df.index > dstart) & (df.index < dend)]
+        df = df.astype(float)  # makes sure that all columns are floats for consistency
     else:
         df = None
 
@@ -201,7 +202,7 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
 def read_nos_df(dataname):
     '''Read in individual tcoon datasets and arrange variables.'''
-
+    # import pdb; pdb.set_trace()
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
     if 'type=met' in dataname:
         names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
@@ -224,6 +225,7 @@ def read_nos_df(dataname):
 
     elif 'type=phys' in dataname:
         names = ['WaterT [deg C]']
+        # CHANGE THIS
         df = df.drop(['CONDUCTIVITY'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
@@ -237,10 +239,12 @@ def read_nos_df(dataname):
     if not df.empty:
         if isinstance(df.index[0], str):
             df = df.drop(df.index[0], axis=0)
-
-    df.columns = names
-    df.index.name = 'Dates [UTC]'
-    df = df.round(rdict)
+    try:
+        df.columns = names
+        df.index.name = 'Dates [UTC]'
+        df = df.round(rdict)
+    except:
+        pass
 
     return df
 
