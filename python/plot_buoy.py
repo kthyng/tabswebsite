@@ -336,7 +336,7 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
         ax1.plot(df['idx'], df[key], lw=lw, color='k', linestyle='-')
     # this catches when TCOON data is temporarily unavailable and model output is not available
     if (df is None or key not in df.keys() or df[key].isnull().all()) \
-         and all([dft is None for dft in [df1, df2, df3]]):
+         and all([dft is None for dft in [df1, df2, df3, df4]]):
         ax1.text(0.1, 0.5, label1.replace('\n','').split('[')[0].split('$')[0] + ' data not available at this time.', transform=ax1.transAxes)
         ax1.get_yaxis().set_ticks([])
         return
@@ -373,7 +373,6 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
         ax1.text(0.85, 0.95, 'Depth: %2.1fm' % dodepth, fontsize=10, transform=ax1.transAxes)
 
 
-
 def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
             dolegend=False, tlims=None):
     '''Add basic var to plot as line plot with no extra space.'''
@@ -406,32 +405,51 @@ def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
         add_legend(ax, df, df1, df2, df3, tlims)
 
 
-def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None, sameylim=False):
-    '''2 variables, one on each y axis. same y limits if set True.'''
+def add_2var(ax1, df, var1, label1, var2, label2, ymaxrange=None,
+             df1=None, df2=None, df3=None,
+             tlims=None, sameylim=False, dolegend=False,
+             cc1='#559349', cc2='#874993'):
+    '''2 variables, one on each y axis. same y limits if set True.
 
-    c1, c2 = '#559349', '#874993'
+    df1, df2, df3 are all for left side y axis.
+    Default colors are green and purple be accept inputs instead.
+    '''
+
     # 1st var
-    ax1.plot(df['idx'], df[var1], lw=lw, color=c1, linestyle='-')
-    ax1.set_ylabel(label1, color=c1)
-    ax1.tick_params(axis='y', colors=c1)
+    ax1.plot(df['idx'], df[var1], lw=lw, color=cc1, linestyle='-')
+    if df1 is not None:
+        ax1.plot(df1['idx'], df1[var1], lw=lw, color=c1, linestyle='-')
+    if df2 is not None:
+        ax1.plot(df2['idx'], df2[var1], lw=lw, color=c2, linestyle='-')
+    if df3 is not None:
+        ax1.plot(df3['idx'], df3[var1], lw=lw, color=c2, linestyle='--')
+    ax1.set_ylabel(label1, color=cc1)
+    ax1.tick_params(axis='y', colors=cc1)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax1, ymaxrange)
-    shifty(ax1)
+    # add r^2 to subplot
+    add_r2(ax1, df, [df1, df2, df3], var1)
     # 2nd var
     ax2 = ax1.twinx()
-    ax2.plot(df['idx'], df[var2], lw=lw, color=c2, linestyle='--')
-    ax2.set_ylabel(label2 + ' [--]', color=c2)
-    ax2.tick_params(axis='y', colors=c2)
+    ax2.plot(df['idx'], df[var2], lw=lw, color=cc2, linestyle='--')
+    ax2.set_ylabel(label2, color=cc2)
+    ax2.tick_params(axis='y', colors=cc2)
     if ymaxrange is not None:  # Have max limits for y axis
         setymaxrange(ax2, ymaxrange)
-    shifty(ax2)
+    # set y range by signal within tlims (in case data off-screen changing it)
+    setylimsintlims(ax1, df, [df1, df2, df3], var1, tlims)
     if sameylim:
         ylim = ax1.get_ylim()
         ax2.set_ylim(ylim[0], ylim[1])
+    shifty(ax1)
+    shifty(ax2)
+    # add data/model legend
+    if dolegend:
+        add_legend(ax1, df, df1, df2, df3, tlims)
 
 
 def add_2var_sameplot(ax, df, var1, label1, var2, ymaxrange=None):
-    '''2 variables, one on each y axis. same y limits if set True.'''
+    '''2 variables on same y axis.'''
 
     if var1 in df.keys():
         ax.plot(df['idx'], df[var1], lw=lw, color='k', linestyle='-')
@@ -717,24 +735,18 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     if which is None:  # can read in table if not tabs buoy
         which = bys[buoy]['table1']
 
-    if which == 'ven' or which == 'eng' or which == 'met' or which == 'sum':
-        nsubplots = 4
-    elif which == 'salt' or which == 'wave':
-        nsubplots = 3
-    elif which == 'ndbc':
-        nsubplots = 5
-    elif which == 'ndbc-nowave':
-        nsubplots = 3
-    elif which == 'ndbc-nowave-nowtemp':
-        nsubplots = 3
-    elif which == 'ndbc-nowave-nowtemp-nopress':
+    if which in ['tcoon-tide', 'ports']:
+        nsubplots = 1
+    elif which in ['ndbc-met-nopress', 'nos-water']:
         nsubplots = 2
-    elif which == 'tcoon-tide':
-        nsubplots = 1
-    elif which == 'tcoon':
+    elif which in ['salt', 'wave', 'nos-met', 'ndbc-met']:
+        nsubplots = 3
+    elif which in ['ven', 'eng', 'met', 'sum', 'ndbc-nowave']:
+        nsubplots = 4
+    elif which in ['tcoon', 'nos']:
         nsubplots = 5
-    elif which == 'ports':
-        nsubplots = 1
+    elif which in ['ndbc', 'nos-cond']:
+        nsubplots = 6
 
     if len(buoy) == 1 and which != 'wave' and df is not None:
         # for TABS buoys
@@ -756,31 +768,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         # addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
         # # reindex dataframe with added entries for nans, and sort back into order
         # df = df.reindex(np.hstack((idx, addidx))).sort_index()
-    elif 'ndbc' in which and not 'nowave' in which:  # NDBC with wave
+    elif 'ndbc' in which and 'Wave Ht [m]' in df.keys() and not df['Wave Ht [m]'].isnull().all():  # NDBC with wave
         # fill in missing data with nan's so not plotted across.
         base = 50
         df = df.resample('60 T', base=base).interpolate(method='time', limit=1)
-    # elif 'ndbc' in which and not 'nowave' in which:
-    #     # Resample and interpolate to catch the case where wind data is at
-    #     # higher frequency than wave data so wave data is plotted with holes.
-    #     if df is not None:
-    #         # only interpolate wave data
-    #         for key in ['Wave Ht [m]', 'Wave Pd [s]']:
-    #             idx = df.index
-    #             base = idx[0].minute
-    #             datafreq = (idx[1] - idx[0]).seconds/60.
-    #             if key in df.columns:
-    #                 df[key] = df[key].resample(str(datafreq) + 'T', base=base).interpolate()
-    #                 # but then need to check for data gap that should not be connected
-    #                 # check for gap over an hour. factor 1e9 due to nanoseconds.
-    #                 ind = (np.diff(idx)/1e9).astype(float) > 3700
-    #                 # if big gap, insert nan
-    #                 addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
-    #                 # reindex dataframe with added entries for nans, and sort back into order
-    #                 df = df.reindex(np.hstack((idx, addidx))).sort_index()
-        # # fill in missing data at 60 min frequency as nans so not plotted
-        # base = df.index[0].minute
-        # df = df.resample('60T', base=base).asfreq()
 
     # set up datetime number indices since quiver doesn't work otherwise
     for dft in [df, df1, df2, df3, df4]:
@@ -821,7 +812,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var(axes[1], df, 'SigStr [dB]', 'Sig Str [dB]', ymaxrange=[-25, 0],
                 tlims=tlims)
         add_var(axes[2], df, 'Nping', 'Ping Cnt', ymaxrange=[30, 210], tlims=tlims)
-        add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty', ymaxrange=[-20, 20])
+        add_2var(axes[3], df, 'Tx', 'Tx', 'Ty', 'Ty [--]', ymaxrange=[-20, 20])
 
     elif which == 'met':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
@@ -859,14 +850,19 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'ndbc':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[2], df, 'Wave Ht [m]', 'Wave Height [m]',
+        add_var_2units(axes[2], df, 'AirT [deg C]',
+                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                        ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, tlims=tlims)
+        add_var_2units(axes[3], df, 'Wave Ht [m]', 'Wave height\n[m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
-        add_var(axes[3], df, 'Wave Pd [s]', 'Wave Period [s]', ymaxrange=[0,12], tlims=tlims)
-        add_var_2units(axes[4], df, 'WaterT [deg C]',
-                       'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+        add_var(axes[4], df, 'Wave Pd [s]', 'Wave period\n[s]', ymaxrange=[0,12], tlims=tlims)
+        add_var_2units(axes[5], df, 'WaterT [deg C]',
+                       'Water\ntemperature ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
@@ -877,13 +873,18 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[2], df, 'WaterT [deg C]',
+        add_var_2units(axes[2], df, 'AirT [deg C]',
+                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                        ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, tlims=tlims)
+        add_var_2units(axes[3], df, 'WaterT [deg C]',
                        'Water temperature\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
 
-    elif which == 'ndbc-nowave-nowtemp':
+    elif which in ['ndbc-met', 'nos-met']:
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
@@ -895,7 +896,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, dolegend=True, tlims=tlims)
 
-    elif which == 'ndbc-nowave-nowtemp-nopress':
+    elif which == 'ndbc-met-nopress':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AirT [deg C]',
@@ -912,7 +913,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         #                'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
         #                ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
 
-    elif which == 'tcoon':
+    elif which == 'tcoon' or which == 'nos':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
@@ -932,6 +933,43 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
+
+    elif which == 'nos-water':
+        # df4 is an optional input containing NOAA tidal height prediction
+        add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
+                       dolegend=True)
+        add_var_2units(axes[1], df, 'WaterT [deg C]',
+                       'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
+
+    elif which == 'nos-cond':
+        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
+        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
+                       'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
+                       df2=df2, df3=df3, tlims=tlims)
+        add_var_2units(axes[2], df, 'AirT [deg C]',
+                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                        ymaxrange=[-25,40], df1=df1, df2=df2,
+                       df3=df3, tlims=tlims)
+        # df4 is an optional input containing NOAA tidal height prediction
+        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
+                       dolegend=True)
+        add_var_2units(axes[4], df, 'WaterT [deg C]',
+                       'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
+        add_2var(axes[5], df, 'Salinity', 'Salinity',
+                       'Conductivity [mS/cm]',
+                       'Conductivity\n' + r'$\left[\mathrm{mS}\cdot\mathrm{cm}^{-1} \right]$',
+                       ymaxrange=[0, 30], df1=df1, df2=df2, df3=df3,
+                       tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
         add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +

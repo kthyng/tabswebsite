@@ -224,11 +224,12 @@ def read_nos_df(dataname):
         rdict = {}
 
     elif 'type=phys' in dataname:
-        names = ['WaterT [deg C]']
-        # CHANGE THIS
-        df = df.drop(['CONDUCTIVITY'], axis=1, errors='ignore')
+        names = ['WaterT [deg C]', 'Conductivity [mS/cm]', 'Salinity']
+        # calculate salinity from conductivity
+        df['Salinity'] = gsw.SP_from_C(df['WATERTEMP'], df['CONDUCTIVITY'],
+                                       np.zeros(len(df)))
         # dictionary for rounding decimal places
-        rdict = {}
+        rdict = {'Salinity': 2}
 
     elif 'prediction' in dataname:  # tidal height prediction
         names = ['Water Level [m]']
@@ -518,7 +519,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 else:
                     j, i = bp.model(buoy, 'rho')  # get model indices
                 df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-                if which == 'salt':
+                if which == 'salt' or 'cond' in which:
                     df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
                 df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
                 df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)

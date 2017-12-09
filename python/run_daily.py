@@ -27,14 +27,15 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
+        if not '8761724' in buoy:
+            continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
-        # if not '8770475' in buoy:
-        #     continue
-        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and bys[buoy][table] != 'tidepredict']
+        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and 'predict' not in bys[buoy][table]]
 
         for table in tables:  # loop through tables for each buoy
-            if not bys[buoy]['active']:  # only do this for active buoys
+            # only do this for active buoys
+            if not bys[buoy]['active']:
                 continue
 
             print(buoy)
@@ -85,11 +86,10 @@ if __name__ == "__main__":
             else:
                 dfmodeltides = None
 
-
-            # none of these use model output, so no forecast and therefore no
             # extra time needed in x direction
-            if dfmodelforecast is not None:  # catches PORTS
+            if dfmodeltides is not None:  # catches PORTS and tide prediction
                 tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
+            # none of these use model output, so no forecast and therefore no
             elif table == 'wave' or table == 'eng' or not bp.model(buoy, 'rho'):
                 tlims = None
             else:
@@ -109,34 +109,34 @@ if __name__ == "__main__":
             fig.savefig(fname + '_low.png', dpi=60)
             close(fig)
 
-    for buoy in bys.keys():  # loop through buoys separately for buoy headers
-        if not bys[buoy]['active']:  # only do this for active buoys
-            continue
-        # write header
-        print(buoy)
-        bh.make(buoy)
-
-    # separate for making currents summaries
-    # use data that was calculated previously in this script
-    dfs = []; buoys = []
-    for buoy in bys.keys():
-        if len(buoy) > 1 or not bys[buoy]['active']:  # don't include other buoys
-            continue
-        fname = 'tabs_' + buoy + '_ven'
-        df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,
-                           index_col=0, na_values=[-999])
-        df = df.tz_localize('utc')  # all files are read in utc
-        # check if any of dataset is from within the past 5 days before appending
-        if (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
-            dfs.append(df)
-        else:
-            dfs.append(None)
-        buoys.append(buoy)
-    fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
-    fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
-    fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
-    fig1.savefig(path.join('..', 'daily', 'currents1.png'))
-    fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
-    fig2.savefig(path.join('..', 'daily', 'currents2.png'))
-    close(fig1)
-    close(fig2)
+    # for buoy in bys.keys():  # loop through buoys separately for buoy headers
+    #     if not bys[buoy]['active']:  # only do this for active buoys
+    #         continue
+    #     # write header
+    #     print(buoy)
+    #     bh.make(buoy)
+    #
+    # # separate for making currents summaries
+    # # use data that was calculated previously in this script
+    # dfs = []; buoys = []
+    # for buoy in bys.keys():
+    #     if len(buoy) > 1 or not bys[buoy]['active']:  # don't include other buoys
+    #         continue
+    #     fname = 'tabs_' + buoy + '_ven'
+    #     df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,
+    #                        index_col=0, na_values=[-999])
+    #     df = df.tz_localize('utc')  # all files are read in utc
+    #     # check if any of dataset is from within the past 5 days before appending
+    #     if (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
+    #         dfs.append(df)
+    #     else:
+    #         dfs.append(None)
+    #     buoys.append(buoy)
+    # fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
+    # fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
+    # fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
+    # fig1.savefig(path.join('..', 'daily', 'currents1.png'))
+    # fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
+    # fig2.savefig(path.join('..', 'daily', 'currents2.png'))
+    # close(fig1)
+    # close(fig2)
