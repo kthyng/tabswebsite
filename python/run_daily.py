@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        if not '8761724' in buoy:
+        if not '8741533' in buoy:
             continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table

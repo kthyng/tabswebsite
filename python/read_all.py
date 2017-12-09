@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        if buoy != '8764227':
+        if buoy != '8770613':
             continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]

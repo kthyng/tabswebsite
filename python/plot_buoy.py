@@ -367,8 +367,8 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     add_rhs(ax1, label2, con)
     # Add ebb/flood text labels
     if doebbflood:
-        ax1.text(0.02, 0.93, 'FLOOD', fontsize=10, transform=ax1.transAxes)
-        ax1.text(0.02, 0.03, 'EBB', fontsize=10, transform=ax1.transAxes)
+        ax1.text(0.02, 0.95, 'FLOOD', fontsize=10, transform=ax1.transAxes)
+        ax1.text(0.02, 0.015, 'EBB', fontsize=10, transform=ax1.transAxes)
     if not dodepth == False:
         ax1.text(0.85, 0.95, 'Depth: %2.1fm' % dodepth, fontsize=10, transform=ax1.transAxes)
 
@@ -690,13 +690,16 @@ def setup(nsubplots, table=None, buoy=None):
 
     if nsubplots == 1:
         figsize = (8.5, 5)
-        props = {'top': 0.92, 'right': 0.9, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.275}
+        props = {'top': 0.88, 'right': 0.9, 'left': 0.11, 'hspace': 0.1, 'bottom': 0.275}
     elif nsubplots == 2:
         figsize = (8.5, 8.5)
-        props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.08, 'bottom': 0.175}
+        props = {'top': 0.93, 'right': 0.88, 'left': 0.12, 'hspace': 0.08, 'bottom': 0.175}
     else:
         figsize = (8.5, 11)
-        props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.125}
+        if len(buoy) == 1:  # don't need as much space at top for TABS buoys
+            props = {'top': 0.96, 'right': 0.88, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.125}
+        else:
+            props = {'top': 0.94, 'right': 0.88, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.125}
 
     # plot
     fig, axes = plt.subplots(nsubplots, 1, figsize=figsize, sharex=True)
@@ -711,15 +714,27 @@ def setup(nsubplots, table=None, buoy=None):
         ll = str(lat[0]) + r'$\!^\circ$' + str(lat[1]) + '\'N' + '  ' \
                 + str(abs(lon[0])) + r'$\!^\circ$' + str(lon[1]) + '\'W'
         if len(buoy) == 1:
-            title = 'TGLO TABS Buoy ' + buoy + ': ' + ll
+            prefix = 'TABS Buoy'
         elif len(buoy) == 5:  # NDBC
-            title = 'NDBC Station ' + buoy + ': ' + ll
+            prefix = 'NDBC Station'
         elif 'tcoon' in table:
-            title = 'TCOON Station ' + buoy + ': ' + ll
+            prefix = 'TCOON Station'
         elif 'nos' in table:
-            title = 'NOS Station ' + buoy + ': ' + ll
+            prefix = 'NOS Station'
         elif 'ports' in table:
-            title = 'PORTS Station ' + buoy + ': ' + ll
+            prefix = 'PORTS Station'
+
+        title = '%s %s' % (prefix, buoy)
+        # add other name for buoy if exists
+        if isinstance(bys[buoy]['alias'], str):
+            title += '/%s' % bys[buoy]['alias']
+        title += ': %s' % ll  # add on lat/lon
+        # add description of buoy location if exists
+        if isinstance(bys[buoy]['description'], str):
+            title += '\n%s' % bys[buoy]['description']
+
+        # title = '%s %s: %s\n%s, %s' % \
+        #         (prefix, buoy, ll, bys[buoy]['alias'], bys[buoy]['description'])
         axes[0].set_title(title, fontsize=18)
 
     return fig, axes
@@ -737,7 +752,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
 
     if which in ['tcoon-tide', 'ports']:
         nsubplots = 1
-    elif which in ['ndbc-met-nopress', 'nos-water']:
+    elif which in ['nos-water']:
         nsubplots = 2
     elif which in ['salt', 'wave', 'nos-met', 'ndbc-met']:
         nsubplots = 3
@@ -896,22 +911,9 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, dolegend=True, tlims=tlims)
 
-    elif which == 'ndbc-met-nopress':
-        add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
-                     df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AirT [deg C]',
-                       'Air temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
-                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-                        ymaxrange=[-25,40], df1=df1, df2=df2,
-                       df3=df3, dolegend=True, tlims=tlims)
-
     elif which == 'tcoon-tide':
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Height\n[m, MSL]',
+        add_var_2units(axes[0], df, 'Water Level [m]', 'Height [m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, dolegend=True)
-        # add_var_2units(axes[1], df, 'WaterT [deg C]',
-        #                'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
-        #                'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
-        #                ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3, tlims=tlims)
 
     elif which == 'tcoon' or which == 'nos':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
@@ -936,11 +938,11 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
 
     elif which == 'nos-water':
         # df4 is an optional input containing NOAA tidal height prediction
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height [m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=True)
         add_var_2units(axes[1], df, 'WaterT [deg C]',
-                       'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'Water temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                        ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
                        tlims=tlims, dolegend=True)
@@ -972,7 +974,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
-        add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed\n' +
+        add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed ' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df4=df4,
