@@ -44,7 +44,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
         df = pd.DataFrame()
         # check that we are within normal data frequency
         while date + pd.Timedelta('60 minutes') < dend:
-            print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
+            # print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
             # # if we are using data, dend cannot be in the future
             # dend = min(dend, pd.Timestamp('now', tz='utc'))
             if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
@@ -94,7 +94,20 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
         df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
-        df = read_tabs(table, buoy, dstart, dend)
+        # sum goes across tables
+        dfs = []
+        if table == 'sum':
+            dfs.append(read_tabs('ven', buoy, dstart, dend))
+            if isinstance(bys[buoy]['table3'], str) and 'salt' in bys[buoy]['table3']:
+                # drop water temp from here so that there aren't two in dataframe
+                dfs.append(read_tabs('salt', buoy, dstart, dend).drop(['WaterT [deg C]'], axis=1))
+            if isinstance(bys[buoy]['table4'], str) and 'met' in bys[buoy]['table4']:
+                dfs.append(read_tabs('met', buoy, dstart, dend))
+            # combine tables together
+            df = pd.concat([df for df in dfs], axis=1)
+
+        else:
+            df = read_tabs(table, buoy, dstart, dend)
 
     return df
 
@@ -142,15 +155,17 @@ def read_ports_df(dataname, dates=None):
         theta[theta<0] += 360
         # tidal data needs to be converted into along-channel direction
         # along-channel flood direction (from website for data), converted from compass to math angle
-        diralong = 90 - bys[buoy]['angle'] + 360
-
+        diralong = 90 - bys[buoy]['angle']
+        if diralong < 0:
+            diralong += 360
         # first convert to east/west, north/south
         # all speeds in cm/s
         east = df[' Speed (cm/sec)']*np.cos(np.deg2rad(theta))
         north = df[' Speed (cm/sec)']*np.sin(np.deg2rad(theta))
         # then convert to along-channel (mean ebb and mean flood)
-        # this is overwriting speed (magnitude) with speed (alongchannel)
-        df['Along (cm/sec)'] = -(east*np.cos(diralong) - north*np.sin(diralong))
+        df['Along (cm/sec)'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
+        df['Across (cm/sec)'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
+        # import pdb; pdb.set_trace()
 
         df.rename(columns={' Speed (cm/sec)': 'Speed (cm/sec)',
                            ' Dir (true)': 'Dir (true)'}, inplace=True)
@@ -186,7 +201,11 @@ def read_nos(buoy, dstart, dend, usemodel=False):
                 dft = dft[~dft.index.duplicated(keep='first')]  # remove any duplicated indices
             dfs.append(dft)
         # combine the dataframes together
-        df = pd.concat([df for df in dfs], axis=1)
+        # don't append if all df are empty
+        if [df.empty for df in dfs].count(True) != len(dfs):
+            df = pd.concat([df for df in dfs if not df.empty], axis=1)
+        else:
+            df = pd.concat([df for df in dfs], axis=1)
 
     else:  # use model
 
@@ -224,12 +243,18 @@ def read_nos_df(dataname):
         rdict = {}
 
     elif 'type=phys' in dataname:
-        names = ['WaterT [deg C]', 'Conductivity [mS/cm]', 'Salinity']
-        # calculate salinity from conductivity
-        df['Salinity'] = gsw.SP_from_C(df['WATERTEMP'], df['CONDUCTIVITY'],
-                                       np.zeros(len(df)))
-        # dictionary for rounding decimal places
-        rdict = {'Salinity': 2}
+        buoy = dataname.split('id=')[1][:7]
+        if 'cond' in bys[buoy]['table1']:
+            names = ['WaterT [deg C]', 'Conductivity [mS/cm]', 'Salinity']
+            # calculate salinity from conductivity
+            df['Salinity'] = gsw.SP_from_C(df['WATERTEMP'], df['CONDUCTIVITY'],
+                                           np.zeros(len(df)))
+            # dictionary for rounding decimal places
+            rdict = {'Salinity': 2}
+        else:
+            names = ['WaterT [deg C]']
+            df = df.drop(['CONDUCTIVITY'], axis=1)
+            rdict = {}
 
     elif 'prediction' in dataname:  # tidal height prediction
         names = ['Water Level [m]']
@@ -505,7 +530,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             anglev = ds['angle'][i]  # using at least nearby grid rotation angle
         else:
             try:
-                if which == 'ven':
+                if which in ['ven', 'sum']:
                     j, i = bp.model(buoy, 'u')  # get model indices
                     along = ds['u'].sel(ocean_time=slice(dstart, dend))\
                                    .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
@@ -519,7 +544,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 else:
                     j, i = bp.model(buoy, 'rho')  # get model indices
                 df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-                if which == 'salt' or 'cond' in which:
+                if which in ['salt', 'sum'] or 'cond' in which:
                     df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
                 df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
                 df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
@@ -532,7 +557,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
 
         # Project along- and across-shelf velocity rather than use from model
         # so that angle matches buoy
-        if which == 'ven':
+        if which in ['ven', 'sum']:
             df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(along, across, anglev)  # approximately to east, north
             theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
@@ -553,7 +578,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
         if which == 'met':
             df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
-        if which == 'salt':
+        if which in ['salt', 'sum']:
             df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
     # # return None instead of just header if no data for time period

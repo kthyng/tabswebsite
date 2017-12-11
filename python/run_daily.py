@@ -23,12 +23,12 @@ tz = 'US/Central'
 if __name__ == "__main__":
 
     engine = tools.setup_engine()
-    tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
+    tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5', 'table6']
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        if not '8741533' in buoy:
-            continue
+        # if not 'mg0101' in buoy:
+        #     continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and 'predict' not in bys[buoy][table]]
@@ -37,10 +37,12 @@ if __name__ == "__main__":
             # only do this for active buoys
             if not bys[buoy]['active']:
                 continue
+            # if not table == 'ven':
+            #     continue
 
             print(buoy)
             # read in data in UTC
-            if bys[buoy]['inmysql']:  # mysql tables
+            if bys[buoy]['inmysql'] and table != 'sum':  # mysql tables
                 dend = tools.query_setup_recent(engine, buoy, table).tz_localize('utc')
             else:
                 dend = pd.Timestamp('now', tz='utc')
@@ -91,7 +93,8 @@ if __name__ == "__main__":
                 tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
             # none of these use model output, so no forecast and therefore no
             elif table == 'wave' or table == 'eng' or not bp.model(buoy, 'rho'):
-                tlims = None
+                # tlims = None
+                tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(now).to_pydatetime())]
             else:
                 # tlims = [dfmodelrecent['idx'].iloc[0], dfmodelforecast['idx'].iloc[-1]]
                 tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]

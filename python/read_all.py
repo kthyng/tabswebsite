@@ -82,8 +82,12 @@ if __name__ == "__main__":
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        if buoy != '8770613':
-            continue
+        # if buoy != '8770475':
+        #     continue
+        # if buoy not in ['g06010', 'g09010', 'mc0101', 'sn0101', 'sn0201',
+        #                 'sn0301', 'sn0401', 'sn0501', 'sn0701', 'lc0101',
+        #                 'lc0201', 'mg0101', 'ps0401', 'ps0201', 'ps0301']:
+            # continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 

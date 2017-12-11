@@ -192,7 +192,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
         ax.get_yaxis().set_ticks([])
         return
     # if data is not within input time range, use model output instead
-    if tlims is not None:
+    if tlims is not None and (df1 is not None or df2 is not None or df3 is not None):
         if df['idx'][-1] < tlims[0] or df['idx'][0] > tlims[-1]:
             df = pd.concat([df1, df2, df3])  # in case there is a df3
             color = c2
@@ -284,7 +284,8 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     axknots.set_ylabel('[knots]')
 
 
-def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
+def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None,
+            label=None):
     '''Add along- or across-shelf velocity to plot
 
     which   'Across' or 'Along'
@@ -309,28 +310,34 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None):
     shifty(ax, N=0.1)
     # force 0 line to be within y limits
     shifty(ax, N=0)
-    if which == 'Across [cm/s]':
-        ax.set_ylabel('Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
-    elif which == 'Along [cm/s]':
-        ax.set_ylabel('Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+    if label is None:
+        if which == 'Across [cm/s]':
+            label = 'Cross-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
+        elif which == 'Along [cm/s]':
+            label = 'Along-shelf flow\n' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$'
+    ax.set_ylabel(label)
     # convert to knots on rhs
     add_rhs(ax, '[knots]', 'cps2kts')
     if which == 'Across [cm/s]':
-        ax.text(0.02, 0.93, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.9, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(bys[buoy]['angle']) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.9, str(bys[buoy]['angle']) + '˚T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
-        ax.text(0.02, 0.93, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
+        ax.text(0.02, 0.9, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.91, str(bys[buoy]['angle']-90) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.9, str(bys[buoy]['angle']-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, df4=None, tlims=None, dolegend=False,
-                   add0=False, doebbflood=False, dodepth=False):
-    '''Plot with units on both left and right sides of plot.'''
+                   add0=False, doebbflood=False, dodepth=False, dodepthm=np.nan,
+                   doangle=False):
+    '''Plot with units on both left and right sides of plot.
+
+    dodepth should be a depth in meters if you want to write on the sensor depth.
+    use dodepthm for adding model depth, if relevant.'''
 
     if df is not None and not df[key].isnull().all():
         ax1.plot(df['idx'], df[key], lw=lw, color='k', linestyle='-')
@@ -369,9 +376,13 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     if doebbflood:
         ax1.text(0.02, 0.95, 'FLOOD', fontsize=10, transform=ax1.transAxes)
         ax1.text(0.02, 0.015, 'EBB', fontsize=10, transform=ax1.transAxes)
-    if not dodepth == False:
-        ax1.text(0.85, 0.95, 'Depth: %2.1fm' % dodepth, fontsize=10, transform=ax1.transAxes)
-
+    # add rotation angle
+    if not doangle == False:
+        ax1.text(0.9, 0.95, str(doangle) + '˚T', fontsize=10, transform=ax1.transAxes)
+    if not dodepth == False:  # data
+        ax1.text(0.55, 0.95, 'Depth: %2.1fm' % dodepth, color='k', fontsize=10, transform=ax1.transAxes)
+    if not np.isnan(dodepthm):  # model
+        ax1.text(0.725, 0.95, 'Depth: %2.1fm' % dodepthm, color=c3, fontsize=10, transform=ax1.transAxes)
 
 def add_var(ax, df, var, varlabel, ymaxrange=None, df1=None, df2=None, df3=None,
             dolegend=False, tlims=None):
@@ -485,7 +496,7 @@ def add_xlabels(ax, df, fig, tlims=None):
     if tlims is not None:
         ax.set_xlim(tlims[0], tlims[1])
     else:
-        plt.autoscale(enable=True, axis='x', tight=True)
+        ax.autoscale(enable=True, axis='x', tight=True)
 
     # use this because includes forecast model output along with data
     xlim = np.diff(ax.get_xlim())  # x limit length in days
@@ -690,7 +701,7 @@ def setup(nsubplots, table=None, buoy=None):
 
     if nsubplots == 1:
         figsize = (8.5, 5)
-        props = {'top': 0.88, 'right': 0.9, 'left': 0.11, 'hspace': 0.1, 'bottom': 0.275}
+        props = {'top': 0.88, 'right': 0.9, 'left': 0.15, 'hspace': 0.1, 'bottom': 0.275}
     elif nsubplots == 2:
         figsize = (8.5, 8.5)
         props = {'top': 0.93, 'right': 0.88, 'left': 0.12, 'hspace': 0.08, 'bottom': 0.175}
@@ -756,11 +767,11 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         nsubplots = 2
     elif which in ['salt', 'wave', 'nos-met', 'ndbc-met']:
         nsubplots = 3
-    elif which in ['ven', 'eng', 'met', 'sum', 'ndbc-nowave']:
+    elif which in ['ven', 'eng', 'met', 'ndbc-nowave']:
         nsubplots = 4
     elif which in ['tcoon', 'nos']:
         nsubplots = 5
-    elif which in ['ndbc', 'nos-cond']:
+    elif which in ['ndbc', 'nos-cond', 'sum']:
         nsubplots = 6
 
     if len(buoy) == 1 and which != 'wave' and df is not None:
@@ -856,6 +867,25 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                 'Density ' + r'$\left[ \mathrm{kg} \cdot \mathrm{m}^{-3} \right]$',
                 df1=df1, df2=df2, df3=df3, ymaxrange=[1005, 1036], dolegend=True, tlims=tlims)
 
+    elif which == 'sum':
+        add_currents(axes[0], df, 'water', 'East [cm/s]', 'North [cm/s]',
+                     df1=df1, df2=df2, df3=df3, tlims=tlims)
+        add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110],
+                df1=df1, df2=df2, df3=df3,
+                label='Cross-shelf\nflow ' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+        add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110],
+                df1=df1, df2=df2, df3=df3,
+                label='Along-shelf\nflow ' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+        add_var_2units(axes[3], df, 'WaterT [deg C]',
+                       'Water\ntemp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
+                       'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
+                       ymaxrange=[5, 32], df1=df1, df2=df2, df3=df3,
+                       tlims=tlims, dolegend=True)
+        add_var(axes[4], df, 'Salinity', 'Salinity', ymaxrange=[12, 37], df1=df1,
+                df2=df2, df3=df3, tlims=tlims)
+        add_currents(axes[5], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
+                     df2=df2, df3=df3, tlims=tlims)
+
     elif which == 'wave':
         add_var_2units(axes[0], df, 'WaveHeight [m]', 'Wave Height [m]',
                        'm2ft', '[ft]', ymaxrange=[0,5], tlims=tlims)
@@ -937,10 +967,14 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, dolegend=True)
 
     elif which == 'nos-water':
+        if df4 is None:  # legend for NOAA model
+            dolegend = False
+        else:
+            dolegend = True
         # df4 is an optional input containing NOAA tidal height prediction
         add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height [m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
-                       dolegend=True)
+                       dolegend=dolegend)
         add_var_2units(axes[1], df, 'WaterT [deg C]',
                        'Water temp ' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
@@ -979,7 +1013,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df4=df4,
                        dolegend=True, add0=True, tlims=tlims, doebbflood=True,
-                       dodepth=bys[buoy]['depth'])
+                       doangle=bys[buoy]['angle'],
+                       dodepth=bys[buoy]['depth'], dodepthm=bys[buoy]['depth_model'])
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None and tlims is not None:

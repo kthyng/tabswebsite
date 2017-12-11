@@ -90,19 +90,24 @@ The date and time at each station indicates the end of the three-hour average.<b
 // this list should match the "active" buoy list in python/buoy_data.py
 $blet=array("B","D","F","J","K","R","V","W","X",
             '42001', '42002', '42019','42020','42035', '42036', '42039', '42040',
-            'SRST2', 'PTAT2', 'BURL1', 'GISL1', 'AMRL1', 'PSTL1',
-            'g06010',
+            'SRST2', 'PTAT2', 'BURL1',
+            'g06010', 'mc0101', 'sn0101', 'sn0201', 'sn0301', 'sn0401', 'sn0501',
+            'sn0701', 'lc0101', 'lc0201', 'mg0101',
             '8770475','8770520', '8770777', '8770808',
             '8770822','8770971', '8771486', '8771972', '8772985', '8773037',
             '8773146', '8773259', '8773701', '8774230', '8775237',
             '8775241', '8775244', '8775296', '8775792', '8776139',
-            '8776604', '8777812', '8778490', '8779280', '8779748', '8779749'
+            '8776604', '8777812', '8778490', '8779280', '8779748', '8779749',
+            '8734673', '8735180', '8741003', '8741041', '8741094', '8741501',
+            '8741533', '8747437', '8760721', '8760922', '8761305', '8761724',
+            '8764227', '8764314', '8766072', '8768094', '8770570', '8770613',
+            '8771013', '8771341', '8771450', '8773767', '8775870', '8779770'
             );
 $bidx=0;
 foreach ($blet as $f) {
     if (strlen($f) == 1) {
-    	$venfile="daily/tabs_".$f."_ven";
-        $table = "ven";
+    	$venfile="daily/tabs_".$f."_sum";
+        $table = "sum";
     }
     else {
     	$venfile="daily/".$f;
@@ -179,13 +184,17 @@ foreach ($blet as $f) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>NDBC</i></td></tr>";  // Label between TABS and NDBC buoys
     }
-    else if ($f == "PSTL1") {
+    else if ($f == "BURL1") {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>PORTS</i></td></tr>";
     }
-    else if ($f == "g06010") {
+    else if ($f == "mg0101") {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>TCOON</i></td></tr>";  // Label between PORTS and TCOON buoys
+    }
+    else if ($f == "8779749") {
+    print "<tr><td><br></td></tr>";  // space
+    print "<tr><td></td><td><i>NOS</i></td></tr>";  // Label between PORTS and TCOON buoys
     }
 }
 print "<tr></tr>";
