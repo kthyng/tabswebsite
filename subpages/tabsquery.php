@@ -104,7 +104,7 @@ if ($datepicker == "recent") {
         $command = escapeshellcmd('/usr/bin/python3 ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/anaconda/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
     }
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.

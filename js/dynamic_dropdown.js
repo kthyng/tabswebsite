@@ -33,10 +33,17 @@ var data = {
     "SRST2": ["ndbc"],
     "PTAT2": ["ndbc"],
     "BURL1": ["ndbc"],
-    "GISL1": ["ndbc"],
-    "AMRL1": ["ndbc"],
-    "PSTL1": ["ndbc"],
     "g06010": ["ports"],
+    "mc0101": ["ports"],
+    "sn0101": ["ports"],
+    "sn0201": ["ports"],
+    "sn0301": ["ports"],
+    "sn0401": ["ports"],
+    "sn0501": ["ports"],
+    "sn0701": ["ports"],
+    "lc0101": ["ports"],
+    "lc0201": ["ports"],
+    "mg0101": ["ports"],
     '8770475': ["tcoon"],
     '8770520': ["tcoon"],
     '8770733': ["tcoon"],
@@ -66,6 +73,30 @@ var data = {
     '8779280': ["tcoon"],
     '8779748': ["tcoon"],
     '8779749': ["tcoon"],
+    '8734673': ["nos"],
+    '8735180': ["nos"],
+    '8741003': ["nos"],
+    '8741041': ["nos"],
+    '8741094': ["nos"],
+    '8741501': ["nos"],
+    '8741533': ["nos"],
+    '8747437': ["nos"],
+    '8760721': ["nos"],
+    '8760922': ["nos"],
+    '8761305': ["nos"],
+    '8761724': ["nos"],
+    '8764227': ["nos"],
+    '8764314': ["nos"],
+    '8766072': ["nos"],
+    '8768094': ["nos"],
+    '8770570': ["nos"],
+    '8770613': ["nos"],
+    '8771013': ["nos"],
+    '8771341': ["nos"],
+    '8771450': ["nos"],
+    '8773767': ["nos"],
+    '8775870': ["nos"],
+    '8779770': ["nos"]
 }
 
 $(function() {
@@ -105,6 +136,9 @@ http://jsfiddle.net/NaUAL/
         else if (valorig == "tcoon"){
           valnameorig = "TCOON buoy"
         }
+        else if (valorig == "nos"){
+          valnameorig = "NOS buoy"
+        }
         // only create html if initial table value exists
         // also only use table variable if it is an option for the buoy
         if (valorig && $.inArray(valorig, vals) != -1){
@@ -139,6 +173,9 @@ http://jsfiddle.net/NaUAL/
               }
               else if (val == "tcoon"){
                 valname = "TCOON buoy"
+              }
+              else if (val == "nos"){
+                valname = "NOS buoy"
               }
               html.push('<option value=' + val + '>'+valname+'</option>')
             // //   html.push('<option>'+val+'</option>')

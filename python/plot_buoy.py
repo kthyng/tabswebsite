@@ -957,9 +957,13 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
         # df4 is an optional input containing NOAA tidal height prediction
+        if df4 is not None:  # only show legend here if needed
+            dolegend = True
+        else:
+            dolegend = False
         add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
-                       dolegend=True)
+                       dolegend=dolegend)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
@@ -1008,7 +1012,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
-        add_var_2units(axes[0], df, 'Along (cm/sec)', 'Along-channel speed ' +
+        add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df4=df4,
@@ -1038,7 +1042,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
 def currents(dfs, buoys):
     '''Plot currents for all active buoys.'''
 
-    fig, axes = setup(nsubplots=len(dfs))
+    fig, axes = setup(nsubplots=len(dfs), buoy=buoys[0])
 
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):

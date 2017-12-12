@@ -43,17 +43,20 @@ def html(head, tablename, dftail, dftaile):
             unite = '[' + keye.split('[')[-1]
         else:
             unit = ''; unite = ''
-        metric = '{:4.2f} {}'.format(dftail[key].values[0], unit)
-        head.append('<td>' + name + metric)
-        if unit != '':
-            head.append(',')
-        head.append('&nbsp;')
-        if not unit == unite:
-            english = '{:4.2f} {}'.format(dftaile[keye].values[0], unite)
-            head.append(english)
-        head.append('&nbsp;&nbsp;&nbsp;</td>')
-        if i != 1 and i%3 == 0:
-            head.append('</tr><tr>')
+        # create line for header
+        value = dftail[key].values[0]  # data value
+        if value != -999.00:
+            metric = '{:4.2f} {}'.format(value, unit)
+            head.append('<td>' + name + metric)
+            if unit != '':
+                head.append(',')
+            head.append('&nbsp;')
+            if not unit == unite:
+                english = '{:4.2f} {}'.format(dftaile[keye].values[0], unite)
+                head.append(english)
+            head.append('&nbsp;&nbsp;&nbsp;</td>')
+            if i != 1 and i%3 == 0:
+                head.append('</tr><tr>')
         i += 1
     head.append('<tr></tr><tr></tr>')
     return head
@@ -64,12 +67,13 @@ def make(buoy):
 
 
     lon, lat = bys[buoy]['lon'], bys[buoy]['lat']
-    ll = str(lat) + '&deg; ' + 'N' + '&nbsp;&nbsp;' \
-            + str(abs(lon)) + '&deg; ' + 'W'
+    ll = '%2.3f&deg; N &nbsp;&nbsp; %2.3f&deg; W' % (lat, abs(lon))
     # pulls out the non-nan table values to loop over valid table names
     tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
     for table in tables:  # loop through tables for each buoy
-
+        # table entries with "predict" in them are not really separate tables
+        if 'predict' in table:
+            continue
         # use name for TABS tables but not others
         if table in tablenames.keys():
             tablename = tablenames[table]
@@ -89,9 +93,9 @@ def make(buoy):
         if df is None or df.empty:
             continue
         df = df.tz_localize('UTC')  # timezone is UTC
+        # import pdb; pdb.set_trace()
         dftail = df.tail(1)
         dftaile = tools.convert_units(dftail, units='E', tz=None)
-        # import pdb; pdb.set_trace()
         time = dftail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
         time2 = dftail.index.tz_convert('US/Central').strftime("%Y-%m-%d %H:%M %Z")[0]
         try:

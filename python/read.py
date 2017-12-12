@@ -57,7 +57,8 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
                 td = pd.Timedelta('31 days')
                 if 'ports' in bys[buoy]['table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
-                daystoread = min(td, dend-date)
+                # need to make sure dates are all in same time zone
+                daystoread = min(td, dend.tz_convert('utc')-date)
                 dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
                                    tz=tz, usemodel=usemodel, userecent=userecent)
                 if df is not None:
@@ -144,7 +145,7 @@ def read_ports_df(dataname, dates=None):
         return None
 
     if 'http' and 'Predictions' in dataname:  # website, model predictions
-        df.rename(columns={' Speed (cm/sec)': 'Along (cm/sec)'}, inplace=True)
+        df.rename(columns={' Speed (cm/sec)': 'Along [cm/s]'}, inplace=True)
 
     elif 'http' and 'DataPlot' in dataname:  # reading from website, data
         # find buoy name
@@ -163,12 +164,12 @@ def read_ports_df(dataname, dates=None):
         east = df[' Speed (cm/sec)']*np.cos(np.deg2rad(theta))
         north = df[' Speed (cm/sec)']*np.sin(np.deg2rad(theta))
         # then convert to along-channel (mean ebb and mean flood)
-        df['Along (cm/sec)'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
-        df['Across (cm/sec)'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
+        df['Along [cm/s]'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
+        df['Across [cm/s]'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
         # import pdb; pdb.set_trace()
 
-        df.rename(columns={' Speed (cm/sec)': 'Speed (cm/sec)',
-                           ' Dir (true)': 'Dir (true)'}, inplace=True)
+        df.rename(columns={' Speed (cm/sec)': 'Speed [cm/s]',
+                           ' Dir (true)': 'Dir [deg T]'}, inplace=True)
 
     df.index.rename('Dates [UTC]', inplace=True)
 

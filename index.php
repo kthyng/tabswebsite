@@ -111,11 +111,6 @@ foreach ($blet as $f) {
     }
     else {
     	$venfile="daily/".$f;
-    //     $table = "ndbc";
-    // }
-    // else if (strlen($f) == 7) {
-    // 	$venfile="daily/tcoon_".$f;
-    //     $table = "tcoon";
     }
 
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
@@ -129,28 +124,6 @@ foreach ($blet as $f) {
             $datestr=$data[0];
     		$timestr=substr($data[1],0,5);
 
-            // // tabs datetime in UTC and Texas time (CST/CDT)
-            // // set up date and time together with UTC timezone (which is what the data is in)
-            // $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
-            // // save formatted string
-            // // http://php.net/manual/en/datetime.formats.date.php
-            // $dtUTCstr = $dtUTC->format('M d, Y H:i');
-            // // find time zone abbreviation
-            // // http://stackoverflow.com/questions/5362628/how-to-get-the-names-and-abbreviations-of-a-time-zone-in-php
-            // $dtUTCtz = $dtUTC->format('T');
-            //
-            // // start from UTC datetime
-            // $dtTX = $dtUTC;
-            // // convert to TX
-            // // http://www.silenceit.ca/2011/06/15/how-to-convert-timetimezones-with-php/
-            // $dtTX->setTimezone(new DateTimeZone('America/Chicago'));
-            // $dtTXstr = $dtTX->format('M d, Y H:i');
-            // $dtTXtz = $dtTX->format('T');
-            // // # date range for the php call
-            // // $recent = $dtUTC->format('Y-m-d');  # most recent date for buoy
-            // // $earlier = $dtUTC->modify('-4 days')->format('Y-m-d');
-            // // $timerange = $earlier."+-+".$recent;  # + makes the space between the dates somehow
-
             $dtTX = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
             $dtTXstr = $dtTX->format('M d, Y H:i');
             $dtTXtz = $dtTX->format('T');
@@ -158,15 +131,12 @@ foreach ($blet as $f) {
             // check for if report is more than about 3 days old (ignoring time zones, etc)
             $today = new DateTime('now', new DateTimeZone('America/Chicago'));
             $interval = date_diff($dtTX, $today);  # difference in days between now and most recent data
-            // $interval = date_diff($dtUTC, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
             if ($intervalstr>3){ // old report
                 $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz\n</div></td>";
-                // $buoystr = "<td nowrap valign=top><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</td>";
             }
             elseif ($intervalstr<=7) { // bold for recent report
                 $buoystr =  "<td nowrap valign=top><div id=\"Report\"><b>$dtTXstr $dtTXtz\n</div></b></td>";
-                // $buoystr =  "<td nowrap valign=top><b><font class=bksm>$dtUTCstr $dtUTCtz ($dtTXstr $dtTXtz)\n</b></td>";
             }
             else {  // missing plot
                 $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
@@ -177,7 +147,7 @@ foreach ($blet as $f) {
         $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=UTC&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
+    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=US/Central&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
     print $buoystr;
     $bidx++;
     if ($f == "X") {

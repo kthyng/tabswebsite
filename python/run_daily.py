@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        # if not 'mg0101' in buoy:
+        # if not 'sn0301' in buoy:
         #     continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
@@ -112,34 +112,36 @@ if __name__ == "__main__":
             fig.savefig(fname + '_low.png', dpi=60)
             close(fig)
 
-    # for buoy in bys.keys():  # loop through buoys separately for buoy headers
-    #     if not bys[buoy]['active']:  # only do this for active buoys
-    #         continue
-    #     # write header
-    #     print(buoy)
-    #     bh.make(buoy)
-    #
-    # # separate for making currents summaries
-    # # use data that was calculated previously in this script
-    # dfs = []; buoys = []
-    # for buoy in bys.keys():
-    #     if len(buoy) > 1 or not bys[buoy]['active']:  # don't include other buoys
-    #         continue
-    #     fname = 'tabs_' + buoy + '_ven'
-    #     df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,
-    #                        index_col=0, na_values=[-999])
-    #     df = df.tz_localize('utc')  # all files are read in utc
-    #     # check if any of dataset is from within the past 5 days before appending
-    #     if (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
-    #         dfs.append(df)
-    #     else:
-    #         dfs.append(None)
-    #     buoys.append(buoy)
-    # fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
-    # fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
-    # fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
-    # fig1.savefig(path.join('..', 'daily', 'currents1.png'))
-    # fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
-    # fig2.savefig(path.join('..', 'daily', 'currents2.png'))
-    # close(fig1)
-    # close(fig2)
+    for buoy in bys.keys():  # loop through buoys separately for buoy headers
+        if not bys[buoy]['active']:  # only do this for active buoys
+            continue
+        # if not buoy == 'sn0301':
+        #     continue
+        # write header
+        print(buoy)
+        bh.make(buoy)
+
+    # separate for making currents summaries
+    # use data that was calculated previously in this script
+    dfs = []; buoys = []
+    for buoy in bys.keys():
+        if len(buoy) > 1 or not bys[buoy]['active']:  # don't include other buoys
+            continue
+        fname = 'tabs_' + buoy + '_ven'
+        df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,
+                           index_col=0, na_values=[-999])
+        df = df.tz_localize('utc')  # all files are read in utc
+        # check if any of dataset is from within the past 5 days before appending
+        if (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
+            dfs.append(df)
+        else:
+            dfs.append(None)
+        buoys.append(buoy)
+    fig1 = plot_buoy.currents(dfs[:5], buoys[:5])
+    fig2 = plot_buoy.currents(dfs[5:], buoys[5:])
+    fig1.savefig(path.join('..', 'daily', 'currents1.pdf'))
+    fig1.savefig(path.join('..', 'daily', 'currents1.png'))
+    fig2.savefig(path.join('..', 'daily', 'currents2.pdf'))
+    fig2.savefig(path.join('..', 'daily', 'currents2.png'))
+    close(fig1)
+    close(fig2)

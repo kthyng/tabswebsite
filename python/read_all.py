@@ -67,12 +67,9 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
                    usemodel=False, userecent=False)
 
     if df is not None:
-        # try:
         tools.write_file(df, fname, filetype='hdf', mode=mode, append=append)
         tools.write_file(df, fname, filetype='txt', compression=False, mode=mode)
         tools.write_file(df, fname, filetype='txt', compression=True, mode=mode)
-        # except:
-        #     print("Can't write to file for buoy " + buoy)
     else:
         print('No new data has been read in for buoy ' + buoy + ' table ' + table)
 
@@ -87,7 +84,7 @@ if __name__ == "__main__":
         # if buoy not in ['g06010', 'g09010', 'mc0101', 'sn0101', 'sn0201',
         #                 'sn0301', 'sn0401', 'sn0501', 'sn0701', 'lc0101',
         #                 'lc0201', 'mg0101', 'ps0401', 'ps0201', 'ps0301']:
-            # continue
+        #     continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
