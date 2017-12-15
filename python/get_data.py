@@ -62,8 +62,8 @@ if 'tabs_' in fname:  # only need table name for tabs
     table = fname.split('/')[-1].split('_')[2]
     buoy = fname.split('/')[-1].split('_')[1]
 else:
-    table = None
     buoy = fname.split('/')[-1].split('_')[0]
+    table = bys[buoy]['table1']
 
 ## Read in data ##
 # from daily file, only for showing table since images created in run_daily.py

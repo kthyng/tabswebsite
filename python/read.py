@@ -58,7 +58,10 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
                 if 'ports' in bys[buoy]['table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
                 # need to make sure dates are all in same time zone
-                daystoread = min(td, dend.tz_convert('utc')-date)
+                if date.tz == dend.tz:  # if time zones the same, don't change either
+                    daystoread = min(td, dend-date)
+                else:  # convert dend to utc
+                    daystoread = min(td, dend.tz_convert('utc')-date)
                 dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
                                    tz=tz, usemodel=usemodel, userecent=userecent)
                 if df is not None:
@@ -166,7 +169,6 @@ def read_ports_df(dataname, dates=None):
         # then convert to along-channel (mean ebb and mean flood)
         df['Along [cm/s]'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
         df['Across [cm/s]'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
-        # import pdb; pdb.set_trace()
 
         df.rename(columns={' Speed (cm/sec)': 'Speed [cm/s]',
                            ' Dir (true)': 'Dir [deg T]'}, inplace=True)
@@ -208,6 +210,15 @@ def read_nos(buoy, dstart, dend, usemodel=False):
         else:
             df = pd.concat([df for df in dfs], axis=1)
 
+        # calculate salinity from conductivity, if available
+        if 'Conductivity [mS/cm]' in df.keys():
+            df['Salinity'] = gsw.SP_from_C(df['Conductivity [mS/cm]'],
+                                           df['WaterT [deg C]'],
+                                           df['AtmPr [MB]']/100. - 10.1325)
+            # dictionary for rounding decimal places
+            rdict = {'Salinity': 2}
+            df = df.round(rdict)
+            import pdb; pdb.set_trace()
     else:  # use model
 
         prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&station='
@@ -222,7 +233,7 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
 def read_nos_df(dataname):
     '''Read in individual tcoon datasets and arrange variables.'''
-    # import pdb; pdb.set_trace()
+
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
     if 'type=met' in dataname:
         names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
@@ -246,12 +257,7 @@ def read_nos_df(dataname):
     elif 'type=phys' in dataname:
         buoy = dataname.split('id=')[1][:7]
         if 'cond' in bys[buoy]['table1']:
-            names = ['WaterT [deg C]', 'Conductivity [mS/cm]', 'Salinity']
-            # calculate salinity from conductivity
-            df['Salinity'] = gsw.SP_from_C(df['WATERTEMP'], df['CONDUCTIVITY'],
-                                           np.zeros(len(df)))
-            # dictionary for rounding decimal places
-            rdict = {'Salinity': 2}
+            names = ['WaterT [deg C]', 'Conductivity [mS/cm]']
         else:
             names = ['WaterT [deg C]']
             df = df.drop(['CONDUCTIVITY'], axis=1)
