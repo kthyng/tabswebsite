@@ -218,7 +218,6 @@ def read_nos(buoy, dstart, dend, usemodel=False):
             # dictionary for rounding decimal places
             rdict = {'Salinity': 2}
             df = df.round(rdict)
-            import pdb; pdb.set_trace()
     else:  # use model
 
         prefix = 'https://tidesandcurrents.noaa.gov/api/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&station='
