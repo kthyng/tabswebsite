@@ -58,7 +58,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
                 if 'ports' in bys[buoy]['table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
                 # need to make sure dates are all in same time zone
-                if date.tz == dend.tz:  # if time zones the same, don't change either
+                if date.tzinfo.zone == dend.tzinfo.zone:  # if time zones the same, don't change either
                     daystoread = min(td, dend-date)
                 else:  # convert dend to utc
                     daystoread = min(td, dend.tz_convert('utc')-date)
@@ -212,9 +212,13 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
         # calculate salinity from conductivity, if available
         if 'Conductivity [mS/cm]' in df.keys():
+            if not 'AtmPr [MB]' in df.keys():
+                pr = np.zeros(len(df))
+            else:
+                pr = df['AtmPr [MB]']/100. - 10.1325
             df['Salinity'] = gsw.SP_from_C(df['Conductivity [mS/cm]'],
                                            df['WaterT [deg C]'],
-                                           df['AtmPr [MB]']/100. - 10.1325)
+                                           pr)
             # dictionary for rounding decimal places
             rdict = {'Salinity': 2}
             df = df.round(rdict)
