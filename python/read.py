@@ -264,7 +264,7 @@ def read_nos_df(dataname):
         else:
             names = ['WaterT [deg C]']
             df = df.drop(['CONDUCTIVITY'], axis=1)
-            rdict = {}
+        rdict = {}
 
     elif 'prediction' in dataname:  # tidal height prediction
         names = ['Water Level [m]']
