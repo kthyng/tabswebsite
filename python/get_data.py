@@ -130,8 +130,9 @@ elif datatype == 'pic':
         tlims = [date2num(pd.to_datetime(dstart.tz_localize(None)).to_pydatetime()), date2num(pd.to_datetime(dend.tz_localize(None)).to_pydatetime())]
     else:
         tlims = None
-    fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
-                         df2=dfmodelrecent, df3=dfmodelforecast,
-                         df4=dfmodeltides, tlims=tlims)
-    fig.savefig(fname + '.pdf')
-    fig.savefig(fname + '.png')
+    if any([dft is not None for dft in [df, dfmodelhindcast, dfmodelrecent, dfmodelforecast,dfmodeltides]]):
+        fig = plot_buoy.plot(df, buoy, which=table, df1=dfmodelhindcast,
+                             df2=dfmodelrecent, df3=dfmodelforecast,
+                             df4=dfmodeltides, tlims=tlims)
+        fig.savefig(fname + '.pdf')
+        fig.savefig(fname + '.png')

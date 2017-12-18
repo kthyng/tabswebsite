@@ -72,6 +72,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
 
     # return None instead of just header if no data for time period
     if df is not None and not df.empty:
+        df.index.name = 'Dates [UTC]'
         df = df.tz_localize('utc')  # all files are read in utc
         df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
         if dstart is not None:
@@ -275,12 +276,13 @@ def read_nos_df(dataname):
     if not df.empty:
         if isinstance(df.index[0], str):
             df = df.drop(df.index[0], axis=0)
-    try:
+            df = pd.DataFrame()
+    if not df.empty:
         df.columns = names
         df.index.name = 'Dates [UTC]'
         df = df.round(rdict)
-    except:
-        pass
+    # except:
+    #     pass
 
     return df
 

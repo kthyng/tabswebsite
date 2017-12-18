@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        # if not 'sn0301' in buoy:
+        # if not '8775244' in buoy:
         #     continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
@@ -102,15 +102,16 @@ if __name__ == "__main__":
             # tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
             # else:
             #     tlims = None
-            # will plot model output from now if available, otherwise data regardless of how old
-            fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent,
-                                 df3=dfmodelforecast, df4=dfmodeltides,
-                                 tlims=tlims)
-            fig.savefig(fname + '.pdf')
-            fig.savefig(fname + '.png')
-            # save smaller for hover
-            fig.savefig(fname + '_low.png', dpi=60)
-            close(fig)
+            # will plot model output from now if available
+            if any([dft is not None for dft in [df, dfmodelrecent, dfmodelforecast,dfmodeltides]]):
+                fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent,
+                                     df3=dfmodelforecast, df4=dfmodeltides,
+                                     tlims=tlims)
+                fig.savefig(fname + '.pdf')
+                fig.savefig(fname + '.png')
+                # save smaller for hover
+                fig.savefig(fname + '_low.png', dpi=60)
+                close(fig)
 
     for buoy in bys.keys():  # loop through buoys separately for buoy headers
         if not bys[buoy]['active']:  # only do this for active buoys
