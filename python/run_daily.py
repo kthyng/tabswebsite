@@ -40,7 +40,7 @@ if __name__ == "__main__":
             # if not table == 'ven':
             #     continue
 
-            print(buoy)
+            # print(buoy)
             # read in data in UTC
             if bys[buoy]['inmysql'] and table != 'sum':  # mysql tables
                 dend = tools.query_setup_recent(engine, buoy, table).tz_localize('utc')
