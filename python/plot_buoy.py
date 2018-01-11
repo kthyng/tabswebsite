@@ -1021,8 +1021,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        dodepth=bys[buoy]['depth'], dodepthm=bys[buoy]['depth_model'])
 
     # use longer dataframe in case data or model are cut short
-    if df1 is not None or df2 is not None or df3 is not None and tlims is not None:
-        dfm = pd.concat([df1, df2, df3])
+    if df1 is not None or df2 is not None or df3 is not None or df4 is not None and tlims is not None:
+        dfm = pd.concat([df1, df2, df3, df4])
 
         if df is None:  # if no data
             df = dfm
