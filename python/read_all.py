@@ -91,5 +91,5 @@ if __name__ == "__main__":
         for table in tables:  # loop through tables for each buoy
             # if table != 'eng':
             #     continue
-            print(buoy, table)
+            # print(buoy, table)
             readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='utc'))
