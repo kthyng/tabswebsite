@@ -301,6 +301,7 @@ def read_ndbc(buoy, dstart, dend, userecent=True):
                               dstart.strftime("%Y-%m-%d"),
                               dend.strftime("%Y-%m-%d %H:%M"))
         df = read_ndbc_df([q, engine])
+        engine.dispose()
 
     else:
 
@@ -398,6 +399,7 @@ def read_tabs(table, buoy, dstart, dend):
     query = tools.query_setup(engine, buoy, table, dstart.strftime("%Y-%m-%d"),
                               dend.strftime("%Y-%m-%d %H:%M"))
     df = pd.read_sql_query(query, engine, index_col=['obs_time'])
+    engine.dispose()
     df.drop(df.index[df.index.isnull()], inplace=True)  # drop bad rows
     df[(df == -99.0) | (df == -999.0) | (df == -999.00)] = np.nan  # replace missing values
 

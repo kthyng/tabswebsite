@@ -112,6 +112,7 @@ if __name__ == "__main__":
                 # save smaller for hover
                 fig.savefig(fname + '_low.png', dpi=60)
                 close(fig)
+    engine.dispose()
 
     for buoy in bys.keys():  # loop through buoys separately for buoy headers
         if not bys[buoy]['active']:  # only do this for active buoys
@@ -119,7 +120,7 @@ if __name__ == "__main__":
         # if not buoy == 'sn0301':
         #     continue
         # write header
-        print(buoy)
+        # print(buoy)
         bh.make(buoy)
 
     # separate for making currents summaries
