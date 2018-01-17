@@ -490,41 +490,42 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             command = 'mail -s "Model output problem" ' + email + ' <<< "Model output of type ' + timing + ' is not working."'
             system(command)
             # skip model output but do data
-            df = None
-            return df
+            ds = None
+            # return df
 
     # use modeling forcing information instead of model output. If won't work, give up.
     try:
-        dsf = xr.open_dataset(locf)
-    except IOError as e:  # if copano thredds is not working
         try:
-            locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
             dsf = xr.open_dataset(locf)
-        except IOError as e:  # if barataria thredds is also not working
-            # email Kristen warning
-            command = 'mail -s "Model forcing output problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working.""'
-            os.system(command)
-            # skip model output but do data
-            df = None
-            return df
+        except IOError as e:  # if copano thredds is not working
+            try:
+                locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
+                dsf = xr.open_dataset(locf)
+            except IOError as e:  # if barataria thredds is also not working
+                # email Kristen warning
+                command = 'mail -s "Model forcing i/o problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working."'
+                system(command)
+                # skip model output but do data
+                dsf = None
+                # return df
+    # This is an overall catch in case forcing can't be read in due to unknown error
+    except:
+        # email Kristen warning
+        command = 'mail -s "Model forcing new problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working."'
+        system(command)
+        # skip model output but do data
+        dsf = None
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
     # first data date is greater than last model time, so that time periods overlap
     # sometimes called ocean_time and sometimes time
-    # if 'time' in ds:  # ocean_time should be repurposed with info from time
-    #     ds['ocean_time'] = ds['time']
-    #     ds = ds.swap_dims({'time': 'ocean_time'})
-    # if pd.datetime.strptime(dend, '%Y-%m-%d %H:%M') <= pd.to_datetime(ds['ocean_time'].isel(ocean_time=0).data) or \
-    #    pd.datetime.strptime(dstart, '%Y-%m-%d') >= pd.to_datetime(ds['ocean_time'].isel(ocean_time=-1).data) :
-    #     df = None
+    # this case catches when the timing of the model is output the desired times
     if dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
        dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
         df = None
-        return
+        return df
     else:
-        # dstart = dstart.strftime("%Y-%m-%d")
-        # dend = dend.strftime('%Y-%m-%d %H:%M')
         # Initialize model dataframe with times
         df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
@@ -576,9 +577,11 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+        if which in ['salt', 'sum']:
+            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
     # check meteorological timing separately since can be different
-    if dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
+    if dsf is None or dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
        dstart >= pd.Timestamp(dsf['time'].isel(time=-1).data, tz='utc'):
         # fill in met keys so they exist
         keys = ['AtmPr [MB]', 'AirT [deg C]']
@@ -592,16 +595,5 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
         if which == 'met':
             df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
-        if which in ['salt', 'sum']:
-            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
-
-    # # return None instead of just header if no data for time period
-    # if df is not None and not df.empty:
-    #     df = df.tz_localize('utc')  # all files are read in utc
-    # else:
-    #     df = None
-    #
-    # df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
-    # # df = df.loc[(df.index > dstart) & (df.index < dend)]
 
     return df

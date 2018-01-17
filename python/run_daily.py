@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        # if not '8775244' in buoy:
+        # if not buoy == 'B':
         #     continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
@@ -37,13 +37,18 @@ if __name__ == "__main__":
             # only do this for active buoys
             if not bys[buoy]['active']:
                 continue
-            # if not table == 'ven':
+            # if not table == 'sum':
             #     continue
 
             # print(buoy)
             # read in data in UTC
-            if bys[buoy]['inmysql'] and table != 'sum':  # mysql tables
-                dend = tools.query_setup_recent(engine, buoy, table).tz_localize('utc')
+            if bys[buoy]['inmysql']:  # mysql tables
+                if table == 'sum':
+                    # need to have this choose most recent data available
+                    # choose to look for ven since sum mostly shows ven data
+                    dend = tools.query_setup_recent(engine, buoy, 'ven').tz_localize('utc')
+                else:
+                    dend = tools.query_setup_recent(engine, buoy, table).tz_localize('utc')
             else:
                 dend = pd.Timestamp('now', tz='utc')
             # start 5 days earlier from 00:00 on day of last data, and account for time zones
