@@ -7,13 +7,21 @@ from math import sin, cos
 from sqlalchemy import create_engine
 import pandas as pd
 from csv import QUOTE_NONE
-from numpy import sign
+from numpy import sign, loadtxt
 
 
 def setup_engine():
-    '''Setup database engine for mysql querying.'''
+    '''Setup database engine for mysql querying.
 
-    engine = create_engine('mysql+mysqlconnector://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
+    credentials.txt is a local file containing:
+    [username]:[password]@[servername]/[database name]
+    '''
+
+    base = 'mysql+mysqlconnector://'
+    # read in credentials from local file
+    with open('credentials.txt', 'r') as myfile:
+        cred = myfile.read().replace('\n', '')
+    engine = create_engine(base + cred)
 
     return engine
 
