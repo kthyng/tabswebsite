@@ -19,7 +19,7 @@ def setup_engine():
 
     base = 'mysql+mysqlconnector://'
     # read in credentials from local file
-    with open('credentials.txt', 'r') as myfile:
+    with open('../python/credentials.txt', 'r') as myfile:
         cred = myfile.read().replace('\n', '')
     engine = create_engine(base + cred)
 
