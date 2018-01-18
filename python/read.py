@@ -569,7 +569,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
                 df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
-            except:
+            except Exception as e:
                 logging.exception(e)
                 logging.warning('Model timing %s. This warning should be more specific.' % timing)
                 return df
