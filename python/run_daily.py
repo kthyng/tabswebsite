@@ -131,10 +131,6 @@ if __name__ == "__main__":
                 logging.warning('No figure was created for buoy %s (table %s)' % (buoy, table))
 
 
-        # send error email if eflag was set to True somewhere
-        if eflag:
-            tools.send_email()
-
     engine.dispose()
 
 
