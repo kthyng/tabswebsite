@@ -8,6 +8,35 @@ from sqlalchemy import create_engine
 import pandas as pd
 from csv import QUOTE_NONE
 from numpy import sign, loadtxt
+from os import system
+
+
+# def write_log(note, logfile):
+#     '''Append note to logfile.'''
+#
+#     # add time on before note
+#     tstart = pd.Timestamp('now', tz='US/Central').strftime('%a %b %d, %H:%M:%S %Z, %Y')
+#     note = tstart + '\n' + note
+#     command = 'echo "%s" >> %s' % (note, logfile)
+#     system(command)
+
+
+def send_email():
+    '''Send email in case of errors during run_daily.py run.'''
+
+    # address to send to
+    address = 'kthyng@tamu.edu'
+
+    subject = 'TABS: problem during run_daily.py'
+
+    message = '''There was a problem during the last run_daily call.
+    Check in logs/ for more information.
+    '''
+    # command = 'mail -s ' + subject + ' ' + address + ' <<< "Model output of type ' + timing + ' is not working."'
+
+    command = 'mail -s "%s" %s <<< "%s"' % (subject, address, message)
+
+    system(command)
 
 
 def setup_engine():

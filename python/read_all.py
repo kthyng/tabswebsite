@@ -8,9 +8,11 @@ import pandas as pd
 from os import path
 import run_daily as rd
 import read
+import logging
 
 bys = bp.load() # load in buoy data
 tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
+
 
 def remake_hdf():
     '''Remake HDF files from text files if messed up.
@@ -57,6 +59,10 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
     else:
         fname = path.join('..', 'daily', buoy + '_all')
 
+    # if buoy is inactive and its "all" file exists, don't read
+    if not bys[buoy]['active'] and path.exists(fname):
+        return
+
     # if file already exists, overwrite dstart with day after day from last line of file
     if path.exists(fname + '.hdf') and path.exists(fname):
         dstart = pd.Timestamp(open(fname).readlines()[-1][:10], tz='utc') + pd.Timedelta('1 days')
@@ -71,25 +77,22 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
         tools.write_file(df, fname, filetype='txt', compression=False, mode=mode)
         tools.write_file(df, fname, filetype='txt', compression=True, mode=mode)
     else:
-        print('No new data has been read in for buoy ' + buoy + ' table ' + table)
+        logging.warning('No new data has been read in for buoy ' + buoy + ' table ' + table)
 
 
 if __name__ == "__main__":
 
+    logging.basicConfig(filename=path.join('..', 'logs', 'read_all.log'),
+                        level=logging.WARNING,
+                        format='%(asctime)s %(message)s',
+                        datefmt='%a %b %d, %H:%M:%S %Z, %Y')
+
     # loop through buoys: query, make text file
     for buoy in bys.keys():
 
-        # if buoy != '8770475':
-        #     continue
-        # if buoy not in ['g06010', 'g09010', 'mc0101', 'sn0101', 'sn0201',
-        #                 'sn0301', 'sn0401', 'sn0501', 'sn0701', 'lc0101',
-        #                 'lc0201', 'mg0101', 'ps0401', 'ps0201', 'ps0301']:
-        #     continue
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
         for table in tables:  # loop through tables for each buoy
-            # if table != 'eng':
-            #     continue
-            # print(buoy, table)
-            readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='utc'))
+            if 'predict' not in table:  # don't use tables for model predictions
+                readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='utc'))

@@ -15,12 +15,21 @@ import buoy_properties as bp
 import buoy_header as bh
 import read
 from matplotlib.dates import date2num
+import logging
 
 bys = bp.load() # load in buoy data
 
 tz = 'US/Central'
 
+# Email flag. Set to true in script if anything notable is wrong.
+eflag = False
+
 if __name__ == "__main__":
+
+    logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
+                        level=logging.WARNING,
+                        format='%(asctime)s %(message)s',
+                        datefmt='%a %b %d %H:%M:%S %Z %Y')
 
     engine = tools.setup_engine()
     tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5', 'table6']
@@ -83,6 +92,9 @@ if __name__ == "__main__":
                 dfmodelforecast = read.read(buoy, now - pd.Timedelta('1 day'),
                                             future, table=table,
                                             usemodel='forecast', tz=tz)
+                # Catch if model output isn't working
+                if dfmodelrecent is None or dfmodelforecast is None:
+                    eflag = True
             else:
                 dfmodelrecent = None
                 dfmodelforecast = None
@@ -103,11 +115,9 @@ if __name__ == "__main__":
             else:
                 # tlims = [dfmodelrecent['idx'].iloc[0], dfmodelforecast['idx'].iloc[-1]]
                 tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
-            # if dend is not None:
-            # tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
-            # else:
-            #     tlims = None
+
             # will plot model output from now if available
+            # make figure if any df is not equal to None
             if any([dft is not None for dft in [df, dfmodelrecent, dfmodelforecast,dfmodeltides]]):
                 fig = plot_buoy.plot(df, buoy, table, df1=None, df2=dfmodelrecent,
                                      df3=dfmodelforecast, df4=dfmodeltides,
@@ -117,15 +127,22 @@ if __name__ == "__main__":
                 # save smaller for hover
                 fig.savefig(fname + '_low.png', dpi=60)
                 close(fig)
+            else:
+                logging.warning('No figure was created for buoy %s (table %s)' % (buoy, table))
+
+
+        # send error email if eflag was set to True somewhere
+        if eflag:
+            tools.send_email()
+
     engine.dispose()
+
 
     for buoy in bys.keys():  # loop through buoys separately for buoy headers
         if not bys[buoy]['active']:  # only do this for active buoys
             continue
-        # if not buoy == 'sn0301':
-        #     continue
+
         # write header
-        # print(buoy)
         bh.make(buoy)
 
     # separate for making currents summaries
@@ -152,3 +169,8 @@ if __name__ == "__main__":
     fig2.savefig(path.join('..', 'daily', 'currents2.png'))
     close(fig1)
     close(fig2)
+
+
+    # send error email if eflag was set to True somewhere
+    if eflag:
+        tools.send_email()

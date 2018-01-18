@@ -11,9 +11,10 @@ import gsw
 from os import system, path
 import tools
 import requests
+import logging
 
-email = 'kthyng@tamu.edu'
 bys = bp.load() # load in buoy data
+
 
 def read(buoy, dstart, dend, table=None, units=None, tz='utc',
          usemodel=False, userecent=True):
@@ -23,6 +24,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
     '''
+
     # import pdb; pdb.set_trace()
     # read from recent file
     if dstart is None:
@@ -281,8 +283,6 @@ def read_nos_df(dataname):
         df.columns = names
         df.index.name = 'Dates [UTC]'
         df = df.round(rdict)
-    # except:
-    #     pass
 
     return df
 
@@ -353,6 +353,7 @@ def read_ndbc_df(dataname):
         df[df == -99.0] = np.nan  # replace missing values
 
     elif isinstance(dataname, str):  # go to ndbc
+        # these are for two different formats
         try:
             df = pd.read_table(dataname, header=0, skiprows=[1],
                                delim_whitespace=True,
@@ -478,41 +479,45 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc'
         locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
 
+
     # Try two different locations for model output. If won't work, give up.
-    try:  # try copano thredds first
-        ds = xr.open_dataset(loc)
-    except IOError as e:  # if copano thredds is not working
-        try:  # try barataria thredds
-            loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
+    try:
+        try:  # try copano thredds first
             ds = xr.open_dataset(loc)
-        except IOError as e:  # if this also doesn't work, send email and give up
-            # email Kristen warning that model isn't working
-            command = 'mail -s "Model output problem" ' + email + ' <<< "Model output of type ' + timing + ' is not working."'
-            system(command)
-            # skip model output but do data
-            ds = None
-            # return df
+        except IOError as e:  # if copano thredds is not working
+            logging.exception(e)
+            logging.warning('For model timing %s, loc %s did not work. Trying with barataria instead...' % (timing, loc))
+            try:  # try barataria thredds
+                loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
+                ds = xr.open_dataset(loc)
+            except IOError as e:  # if this also doesn't work, send email and give up
+                logging.exception(e)
+                logging.warning('For model timing %s, loc %s did not work. Giving up.' % (timing, loc))
+                # skip model output but do data
+                ds = None
+    except Exception as e:
+        logging.exception(e)
+        logging.warning('For model timing %s, some weird error happened. Giving up.' % (timing))
 
     # use modeling forcing information instead of model output. If won't work, give up.
     try:
         try:
             dsf = xr.open_dataset(locf)
         except IOError as e:  # if copano thredds is not working
+            logging.exception(e)
+            logging.warning('For model timing %s, forcing loc %s did not work. Trying with barataria instead...' % (timing, loc))
             try:
                 locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
                 dsf = xr.open_dataset(locf)
             except IOError as e:  # if barataria thredds is also not working
-                # email Kristen warning
-                command = 'mail -s "Model forcing i/o problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working."'
-                system(command)
+                logging.exception(e)
+                logging.warning('For model timing %s, forcing loc %s did not work. Trying with barataria instead...' % (timing, loc))
                 # skip model output but do data
                 dsf = None
-                # return df
     # This is an overall catch in case forcing can't be read in due to unknown error
-    except:
-        # email Kristen warning
-        command = 'mail -s "Model forcing new problem" ' + email + ' <<< "Model output of type ' + timing + ' for data type ' + which + ' is not working."'
-        system(command)
+    except Exception as e:
+        logging.exception(e)
+        logging.warning('For model timing %s for forcing information, some weird error happened. Giving up.' % (timing))
         # skip model output but do data
         dsf = None
 
@@ -565,9 +570,8 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
             except:
-                # email warning that model isn't working
-                command = 'mail -s "Model problem" ' + email + ' <<< "Model output of type ' + timing + ' is not working. NetCDF file not found when using to access currents."'
-                system(command)
+                logging.exception(e)
+                logging.warning('Model timing %s. This warning should be more specific.' % timing)
                 return df
 
         # Project along- and across-shelf velocity rather than use from model
