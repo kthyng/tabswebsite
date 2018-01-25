@@ -136,13 +136,23 @@ else {
 # Calendar
 print "<TD><input type='text' value='$datepicker' id='datepicker' name='datepicker'></TD>";
 
+if ($tz == 'UTC') {
+    $tzname = 'UTC';
+}
+else if ($tz == 'US/Central') {
+    $tzname = 'Local';
+}
+else if ($tz == 'Etc/GMT+6') {
+    $tzname = 'CST';
+}
+
 # time zone
 print "<td>";
 print "<Select Name=tz>\n";
-print "<option selected value='$tz'>$tz</option>\n";
+print "<option selected value='$tz'>$tzname</option>\n";
 print "<option value='UTC'>UTC</Option>\n";
-print "<option value='US/Central'>US/Central</option>\n</select></td>\n";
-
+print "<option value='US/Central'>Local</option>\n";
+print "<option value='Etc/GMT+6'>CST</option>\n</select></td>\n";
 
 # Model: yes or no
 if ($datepicker=="recent"){

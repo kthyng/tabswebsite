@@ -668,16 +668,27 @@ def add_xlabels(ax, df, fig, tlims=None):
         textlocUTC = 1.03, -0.3
         textloc1 = 0.95, 0.035
         textloc2 = 0.08, 0.045
+    elif nsubplots == 4:
+        textlocUTC = 1.03, -0.35
+        textloc1 = 0.95, 0.025
+        textloc2 = 0.08, 0.035
+    elif nsubplots == 6:
+        textlocUTC = 1.03, -0.45
+        textloc1 = 0.95, 0.025
+        textloc2 = 0.08, 0.035
     else:
         textlocUTC = 1.03, -0.35
         textloc1 = 0.95, 0.025
         textloc2 = 0.08, 0.035
 
     # put in GMT as time zone
-    if df.index.tz == pytz.UTC:
+    # import pdb; pdb.set_trace()
+    if df.index.tzinfo.zone == 'UTC':
         ax.text(*textlocUTC, 'UTC', transform=ax.transAxes, fontsize=10)
-    elif df.index.tz == pytz.timezone('US/Central'):
-        ax.text(*textlocUTC, 'CDT/CST', transform=ax.transAxes, fontsize=10)
+    elif df.index.tzinfo.zone == 'US/Central':
+        ax.text(*textlocUTC, 'CST/CDT', transform=ax.transAxes, fontsize=10)
+    elif df.index.tzinfo.zone == 'Etc/GMT+6':
+        ax.text(*textlocUTC, 'CST', transform=ax.transAxes, fontsize=10)
 
     # rotates and right aligns the x labels
     plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')

@@ -20,12 +20,15 @@ $units = isset($_GET["units"]) ? $_GET["units"] : "";
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 
-// if ($tz == 'UTC') {
-//     $tzname = 'UTC';
-// }
-// else if ($tz == 'central') {
-//     $tzname = 'US/Central';
-// }
+if ($tz == 'UTC') {
+    $tzname = 'UTC';
+}
+else if ($tz == 'US/Central') {
+    $tzname = 'Local';
+}
+else if ($tz == 'Etc/GMT+6') {
+    $tzname = 'CST';
+}
 
 if ($units == 'M') {
     $unitsname = 'Metric';
@@ -191,9 +194,10 @@ print <<<_HTML_
 
 <TD>Timezone:&nbsp;
 <Select Name="tz">
-<option selected value=$tz>$tz</Option>
+<option selected value=$tz>$tzname</Option>
 <option value='UTC'>UTC</Option>
-<option value='US/Central'>US/Central</option>
+<option value='US/Central'>Local</option>
+<option value='Etc/GMT+6'>CST</option>
 </select>
 </td><tr>
 

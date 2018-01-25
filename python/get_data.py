@@ -30,17 +30,26 @@ parser.add_argument('--dstart', type=str, help='dstart', default=None)
 parser.add_argument('--dend', type=str, help='dend', default=None)
 parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
-parser.add_argument('--tz', type=str, help='time zone: "UTC" or "US/Central"', default='UTC')
+parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "CST"', default='UTC')
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
 args = parser.parse_args()
 
 fname = args.fname
 datatype = args.datatype
 units = args.units
-tz = args.tz
+tzname = args.tzname
 usemodel = args.usemodel
 dstart = args.dstart
 dend = args.dend
+
+if tzname.lower() in ['utc', 'gmt']:
+    tz = 'UTC'
+# CST or CDT as appropriate
+elif tzname.lower() in ['local', 'cst/cdt', 'us/central']:
+    tz = 'US/Central'
+# CST only -- no transition for CDT
+elif tzname.lower() in ['cst']:
+    tz = 'Etc/GMT+6'
 
 # can't figure out how to have variable from php a boolean so sending string
 if usemodel == 'False':

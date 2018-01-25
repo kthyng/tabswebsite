@@ -158,9 +158,14 @@ def convert_units(df, units=None, tz=None):
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
 
-    if tz == 'US/Central':  # time zone
+    if tz != 'UTC':
         df = df.tz_convert(tz)
-        df.index.rename(df.index.name.replace('UTC', df.tail(1).index.strftime("%Z")[0]), inplace=True)
+        if tz == 'US/Central':  # time zone
+            tzlabel = 'CST/CDT'
+        elif tz == 'Etc/GMT+6':
+            tzlabel = 'CST'
+
+        df.index.rename(df.index.name.replace('UTC', tzlabel), inplace=True)
 
     return df
 
@@ -176,7 +181,11 @@ def present(df):
     '''Present dataframe df nicely by printing to screen'''
 
     from prettypandas import PrettyPandas
-    print(PrettyPandas(df.tz_localize(None)).render())
+    # prettypandas won't work with repeated indices such as during CST/CDT transition
+    try:
+        print(PrettyPandas(df.tz_localize(None)).render())
+    except:
+        print(df.tz_localize(None).to_html())
 
 
 def write_file(df, fname, filetype='txt', compression=False, mode='w', append=False):

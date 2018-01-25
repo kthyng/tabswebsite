@@ -31,12 +31,15 @@ if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 if (! $model) {$model = 'False';}
 
-// if ($tz == 'UTC') {
-//     $tzname = 'UTC';
-// }
-// else if ($tz == 'central') {
-//     $tzname = 'US/Central';
-// }
+if ($tz == 'UTC') {
+    $tzname = 'UTC';
+}
+else if ($tz == 'US/Central') {
+    $tzname = 'Local';
+}
+else if ($tz == 'Etc/GMT+6') {
+    $tzname = 'CST';
+}
 
 if ($units == 'M') {
     $unitsname = 'Metric';
@@ -101,10 +104,10 @@ if ($datepicker == "recent") {
     }
     // command to show table (not used for pic)
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
     }
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
     }
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
@@ -131,11 +134,11 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --usemodel "'.$model.'"');
+        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'"');
     }
     # checks for Mac and assumes Kristen's mac
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tz.'" --usemodel "'.$model.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'"');
     }
     chmod($tempfile, 0644);
 
@@ -201,6 +204,7 @@ if ($datepicker=="recent") {
     }
 }
 // NEED TO DEFINE NORECENTDATA AND NORECENTDATABUTMODEL FOR NOT RECENT CASE
+// move command earlier for running script and see if get output or not
 
 // Show results of query
 print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
