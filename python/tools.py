@@ -158,7 +158,7 @@ def convert_units(df, units=None, tz=None):
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
 
-    if tz != 'UTC':
+    if tz is not None and tz != 'UTC':
         df = df.tz_convert(tz)
         if tz == 'US/Central':  # time zone
             tzlabel = 'CST/CDT'
