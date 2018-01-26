@@ -498,6 +498,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     except Exception as e:
         logging.exception(e)
         logging.warning('For model timing %s, some weird error happened. Giving up.' % (timing))
+        ds = None
 
     # use modeling forcing information instead of model output. If won't work, give up.
     try:
@@ -526,7 +527,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     # first data date is greater than last model time, so that time periods overlap
     # sometimes called ocean_time and sometimes time
     # this case catches when the timing of the model is output the desired times
-    if dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
+    if ds is None or dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
        dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
         df = None
         return df
