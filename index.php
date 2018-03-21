@@ -88,29 +88,21 @@ The date and time at each station indicates the end of the three-hour average.<b
 <?php
 
 // read in buoy list from csv file with buoy info
-$csv = array_map("str_getcsv", file("includes/buoys.csv", "r"));
+$csv = array_map("str_getcsv", file("includes/buoys.csv"));
 $header = array_shift($csv); // Seperate the header from data
 
 $col = array_search("buoy", $header);  # save buoys
 $active = array_search("active", $header);  # save if buoys are active or not
 
-// for($i=0; $i<count($col)-1; $i++) {
-//   if (strcmp($active[$i], "True")) {
-//     $blet[] = $
-//   }
-//
-//
-//   echo $content[$i].'-'.$contentb[$i];
-// }
-
-
 foreach ($csv as $row) {  // loop over each row in csv file
     // check if buoy is active
-    if (strcmp($row[$active], "True")) {
+    // echo strcmp($row[$active], "TRUE") == 0;
+    // if (strcmp($row[$active], "True")) {
+    if (strcmp($row[$active], "TRUE") == 0) {
     	$blet[] = $row[$col];  // if so, save buoy name
     }
 }
-echo $blet;
+
 // // this list should match the "active" buoy list in python/buoy_data.py
 // $blet=array("B","D","F","J","K","R","V","W","X",
 //             '42001', '42002', '42019','42020','42035', '42036', '42039', '42040',
