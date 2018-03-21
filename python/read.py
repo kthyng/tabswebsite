@@ -503,7 +503,6 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     for i, lo in enumerate(loc):
         try:
             ds = xr.open_dataset(lo)
-            ds['salt'][0,0,0,0]  # test to make sure a value can be read
             break
         except IOError as e:  # if link tried is not working
             logging.exception(e)
@@ -521,7 +520,6 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     for i, lo in enumerate(locf):
         try:
             dsf = xr.open_dataset(lo)
-            ds['Pair'][0,0,0]  # test to make sure a value can be read
             break
         except IOError as e:  # if link tried is not working
             logging.exception(e)
@@ -530,10 +528,20 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. No more options.' % (timing, buoy, lo))
                 dsf = None
+        except KeyError as e:
+            logging.exception(e)
+            if i < len(locf)-1:  # in case there is another option to try
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
+                dsf = None
         except Exception as e:
             logging.exception(e)
-            logging.warning('For model timing %s for forcing information and buoy %s, some weird error happened. Giving up.' % (timing, buoy))
-            dsf = None
+            if i < len(locf)-1:  # in case there is another option to try
+                logging.warning('For model timing %s for forcing information and buoy %s, forcing loc %s did not work, some weird error happened. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work and some weird error happened. No more options.' % (timing, buoy, lo))
+                dsf = None
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
