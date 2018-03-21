@@ -23,17 +23,90 @@
     // print "<h2>TABS Buoy Status</h2>";
     // passthru($command);
 
+    // read into an array the buoys
+    $csv = array_map("str_getcsv", file("../includes/buoys.csv"));
+    $header = array_shift($csv); // Seperate the header from data
+    $buoycol = array_search("buoy", $header);  # save column name for buoys
+    $aliascol = array_search("alias", $header);  # save column name for alias
+    $descriptioncol = array_search("description", $header);  # save column name for description
+    $loncol = array_search("lon", $header);  # save column name for lon
+    $latcol = array_search("lat", $header);  # save column name for lat
+    $table1col = array_search("table1", $header);  # save column name for table1
+    $table2col = array_search("table2", $header);  # save column name for table2
+    $table3col = array_search("table3", $header);  # save column name for table3
+    $table4col = array_search("table4", $header);  # save column name for table4
+    $table5col = array_search("table5", $header);  # save column name for table5
+    $active = array_search("active", $header);  # save column name for buoys being active
+    foreach ($csv as $row) {  // loop over each row in csv file
+        // check if buoy is active
+        if (strcmp($row[$active], "TRUE") == 0) {
+        	$buoysa[] = $row[$buoycol];  // if so, save buoy name
+        }
+        // check if buoy is inactive
+        if (strcmp($row[$active], "FALSE") == 0) {
+        	$buoysia[] = $row[$buoycol];  // if so, save buoy name
+        }
+    }
+
+    print "<h2>Station Information</h2>\n";
+
+    print "<h3>Active Stations</h3>\n";
+    print "<table cellspacing=1 width=100% align=center>";
+
+    # loop through rows in file
+    foreach ($csv as $row) {  // loop over each row in csv file
+        if (strcmp($row[$active], "TRUE") == 0) {
+            print "<tr><th>$row[$buoycol]</th>";  # Station name
+            print "<td>$row[$aliascol]</td>";  # Alternate station name
+            print "<td>$row[$descriptioncol]</td>";  # Description of station
+            print "<td>$row[$loncol]</td>";  # longitude
+            print "<td>$row[$latcol]</td>";  # latitude
+
+            if (strcmp($row[$table1col], "ven") == 0) {
+                print "<td>Currents</td>";
+            }
+            if (strcmp($row[$table3col], "salt") == 0) {
+                print "<td>Water properties</td>";
+            }
+            if (strcmp($row[$table4col], "met") == 0) {
+                print "<td>Met</td>";
+            }
+            if (strcmp($row[$table5col], "wave") == 0) {
+                print "<td>Waves</td>";
+            }
+            print "</tr>";
+        }
+        // // check if buoy is active
+        // if (strcmp($row[$active], "TRUE") == 0) {
+        // 	$buoysa[] = $row[$col];  // if so, save buoy name
+        // }
+        // // check if buoy is inactive
+        // if (strcmp($row[$active], "FALSE") == 0) {
+        // 	$buoysia[] = $row[$col];  // if so, save buoy name
+        // }
+    }
+
+
+    // // list active bouys
+    // foreach ($buoysa as $b) {
+    //     print "<tr><th>$b</th></tr>\n";
+    // }
+
+
 
     ?>
 
-    <h2>TABS Buoy Status</h2>
-    <table cellspacing=4 width=100% align=center>
+    <!-- <h2>TABS Buoy Status</h2>
+    <table cellspacing=4 width=100% align=center> -->
     <!-- header -->
-    <tr> <th>Buoy</th>	<th>System health</th> <th>Lat [N]</th> <th>Lon [W]</th> <th>Lease block</th> <th>Water depth</th> <th>Archive*</th> <th>Notes</th> </tr>
+    <!-- <tr> <th>Buoy</th>	<th>System health</th> <th>Lat [N]</th> <th>Lon [W]</th> <th>Lease block</th> <th>Water depth</th> <th>Archive*</th> <th>Notes</th> </tr> -->
+
+
+
 
     <!-- active buoys -->
-    <tr> <td>B</td>
-        <td><span class="green">C</span>
+    <!-- <tr> <td>B</td> -->
+        <!-- <td><span class="green">C</span>
             <span class="green">M</span>
             <span class="green">T</span>
             <span class="green">E</span>
@@ -47,9 +120,9 @@
             <a href="/tabswebsite/daily/tabs_B_met_all.gz">M</a>
             W
             <a href="/tabswebsite/daily/tabs_B_salt_all.gz">P</a></td>
-        <td>In Service. Buoy redeployed 02/03/2017. Batteries Dead.</td> </tr>
+        <td>In Service. Buoy redeployed 02/03/2017. Batteries Dead.</td> </tr> -->
 
-    <tr> <td>D</td>
+    <!-- <tr> <td>D</td>
         <td><span class="green">C</span>
             <span class="none">M</span>
             <span class="green">T</span>
@@ -115,9 +188,9 @@
             <a href="/tabswebsite/daily/tabs_K_met_all.gz">M</a>
             <a href="/tabswebsite/daily/tabs_K_wave_all.gz">W</a>
             <a href="/tabswebsite/daily/tabs_K_salt_all.gz">P</a></td>
-        <td>In Service. Buoy redeployed on 04/08/2017.</td> </tr>
+        <td>In Service. Buoy redeployed on 04/08/2017.</td> </tr> -->
 
-    <tr> <td>R</td>
+    <!-- <tr> <td>R</td>
         <td><span class="green">C</span>
             <span class="none">M</span>
             <span class="green">T</span>
@@ -336,9 +409,9 @@
             M
             W
             <a href="/tabswebsite/daily/tabs_P_salt_all.gz">P</a></td>
-        <td>Retired 2000/2/19. Data available 1998/7/22 - 2000/2/19.</td> </tr>
+        <td>Retired 2000/2/19. Data available 1998/7/22 - 2000/2/19.</td> </tr> -->
 
-    <tr> <td>S</td>
+    <!-- <tr> <td>S</td>
         <td><span class="gray">C</span>
             <span class="none">M</span>
             <span class="gray">T</span>
@@ -353,7 +426,7 @@
             M
             W
             <a href="/tabswebsite/daily/tabs_S_salt_all.gz">P</a></td>
-        <td>Retired 2001/7/26. Data available 1999/2/19 - 2001/7/23.</td> </tr>
+        <td>Retired 2001/7/26. Data available 1999/2/19 - 2001/7/23.</td> </tr> -->
 
 
     <br><br>
