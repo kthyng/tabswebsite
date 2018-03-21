@@ -83,7 +83,7 @@ if __name__ == "__main__":
             now = pd.Timestamp('now', tz='utc').normalize()
             past = now - pd.Timedelta('5 days')
             future = now + pd.Timedelta('4 days')
-            if bp.model(buoy, 'rho'):
+            if bp.model(buoy, 'rho') and table != 'eng':
                 # read in recent model output, not tied to when data output was found
                 dfmodelrecent = read.read(buoy, past, now, table=table,
                                                 usemodel='recent', tz=tz)

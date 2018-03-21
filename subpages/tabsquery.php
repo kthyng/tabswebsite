@@ -2,13 +2,6 @@
 
 umask(0022);
 
-$cm2e=.01943845;
-$m2e=1.943845;
-$degc="&#176;C";
-$degf="&#176;F";
-$degm="&#176;M";
-$degt="&#176;T";
-
 $PageTitle="TABS Buoy Database Query page";
 
 if ($_SERVER['REQUEST_METHOD'] != 'GET') {
