@@ -196,8 +196,6 @@ if ($datepicker=="recent") {
         }
     }
 }
-// NEED TO DEFINE NORECENTDATA AND NORECENTDATABUTMODEL FOR NOT RECENT CASE
-// move command earlier for running script and see if get output or not
 
 // Show results of query
 print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
@@ -235,7 +233,7 @@ elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $
     passthru($command);
 }
 
-if ($datatype=="pic" && !$norecentdata){
+if ($datatype=="pic" && $norecentdatabutmodel){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
