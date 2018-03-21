@@ -78,9 +78,9 @@ S,,,FALSE,ven,eng,,,,,TRUE,-1,-1,-999,-999,-999,-1,173,-92.81115,28.43641667,BR-
 8734673,FMOA1,"Fort Morgan, AL",TRUE,nos-met,,,,,,FALSE,,,,,,,,-88.024,30.228,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8734673,,
 8735180,,"Dauphin Island, AL",TRUE,nos,tidepredict,,,,,FALSE,,,,,,,,-88.075,30.25,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8735180,,https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8735180
 8741003,PTBM6,"Petit Bois Island, Port of Pascagoula, MS",TRUE,nos-met,,,,,,FALSE,,,,,,,,-88.505,30.213,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741003,,
-8741041,ULAM6,"Dock E, Port of Pascagoula, MS",TRUE,nos-water,tidepredict,,,,,FALSE,,,,,,,,-88.505,30.348,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741041,,https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8741041
-8741094,RARM6,"Range A Rear, Port of Pascagoula, MS",TRUE,nos-met,,,,,,FALSE,,,,,,,,-88.511,30.343,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741094,,
-8741501,DKCM6,"Dock C, Port of Pascagoula, MS",TRUE,nos-met,,,,,,FALSE,,,,,,,,-88.567,30.356,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741501,,
+8741041,ULAM6,"Dock E, Port of Pascagoula, MS",FALSE,nos-water,tidepredict,,,,,FALSE,,,,,,,,-88.505,30.348,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741041,,https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8741041
+8741094,RARM6,"Range A Rear, Port of Pascagoula, MS",FALSE,nos-met,,,,,,FALSE,,,,,,,,-88.511,30.343,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741094,,
+8741501,DKCM6,"Dock C, Port of Pascagoula, MS",FALSE,nos-met,,,,,,FALSE,,,,,,,,-88.567,30.356,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741501,,
 8741533,PNLM6,"Pascagoula NOAA Lab, MS",TRUE,nos-water,,,,,,FALSE,,,,,,,,-88.563,30.368,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8741533,,
 8747437,WYCM6,"Bay Waveland Yacht Club, MS",TRUE,nos,tidepredict,,,,,FALSE,,,,,,,,-89.326,30.326,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8747437,,https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8747437
 8760721,PILL1,"Pilottown, LA",TRUE,nos,tidepredict,,,,,FALSE,,,,,,,,-89.259,29.179,,,,,,,https://tidesandcurrents.noaa.gov/stationhome.html?id=8760721,,https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8760721
