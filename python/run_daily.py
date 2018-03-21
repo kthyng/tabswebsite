@@ -36,8 +36,6 @@ if __name__ == "__main__":
 
     # loop through buoys: query, make text file, make plot
     for buoy in bys.keys():
-        # if not buoy == 'B':
-        #     continue
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and 'predict' not in bys[buoy][table]]
@@ -46,9 +44,6 @@ if __name__ == "__main__":
             # only do this for active buoys
             if not bys[buoy]['active']:
                 continue
-            # if not table == 'sum':
-            #     continue
-
             # print(buoy)
             # read in data in UTC
             if bys[buoy]['inmysql']:  # mysql tables
@@ -151,8 +146,11 @@ if __name__ == "__main__":
         df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,
                            index_col=0, na_values=[-999])
         df = df.tz_localize('utc')  # all files are read in utc
+        # if dataframe is too short, don't include
+        if len(df) < 10:
+            dfs.append(None)
         # check if any of dataset is from within the past 5 days before appending
-        if (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
+        elif (pd.Timestamp('now', tz='utc') - df.index[-1]).days < 5:
             dfs.append(df)
         else:
             dfs.append(None)
