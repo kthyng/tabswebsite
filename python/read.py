@@ -279,7 +279,7 @@ def read_nos_df(dataname):
         if isinstance(df.index[0], str):
             df = df.drop(df.index[0], axis=0)
             df = pd.DataFrame()
-    if not df.empty:
+    if not df.columns.empty:
         df.columns = names
         df.index.name = 'Dates [UTC]'
         df = df.round(rdict)
@@ -465,62 +465,73 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     dostations = False  # this is updated if buoy is in stations list on reading
 
     # separate out which model type we want
+    # links in list are in order they are tried by the system
     if timing == 'hindcast':
         if not bp.station(buoy) == -999:  # can read faster from stations file if buoy included
-            loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta'
+            loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                   'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                   'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
             dostations = True
         else:
-            loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg'
-        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'  # forcing info
+            loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+                   'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+                   'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg']
+        locf = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'] # forcing info
     elif timing == 'recent':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg'
-        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc'  # forcing info
+        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc',
+               'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg']
+        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_blk_archive_agg.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc']  # forcing info
     elif timing == 'forecast':
-        loc = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc'
-        locf = 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc'
+        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_previous_day.nc',
+               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
+               'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
+               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc']
+        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
+                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_latest.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc']
 
-
-    # Try two different locations for model output. If won't work, give up.
-    try:
-        try:  # try copano thredds first
-            ds = xr.open_dataset(loc)
-        except IOError as e:  # if copano thredds is not working
+    # Try different locations for model output. If won't work, give up.
+    for i, lo in enumerate(loc):
+        try:
+            ds = xr.open_dataset(lo)
+            break
+        except IOError as e:  # if link tried is not working
             logging.exception(e)
-            logging.warning('For model timing %s, loc %s did not work. Trying with barataria instead...' % (timing, loc))
-            try:  # try barataria thredds
-                loc = 'barataria'.join(loc.split('copano'))  # change to barataria thredds if copano won't work
-                ds = xr.open_dataset(loc)
-            except IOError as e:  # if this also doesn't work, send email and give up
-                logging.exception(e)
-                logging.warning('For model timing %s, loc %s did not work. Giving up.' % (timing, loc))
-                # skip model output but do data
+            if i < len(loc)-1:  # in case there is another option to try
+                logging.warning('For model timing %s, loc %s did not work. Trying with loc %s instead...' % (timing, lo, loc[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s, loc %s did not work. No more options.' % (timing, lo))
                 ds = None
-    except Exception as e:
-        logging.exception(e)
-        logging.warning('For model timing %s, some weird error happened. Giving up.' % (timing))
-        ds = None
+        except Exception as e:
+            logging.exception(e)
+            logging.warning('For model timing %s, some weird error happened. Giving up.' % (timing))
+            ds = None
 
     # use modeling forcing information instead of model output. If won't work, give up.
-    try:
+    for i, lo in enumerate(locf):
         try:
-            dsf = xr.open_dataset(locf)
-        except IOError as e:  # if copano thredds is not working
+            dsf = xr.open_dataset(lo)
+            break
+        except IOError as e:  # if link tried is not working
             logging.exception(e)
-            logging.warning('For model timing %s, forcing loc %s did not work. Trying with barataria instead...' % (timing, loc))
-            try:
-                locf = 'barataria'.join(locf.split('copano'))  # change to barataria thredds if copano won't work
-                dsf = xr.open_dataset(locf)
-            except IOError as e:  # if barataria thredds is also not working
-                logging.exception(e)
-                logging.warning('For model timing %s, forcing loc %s did not work. Trying with barataria instead...' % (timing, loc))
-                # skip model output but do data
+            if i < len(locf)-1:  # in case there is another option to try
+                logging.warning('For model timing %s, forcing loc %s did not work. Trying with loc %s instead...' % (timing, lo, locf[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s, forcing loc %s did not work. No more options.' % (timing, lo))
                 dsf = None
-    # This is an overall catch in case forcing can't be read in due to unknown error
-    except Exception as e:
-        logging.exception(e)
-        logging.warning('For model timing %s for forcing information, some weird error happened. Giving up.' % (timing))
-        # skip model output but do data
-        dsf = None
+        except Exception as e:
+            logging.exception(e)
+            logging.warning('For model timing %s for forcing information, some weird error happened. Giving up.' % (timing))
+            dsf = None
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
