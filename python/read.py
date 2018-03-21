@@ -503,6 +503,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     for i, lo in enumerate(loc):
         try:
             ds = xr.open_dataset(lo)
+            ds['salt'][0,0,0,0]  # test to make sure a value can be read
             break
         except IOError as e:  # if link tried is not working
             logging.exception(e)
@@ -520,6 +521,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     for i, lo in enumerate(locf):
         try:
             dsf = xr.open_dataset(lo)
+            ds['Pair'][0,0,0]  # test to make sure a value can be read
             break
         except IOError as e:  # if link tried is not working
             logging.exception(e)
