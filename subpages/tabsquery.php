@@ -233,7 +233,7 @@ elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $
     passthru($command);
 }
 
-if ($datatype=="pic" && $norecentdatabutmodel){
+if ($datatype=="pic" && ($norecentdatabutmodel or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
