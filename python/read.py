@@ -507,13 +507,13 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         except IOError as e:  # if link tried is not working
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s, loc %s did not work. Trying with loc %s instead...' % (timing, lo, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s, loc %s did not work. No more options.' % (timing, lo))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work. No more options.' % (timing, buoy, lo))
                 ds = None
         except Exception as e:
             logging.exception(e)
-            logging.warning('For model timing %s, some weird error happened. Giving up.' % (timing))
+            logging.warning('For model timing %s and buoy %s, some weird error happened. Giving up.' % (timing, buoy))
             ds = None
 
     # use modeling forcing information instead of model output. If won't work, give up.
@@ -524,13 +524,13 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         except IOError as e:  # if link tried is not working
             logging.exception(e)
             if i < len(locf)-1:  # in case there is another option to try
-                logging.warning('For model timing %s, forcing loc %s did not work. Trying with loc %s instead...' % (timing, lo, locf[i+1]))
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s, forcing loc %s did not work. No more options.' % (timing, lo))
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. No more options.' % (timing, buoy, lo))
                 dsf = None
         except Exception as e:
             logging.exception(e)
-            logging.warning('For model timing %s for forcing information, some weird error happened. Giving up.' % (timing))
+            logging.warning('For model timing %s for forcing information and buoy %s, some weird error happened. Giving up.' % (timing, buoy))
             dsf = None
 
     # only do this if dend is less than or equal to the first date in the model output
