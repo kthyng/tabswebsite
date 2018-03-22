@@ -1,7 +1,7 @@
 buoy,alias,description,active,table1,table2,table3,table4,table5,table6,inmysql,health_C,health_E,health_M,health_P,health_W,health_T,angle,lon,lat,kind,lease,sensor,depth,depth_model,anemometer,url_station,url_data,url_model,notes
 B,42043,,TRUE,ven,eng,salt,met,,sum,TRUE,4,4,4,4,-999,4,145,-94.89905,28.9823,AA3900 DCS,GA-252,2,19,,4,,,,In Service. Buoy redeployed 02/03/2017. Batteries Dead.
 D,42048,,TRUE,ven,eng,salt,,,sum,TRUE,4,4,-999,4,-999,4,140,-96.8429,27.9396,AA3900 DCS,MA-691,2,18,,,,,,In Service. Buoy redeployed 04/09/2017.
-F,42050,,TRUE,ven,eng,salt,,,sum,TRUE,1,1,-999,1,-999,1,155,-96.2416,28.8425,AA3900 DCS,HI-A69,2,24,,,,,,In Service. Buoy redeployed on 02/02/2017.
+F,42050,,TRUE,ven,eng,salt,,,sum,TRUE,1,1,-999,1,-999,1,155,-94.2416,28.8425,AA3900 DCS,HI-A69,2,24,,,,,,In Service. Buoy redeployed on 02/02/2017.
 J,42044,,TRUE,ven,eng,salt,met,,sum,TRUE,1,1,1,1,-999,1,90,-97.0507,26.1914,AA3900 DCS,PS-1126,2,20,,4,,,,In Service. Buoy redeployed on 01/05/2017.
 K,42045,,TRUE,ven,eng,salt,met,wave,sum,TRUE,1,1,1,1,1,1,90,-96.4998,26.2168,AA3900 DCS,PI-745,2,62,,4,,,,In Service. Buoy redeployed on 04/08/2017.
 R,42051,,TRUE,ven,eng,salt,,,sum,TRUE,1,1,-999,1,-999,1,145,-93.6417,29.635,AA3900 DCS,WC-055,2,9,,,,,,In Service. Buoy redeployed on 02/02/2017.
