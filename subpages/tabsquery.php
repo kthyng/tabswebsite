@@ -166,6 +166,34 @@ print "<div id='container'>";
 include("../includes/header.html");
 include("../includes/navigation.html");
 
+// Figure out if buoy should have TXLA or NOAA model output to set flag
+$csv = array_map("str_getcsv", file("../includes/buoys.csv"));
+$header = array_shift($csv); // Separate the header from data
+$txlacol = array_search("txla", $header);  // column index for txla model info
+$table2col = array_search("table2", $header);
+// Find row for buoy, either with built-in function or by search
+if (!function_exists('array_column')) {
+    $buoycol = array_search("buoy", $header);  # save column name for buoy
+    foreach ($csv as $row) {
+        # if the desired buoy is found in the column, stop so that $row is correct
+        if (strcmp($row[$buoycol],$Buoyname) == 0) {
+            break;
+        }
+    }
+}
+else {
+    $buoyarr = array_column($csv, 0);
+    $buoyrow = array_search($Buoyname, $buoyarr);
+    $row = $csv[$buoyrow];
+}
+// check all model cases
+if (($row[$txlacol] == "TRUE") or ($row[$table2] == "currentspredict")
+    or ($row[$table2] == "tidepredict")) {
+    $model = True;  // this buoy should have model output
+}
+else {
+    $model = False;
+}
 
 // Warning about data being out of data if most recent point is more than 3 days old
 if ($datepicker=="recent") {
@@ -177,22 +205,16 @@ if ($datepicker=="recent") {
     $interval = date_diff($lastdate, $today);  # difference in days between now and most recent data
     $intervalstr = $interval->format('%R%a days');
     if ($intervalstr>3){ // old report
-        // print "<font color='red'><i>&emsp;At least some of this data is more than 3 days old.</i></font>";
+        $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         print "<font color='red'><br><br><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
         // Image selected, model output available, no recent data
-        if (($table == 'ven' or $table == 'salt' or $table == 'met') and $datatype == 'pic') {
+        if ($table != 'eng' and $table != 'wave' and $model and $datatype == 'pic') {
             print "<font color='red'><i> Model output is shown instead.</i></font>";
             $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
         }
         // Image selected, no model output available (wave or eng), no recent data
-        elseif ($datatype == 'pic') {
+        elseif ($model and $datatype == 'pic') {
             print "<font color='red'><i> Model output might be available for other data types.</i></font>";
-            $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
-        }
-        // Data table selected (no recent data)
-        else {
-            // print "<font color='red'><i> Model output might be available for other data types.</i></font>";
-            $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         }
     }
 }
@@ -201,8 +223,9 @@ if ($datepicker=="recent") {
 print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 print "<TD valign=top><br>";
 
+// data download link as long as there is recent data
 print "<font face=helvetica><b><big>Results of TABS Data query</big></b></font>";
-if (! $norecentdata and ! $norecentdatabutmodel){
+if (! $norecentdata){
     print "<font face=helvetica> (<a href=$tempaccess>download data</a>)</font>";
 }
 
@@ -214,8 +237,6 @@ print "<br><br>";
 // if not using recent image, call to database
 // Runs table or image for database
 if ($datepicker!="recent"){
-    // exec($command, $output);
-    // echo $command;
     passthru($command);
     // if data is missing from this time period, just say that
     if (filesize($tempfile) == 0 and !file_exists($tempaccess.".png")){
@@ -226,14 +247,13 @@ if ($datepicker!="recent"){
     else if (filesize($tempfile) == 0 and file_exists($tempaccess.".png")) {
         print "<font color='red'><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
         print "<font color='red'><i> Model output is shown instead.</i></font><br><br>";
-        $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
     }
 }
-elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata && ! $norecentdatabutmodel){
+elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata){
     passthru($command);
 }
 
-if ($datatype=="pic" && ($norecentdatabutmodel or !$norecentdata)){
+if ($datatype=="pic" && ($model or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
