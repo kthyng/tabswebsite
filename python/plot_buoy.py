@@ -212,6 +212,14 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
         width = 0.5
         if which == 'wind':
             width /= 3
+    elif dT <= pd.Timedelta('9 days'):
+        width = 0.4
+        if which == 'wind':
+            width /= 3
+    elif dT <= pd.Timedelta('12 days'):
+        width = 0.3
+        if which == 'wind':
+            width /= 3
     else:
         width = 0.2
         if which == 'wind':
