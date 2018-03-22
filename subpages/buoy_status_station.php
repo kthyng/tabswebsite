@@ -20,10 +20,21 @@
     $csv = array_map("str_getcsv", file("../includes/buoys.csv"));
     $header = array_shift($csv); // Separate the header from data
 
-    // Find row for buoy
-    $buoyarr = array_column($csv, 0);
-    $buoyrow = array_search($buoy, $buoyarr);
-    $row = $csv[$buoyrow];
+    // Find row for buoy, either with built-in function or by search
+    if (!function_exists('array_column')) {
+        $buoycol = array_search("buoy", $header);  # save column name for buoy
+        foreach ($csv as $row) {
+            # if the desired buoy is found in the column, stop so that $row is correct
+            if (strcmp($row[$buoycol],$buoy) == 0) {
+                break;
+            }
+        }
+    }
+    else {
+        $buoyarr = array_column($csv, 0);
+        $buoyrow = array_search($buoy, $buoyarr);
+        $row = $csv[$buoyrow];
+    }
 
     // names
     $aliascol = array_search("alias", $header);  # save column name for alias
