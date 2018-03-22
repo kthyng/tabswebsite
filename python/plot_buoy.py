@@ -794,17 +794,16 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         df = df.resample('30T').interpolate(method='time', limit=1)
             # df = df.resample('30T').asfreq()
     elif which == 'wave':  # TABS
-        # fill in missing data with nan's so not plotted across.
-        base = df.index[0].minute*60 + df.index[0].second
-        df = df.resample('3600 S', base=base).interpolate(method='time', limit=1)
-        # df = df.resample('3600 S', base=base).asfreq()
-        # idx = df.index
-        # # check for gap over an hour. factor 1e9 due to nanoseconds.
-        # ind = (np.diff(idx)/1e9).astype(float) > 3700
-        # # if big gap, insert nan
-        # addidx = idx[:-1][ind] + timedelta(hours=1)  # extra indices to add into gaps
-        # # reindex dataframe with added entries for nans, and sort back into order
-        # df = df.reindex(np.hstack((idx, addidx))).sort_index()
+        # accounting for known issue for interpolation after sampling if indices changes
+        # https://github.com/pandas-dev/pandas/issues/14297
+        # first obtain the desired new index
+        newindex = df.resample('1H', base=0).asfreq().index
+        # interpolate on union of old and new index
+        # use limit=1 so that only one row of nan is filled in
+        df_union = df.reindex(df.index.union(newindex)).interpolate(method='time', limit=1)
+        # reindex to the new index
+        df2 = df_union.reindex(newindex)
+
     elif 'ndbc' in which and 'Wave Ht [m]' in df.keys() and not df['Wave Ht [m]'].isnull().all():  # NDBC with wave
         # fill in missing data with nan's so not plotted across.
         base = 50
