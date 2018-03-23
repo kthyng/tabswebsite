@@ -486,18 +486,18 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc']  # forcing info
     elif timing == 'forecast':
-        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_previous_day.nc',
-               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
-               'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
+        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc']
-        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
-                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
-                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_latest.nc',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
+               'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_previous_day.nc',
+               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc']
+        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_latest.nc',
                 'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc']
+                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
+                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc']
 
     # Try different locations for model output. If won't work, give up.
     for i, lo in enumerate(loc):
