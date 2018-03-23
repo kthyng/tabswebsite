@@ -467,18 +467,16 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     # separate out which model type we want
     # links in list are in order they are tried by the system
     if timing == 'hindcast':
-        if not bp.station(buoy) == -999:  # can read faster from stations file if buoy included
-            loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                   'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                   'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
-            dostations = True
-        else:
-            loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
-                   'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
-                   'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg']
+        locsta = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                  'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                  'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
+        loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+               'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+               'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg']
         locf = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'] # forcing info
     elif timing == 'recent':
+        locsta = []
         loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc',
                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg',
                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg']
@@ -486,6 +484,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc']  # forcing info
     elif timing == 'forecast':
+        locsta = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc']
         loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
@@ -500,10 +499,38 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
                 'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc']
 
     # Try different locations for model output. If won't work, give up.
-    for i, lo in enumerate(loc):
+    # loop over station files first since faster if can use, then regular files
+    old, new = bp.station(buoy)  # get old and new location in stations file for buoy
+    for i, lo in enumerate(locsta + loc):
         try:
             ds = xr.open_dataset(lo)
+            # if this is a station file, need to make sure station is in file
+            if 'sta' in lo or 'stn' in lo:
+                # this is based on the number of stations saved (fewer is old)
+                if ds['zeta'].shape[1] > 70:  # new stations list
+                    ibuoy = new
+                else:  # old stations list
+                    ibuoy = old
+                # check if the buoy is in the station file
+                if ibuoy == -999:
+                    raise KeyError('Buoy %s is not in station file' % (buoy))
+                else:
+                    dostations = True
             break
+        except KeyError as e:
+            logging.exception(e)
+            if i < len(loc)-1:  # in case there is another option to try
+                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
+                ds = None
+        except RuntimeError as e:
+            logging.exception(e)
+            if i < len(loc)-1:  # in case there is another option to try
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.' % (timing, buoy, lo))
+                ds = None
         except IOError as e:  # if link tried is not working
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
@@ -535,6 +562,13 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
                 dsf = None
+        except RuntimeError as e:
+            logging.exception(e)
+            if i < len(locf)-1:  # in case there is another option to try
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. No more options.' % (timing, buoy, lo))
+                dsf = None
         except Exception as e:
             logging.exception(e)
             if i < len(locf)-1:  # in case there is another option to try
@@ -558,15 +592,15 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
 
         # need separate code for dostations
         if dostations:
-            i = bp.station(buoy)
+            # ibuoy = bp.station(buoy)
             along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                           .isel(s_rho=-1, station=i)*100  # convert to cm/s
+                           .isel(s_rho=-1, station=ibuoy)*100  # convert to cm/s
             across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                            .isel(s_rho=-1, station=i)*100
-            df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
-            df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=i)
-            df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
-            df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=i)
+                            .isel(s_rho=-1, station=ibuoy)*100
+            df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
+            df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
+            df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+            df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
 
             # rotate from curvilinear to cartesian
             anglev = ds['angle'][i]  # using at least nearby grid rotation angle
@@ -605,6 +639,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
         if which in ['salt', 'sum']:
             df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
+
+    # skip last past if don't need met model info read in
+    if which not in ['met', 'ndbc', 'ndbc-met', 'ndbc-nowave', 'tcoon', 'nos-met', 'nos', 'nos-cond']:
+        return df
 
     # check meteorological timing separately since can be different
     if dsf is None or dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \

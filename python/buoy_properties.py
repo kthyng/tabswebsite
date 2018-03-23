@@ -165,12 +165,38 @@ def model(buoy, grid):
 def station(buoy):
     '''Give buoy station index if available. -999 otherwise.
 
-    Certain stations are saved separately in ROMS. Buoy B, 8761724, 8760922 will give nan's so
-    is not included in the list, though a placeholder is in its space.'''
+    Older model output has a smaller set of buoys saved and newer model output
+    has more, so this needs to distinguish between the two.
 
-    stations = ['wasB', 'D', 'F', 'J', 'N', 'R', 'V', 'W', '42019', '42020', '42035',
+    Old version: Certain stations are saved separately in ROMS. Buoy B, 8761724,
+    8760922 will give nan's so
+    is not included in the list, though a placeholder is in its space.
+
+    New version has all buoys.'''
+
+    oldstations = ['wasB', 'D', 'F', 'J', 'N', 'R', 'V', 'W', '42019', '42020', '42035',
                 'BURL1', 'PTAT2', 'SRST2', 'was8761724', '8764227', 'was8760922']
+    newstations = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X', '42019',
+                   '42040', '42020', '42035', 'SRST2', 'PTAT2', 'BURL1',
+                   '8761724', '8764227', '8760992', 'A', 'C', 'E', 'G', 'H',
+                   'L', 'M', 'P', '8770475', '8770520', '8770613', '8770733',
+                   '8770808', '8770822', '8770971', '8771013', '8771341',
+                   '8771450', '8771486', '8771972', '8772985', '8773037',
+                   '8773146', '8773259', '8773701', '8774230', '8774513',
+                   '8775237', '8775241', '8775244', '8775283', '8775296',
+                   '8775792', '8776139', '8776604', '8777812', '8778490',
+                   '8779280', '8779748', '8779749', '8770570', '8764314',
+                   '8768094', '8773767', '8775870', '8779770', '8760721',
+                   '8741003', '8741094', '8741041', '8741501', '8741533',
+                   '8761305', '8766072', '8747437']
+
     try:
-        return stations.index(buoy)
+        old = oldstations.index(buoy)
     except:
-        return -999
+        old = -999
+    try:
+        new = newstations.index(buoy)
+    except:
+        new = -999
+
+    return old, new
