@@ -8,10 +8,10 @@
 
 <TITLE>Texas Automated Buoy System (TABS)</TITLE>
 
-<!-- <meta HTTP-EQUIV="REFRESH" CONTENT="300">
+<meta HTTP-EQUIV="REFRESH" CONTENT="300">
 <meta HTTP-EQUIV="Expires" CONTENT="1800">
 <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
-<meta HTTP-EQUIV="Pragma" CONTENT="no-cache"> -->
+<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="HandheldFriendly" content="true">
 <meta name="viewport" content="width=device-width,maximum-scale=1">
