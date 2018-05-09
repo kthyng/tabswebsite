@@ -62,9 +62,10 @@
 <div id="mapcontainer">
 
 <div id="map" >
-  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="100%" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen
+  <!-- <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="100%" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen -->
+<!-- mozallowfullscreen msallowfullscreen></iframe> -->
+  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen
 mozallowfullscreen msallowfullscreen></iframe>
-  <!-- <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://pong.tamu.edu/tabs_map/?framed"></iframe> -->
 <!-- text below map -->
 <center>
 <p><i><font class=bkvsm style="font-size:6pt;">
