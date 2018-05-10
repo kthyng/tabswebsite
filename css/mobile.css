@@ -62,7 +62,6 @@
   }
 
   div#gerg{
-      overflow: hidden;
       margin-left: 2em;
   	}
 
@@ -85,7 +84,6 @@
   }
 
   div#gerg{
-      overflow: hidden;
       margin-left: 0em;
   	}
 
@@ -107,7 +105,6 @@
   }
 
   div#gerg{
-      overflow: hidden;
       margin-left: 0em;
   	}
 
@@ -130,9 +127,7 @@
   }
 
   div#gerg{
-      overflow: hidden;
       margin-left: -1em;
-
   	}
 
   div#title{
@@ -148,6 +143,10 @@ div#mapbuoycontainer{margin-top: 1.5em;}}
 div#mapbuoycontainer{margin-top: 3em;}}
 @media screen and (max-width: 383px) {
 div#mapbuoycontainer{margin-top: 6em;}}
+
+/* GERG Logo size (ATM only or full GERG) */
+@media screen and (max-width: 567px) {
+div#gerg{overflow: hidden}}
 
 
 div#title{
