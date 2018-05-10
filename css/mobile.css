@@ -2,10 +2,6 @@
 /* Want these in decreasing size order to overwrite properly */
 @media screen and (max-width: 900px) {
 
-  div#buoycontainer{
-      margin-top: 3em;
-  }
-
   div#tglo{
       --font-family: 'Open Sans Condensed', sans-serif;
        font-size: 0.6em;
@@ -28,10 +24,6 @@
 
 @media screen and (max-width: 700px) {
 
-  div#buoycontainer{
-      margin-top: 7em;
-  }
-
   div#tglo{
       --font-family: 'Open Sans Condensed', sans-serif;
        font-size: 0.6em;
@@ -53,10 +45,6 @@
 
 @media screen and (max-width: 420px) {
 
-  div#buoycontainer{
-      margin-top: 0em;
-  }
-
   div#tglo{
       display: none;
   }
@@ -75,10 +63,6 @@
 
 @media screen and (max-width: 400px) {
 
-  div#buoycontainer{
-      margin-top: 0em;
-  }
-
   div#tglo{
       display: none;
   }
@@ -95,10 +79,6 @@
 
 
 @media screen and (max-width: 384px) {
-
-  div#buoycontainer{
-      margin-top: 0em;
-  }
 
   div#tglo{
       display: none;
@@ -117,10 +97,6 @@
 
 /* iphone 5 */
 @media screen and (max-width: 330px) {
-
-  div#buoycontainer{
-      margin-top: 0em;
-  }
 
   div#tglo{
       display: none;
@@ -179,7 +155,6 @@ width:100%;
 div#mapbuoycontainer
 {
  width: auto;
-/* margin-top: 6em; */
 overflow: auto;
 }
 
