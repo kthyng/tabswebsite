@@ -85,7 +85,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 <!-- <TD><div id="blank"><TABLE border=0><TH colspan=1 align=left><font class==bknorm size=1.5em><br>&nbsp &nbsp &nbsp &nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp </font></th></table></div></TD> -->
 <tr>
 <td><b>Recent</b></td>
-<TD valign=top colspan=2><div id="Report"><b><a href="subpages/currents.php">Last data report</a></b></div></td>
+<TD valign=top colspan=2><div id="Report"><b><a href="subpages/currents.php"><font size='3em'>Last data report</font></a></b></div></td>
 </tr>
 
 <?php
