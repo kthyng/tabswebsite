@@ -124,6 +124,23 @@ div#mapbuoycontainer{margin-top: 6em;}}
 @media screen and (max-width: 567px) {
 div#gerg{overflow: hidden}}
 
+/* buoy list vertical spacing */
+@media screen and (max-height: 900px) {
+div#buoycontainer{margin-top: 6em;}}
+@media screen and (max-height: 640px) {
+div#buoycontainer{margin-top: 6em;}}
+@media screen and (max-height: 420px) {
+div#buoycontainer{margin-top: 7em;}}
+@media screen and (max-height: 405px) {
+div#buoycontainer{margin-top: 8em;}}
+@media screen and (max-height: 390px) {
+div#buoycontainer{margin-top: 10em;}}
+@media screen and (max-height: 355px) {
+div#buoycontainer{margin-top: 12em;}}
+@media screen and (max-height: 320px) {
+div#buoycontainer{margin-top: 13em;}}
+
+
 
 div#title{
     --font-family: "HelveticaNeue-Bold", "Helvetica Neue Bold", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
@@ -157,11 +174,11 @@ div#mapbuoycontainer
  width: auto;
 overflow: auto;
 }
-
+/*
 div#buoycontainer
 {
   margin-top: 5em;
-}
+} */
 
 
 div#mapcontainer{
