@@ -1,5 +1,5 @@
-/* Want these in decreasing size order to overwrite properly */
 
+/* Want these in decreasing size order to overwrite properly */
 @media screen and (max-width: 900px) {
 
   div#buoycontainer{
@@ -24,10 +24,10 @@
       margin-left: -2em;
   }
 
-  /* div#map iframe{
-    width: 900px;
-    margin-bottom: -3em;
-  } */
+  div#mapbuoycontainer
+  {
+  margin-top: 3em;
+  }
 }
 
 
@@ -55,10 +55,11 @@
       margin-left: -2em;
   }
 
-  /* div#map iframe{
-    width: 900px;
-    margin-bottom: -2em;
-  } */
+
+    div#mapbuoycontainer
+    {
+    margin-top: 3em;
+    }
 }
 
 @media screen and (max-width: 420px) {
@@ -104,6 +105,11 @@
       margin-right: 0em;
     }
 
+  div#mapbuoycontainer
+  {
+  margin-top: 6em;
+  }
+
 }
 
 
@@ -128,6 +134,11 @@
       margin-left: 0em;
       margin-right: 0em;
     }
+
+  div#mapbuoycontainer
+  {
+  margin-top: 6em;
+  }
 
 }
 
@@ -161,11 +172,14 @@ div#headercontainer{
 width:100%;
 }
 
-div#mapbuoycontainer{
+div#mapbuoycontainer
+{
  width: auto;
-margin-top: 0.5em;
+/* margin-top: 6em; */
 overflow: auto;
 }
+
+
 
 div#mapcontainer{
 max-width: 900px;
@@ -212,9 +226,12 @@ div#wrapper{
 left :0px;
 }
 
-div#navmenu ul{
-display:none;
-}
+/* div#navmenu */
+/* yes reponsive */
+/* ul{display:none;} */
+/* not responsive */
+/* .notmobile ul{display: normal;
+              margin-bottom:30em;} */
 
 /* div#navmobile ul{
 clear: both;
@@ -260,7 +277,9 @@ div#gloseal
 	} */
 
 
-
+/* div#fullbutton{
+    display: none;
+} */
 
 
 div#footerText{
