@@ -23,11 +23,6 @@
   div#gerg{
       margin-left: -2em;
   }
-
-  div#mapbuoycontainer
-  {
-  margin-top: 3em;
-  }
 }
 
 
@@ -54,12 +49,6 @@
   div#gerg{
       margin-left: -2em;
   }
-
-
-    div#mapbuoycontainer
-    {
-    margin-top: 3em;
-    }
 }
 
 @media screen and (max-width: 420px) {
@@ -104,12 +93,28 @@
       margin-left: 1em;
       margin-right: 0em;
     }
+}
 
-  div#mapbuoycontainer
-  {
-  margin-top: 6em;
+
+@media screen and (max-width: 384px) {
+
+  div#buoycontainer{
+      margin-top: 0em;
   }
 
+  div#tglo{
+      display: none;
+  }
+
+  div#gerg{
+      overflow: hidden;
+      margin-left: 0em;
+  	}
+
+  div#title{
+      margin-left: 1em;
+      margin-right: 0em;
+    }
 }
 
 
@@ -134,15 +139,15 @@
       margin-left: 0em;
       margin-right: 0em;
     }
-
-  div#mapbuoycontainer
-  {
-  margin-top: 6em;
-  }
-
 }
 
-
+/* Navigation bar separately */
+@media screen and (max-width: 900px) {
+div#mapbuoycontainer{margin-top: 1.5em;}}
+@media screen and (max-width: 751px) {
+div#mapbuoycontainer{margin-top: 3em;}}
+@media screen and (max-width: 383px) {
+div#mapbuoycontainer{margin-top: 6em;}}
 
 
 div#title{
