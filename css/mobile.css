@@ -143,11 +143,11 @@ div#buoycontainer{margin-top: 15em;}}
 /* map frame sizing */
 @media screen and (max-height: 900px) {
 div#map iframe{
-margin-bottom: -4em;
--ms-zoom: 0.9;
--moz-transform: scale(0.9);
--o-transform: scale(0.9);
--webkit-transform: scale(0.9);}
+margin-bottom: -2em;
+-ms-zoom: 0.88;
+-moz-transform: scale(0.88);
+-o-transform: scale(0.88);
+-webkit-transform: scale(0.88);}
 
 
 
