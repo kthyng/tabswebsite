@@ -52,10 +52,10 @@
 
     div#map iframe{
         margin-bottom: -5em;
-        -ms-zoom: 0.7;
-        -moz-transform: scale(0.7);
-        -o-transform: scale(0.7);
-        -webkit-transform: scale(0.7);}
+        -ms-zoom: 0.68;
+        -moz-transform: scale(0.68);
+        -o-transform: scale(0.68);
+        -webkit-transform: scale(0.68);}
 }
 
 
@@ -150,10 +150,10 @@
 
   div#map iframe{
       margin-bottom: -10em;
-      -ms-zoom: 0.35;
-      -moz-transform: scale(0.35);
-      -o-transform: scale(0.35);
-      -webkit-transform: scale(0.35);}
+      -ms-zoom: 0.4;
+      -moz-transform: scale(0.4);
+      -o-transform: scale(0.4);
+      -webkit-transform: scale(0.4);}
 }
 
 /* Navigation bar separately */
