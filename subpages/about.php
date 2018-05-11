@@ -13,8 +13,20 @@
 
     <h2>About this site</h2>
 
-    The TABS website has been running for about two decades to share buoy data taken by the Geochemical and Environmental Research Group (GERG) at Texas A&amp;M University. Recent development on the site was completed with funding from the Texas General Land Office to co-PIs Drs. Steve DiMarco and Rob Hetland of Texas A&amp;M University (project 13-435-000-7894) and co-PIs Drs. Kristen Thyng and Rob Hetland of Texas A&amp;M University (project 16-092-000-9284).
+    The TABS website has been running since 1995 to share buoy data taken by the Geochemical and Environmental Research Group (GERG) at Texas A&amp;M University. Recent development on the site was completed with funding from the Texas General Land Office to co-PIs Drs. Steve DiMarco and Rob Hetland of Texas A&amp;M University (project 13-435-000-7894) and co-PIs Drs. Kristen Thyng and Rob Hetland of Texas A&amp;M University (project 16-092-000-9284).
 
+    <h3>Tools Used</h3>
+
+    <ul>
+    <li>PHP for much of the web code</li>
+    <li><tt>pandas</tt> Python package for data handling</li>
+    <li><tt>matplotlib</tt> Python package for time series and some map plotting</li>
+    <li>SVG images for front map</li>
+    <li>The front map uses the leaflet library</li>
+    <li>Model fields are shown as png images or drawn on the svg as polygons returned from matplotlib contourf. Wind and currents are drawn as svg paths. </li>
+    <li>The website is served by a python flash web server</li>
+    <li><tt>cmocean</tt> Python package for colormaps</li>
+    </ul>
 
     <!-- <h3>Links</h3>
 
