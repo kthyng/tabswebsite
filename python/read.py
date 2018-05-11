@@ -16,7 +16,7 @@ import logging
 bys = bp.load() # load in buoy data
 
 
-def read(buoy, dstart, dend, table=None, units=None, tz='utc',
+def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
          usemodel=False, userecent=True):
     '''Calls appropriate read function for each table type.
 
@@ -462,60 +462,62 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
 
     dstart and dend are datetime objects.'''
 
-    dostations = False  # this is updated if buoy is in stations list on reading
-
+    # dostations = False  # this is updated if buoy is in stations list on reading
+    # import pdb; pdb.set_trace()
     # separate out which model type we want
     # links in list are in order they are tried by the system
     if timing == 'hindcast':
-        locsta = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                  'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                  'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
-        loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
-               'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg']
-        locf = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'] # forcing info
+        locsta = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
+        # locsta = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+        #           'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+        #           'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
+        # loc = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+        #        'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg',
+        #        'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg']
+        # locf = ['http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc',
+        #         'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_frc'] # forcing info
     elif timing == 'recent':
-        locsta = []
-        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc',
-               'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg']
-        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_blk_archive_agg.nc',
-                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc']  # forcing info
+        # starts April 2018 currently
+        locsta = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc']
+        # loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc',
+        #        'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg',
+        #        'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg']
+        # locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_blk_archive_agg.nc',
+        #         'http://copano.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc',
+        #         'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg_frc']  # forcing info
     elif timing == 'forecast':
         locsta = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc']
-        loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
-               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
-               'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_previous_day.nc',
-               'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
-               'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc']
-        locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_latest.nc',
-                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
-                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
-                'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc']
-
+        # loc = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc',
+        #        'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
+        #        'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc',
+        #        'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_previous_day.nc',
+        #        'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc',
+        #        'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_previous_day.nc']
+        # locf = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_latest.nc',
+        #         'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
+        #         'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_latest.nc',
+        #         'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
+        #         'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
+        #         'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc']
+    import pdb; pdb.set_trace()
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
-    old, new = bp.station(buoy)  # get old and new location in stations file for buoy
-    for i, lo in enumerate(locsta + loc):
+    ibuoy = bp.station(buoy)  # get location in stations file for buoy
+    for i, lo in enumerate(locsta):# + loc):
         try:
             ds = xr.open_dataset(lo)
-            # if this is a station file, need to make sure station is in file
-            if 'sta' in lo or 'stn' in lo:
-                # this is based on the number of stations saved (fewer is old)
-                if ds['zeta'].shape[1] > 70:  # new stations list
-                    ibuoy = new
-                else:  # old stations list
-                    ibuoy = old
-                # check if the buoy is in the station file
-                if ibuoy == -999:
-                    raise KeyError('Buoy %s is not in station file' % (buoy))
-                else:
-                    dostations = True
+            # # if this is a station file, need to make sure station is in file
+            # if 'sta' in lo or 'stn' in lo:
+            #     # this is based on the number of stations saved (fewer is old)
+            #     if ds['zeta'].shape[1] > 70:  # new stations list
+            #         ibuoy = new
+            #     else:  # old stations list
+            #         ibuoy = old
+            #     # check if the buoy is in the station file
+            #     if ibuoy == -999:
+            #         raise KeyError('Buoy %s is not in station file' % (buoy))
+            #     else:
+            # dostations = True
             break
         except KeyError as e:
             logging.exception(e)
@@ -543,39 +545,39 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             logging.warning('For model timing %s and buoy %s, some weird error happened. Giving up.' % (timing, buoy))
             ds = None
 
-    # use modeling forcing information instead of model output. If won't work, give up.
-    for i, lo in enumerate(locf):
-        try:
-            dsf = xr.open_dataset(lo)
-            break
-        except IOError as e:  # if link tried is not working
-            logging.exception(e)
-            if i < len(locf)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
-            else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. No more options.' % (timing, buoy, lo))
-                dsf = None
-        except KeyError as e:
-            logging.exception(e)
-            if i < len(locf)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
-            else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
-                dsf = None
-        except RuntimeError as e:
-            logging.exception(e)
-            if i < len(locf)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
-            else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. No more options.' % (timing, buoy, lo))
-                dsf = None
-        except Exception as e:
-            logging.exception(e)
-            if i < len(locf)-1:  # in case there is another option to try
-                logging.warning('For model timing %s for forcing information and buoy %s, forcing loc %s did not work, some weird error happened. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
-            else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, forcing loc %s did not work and some weird error happened. No more options.' % (timing, buoy, lo))
-                dsf = None
+    # # use modeling forcing information instead of model output. If won't work, give up.
+    # for i, lo in enumerate(locf):
+    #     try:
+    #         dsf = xr.open_dataset(lo)
+    #         break
+    #     except IOError as e:  # if link tried is not working
+    #         logging.exception(e)
+    #         if i < len(locf)-1:  # in case there is another option to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+    #         else:  # no more options to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work. No more options.' % (timing, buoy, lo))
+    #             dsf = None
+    #     except KeyError as e:
+    #         logging.exception(e)
+    #         if i < len(locf)-1:  # in case there is another option to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+    #         else:  # no more options to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
+    #             dsf = None
+    #     except RuntimeError as e:
+    #         logging.exception(e)
+    #         if i < len(locf)-1:  # in case there is another option to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+    #         else:  # no more options to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work due to a RuntimeError. Probably the model location cannot be found. No more options.' % (timing, buoy, lo))
+    #             dsf = None
+    #     except Exception as e:
+    #         logging.exception(e)
+    #         if i < len(locf)-1:  # in case there is another option to try
+    #             logging.warning('For model timing %s for forcing information and buoy %s, forcing loc %s did not work, some weird error happened. Trying with loc %s instead...' % (timing, buoy, lo, locf[i+1]))
+    #         else:  # no more options to try
+    #             logging.warning('For model timing %s and buoy %s, forcing loc %s did not work and some weird error happened. No more options.' % (timing, buoy, lo))
+    #             dsf = None
 
     # only do this if dend is less than or equal to the first date in the model output
     # check if last data datetime is less than 1st model datetime or
@@ -590,79 +592,83 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         # Initialize model dataframe with times
         df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
 
-        # need separate code for dostations
-        if dostations:
-            # ibuoy = bp.station(buoy)
-            along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                           .isel(s_rho=-1, station=ibuoy)*100  # convert to cm/s
-            across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                            .isel(s_rho=-1, station=ibuoy)*100
-            df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
-            df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
-            df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
-            df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+        # # need separate code for dostations
+        # if dostations:
+        # ibuoy = bp.station(buoy)
+        along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+                       .isel(s_rho=-1, station=ibuoy)*100  # convert to cm/s
+        across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+                        .isel(s_rho=-1, station=ibuoy)*100
+        df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
+        df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
+        df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+        df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
 
-            # rotate from curvilinear to cartesian
-            anglev = ds['angle'][i]  # using at least nearby grid rotation angle
-        else:
-            try:
-                if which in ['ven', 'sum']:
-                    j, i = bp.model(buoy, 'u')  # get model indices
-                    along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-                                   .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
-                    j, i = bp.model(buoy, 'v')  # get model indices
-                    across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-                                    .isel(s_rho=-1, eta_v=j, xi_v=i)*100
-                    # rotate from curvilinear to cartesian
-                    anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
-                if not bp.model(buoy, 'rho'):  # no model indices saved
-                    return None
-                else:
-                    j, i = bp.model(buoy, 'rho')  # get model indices
-                df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-                if which in ['salt', 'sum'] or 'cond' in which:
-                    df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
-                df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
-                df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+        # rotate from curvilinear to cartesian
+        anglev = ds['angle'][i]  # using at least nearby grid rotation angle
+        # else:
+        #     try:
+        #         if which in ['ven', 'sum']:
+        #             j, i = bp.model(buoy, 'u')  # get model indices
+        #             along = ds['u'].sel(ocean_time=slice(dstart, dend))\
+        #                            .isel(s_rho=-1, eta_u=j, xi_u=i)*100  # convert to cm/s
+        #             j, i = bp.model(buoy, 'v')  # get model indices
+        #             across = ds['v'].sel(ocean_time=slice(dstart, dend))\
+        #                             .isel(s_rho=-1, eta_v=j, xi_v=i)*100
+        #             # rotate from curvilinear to cartesian
+        #             anglev = ds['angle'][j,i]  # using at least nearby grid rotation angle
+        #         if not bp.model(buoy, 'rho'):  # no model indices saved
+        #             return None
+        #         else:
+        #             j, i = bp.model(buoy, 'rho')  # get model indices
+        #         df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        #         if which in ['salt', 'sum'] or 'cond' in which:
+        #             df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, eta_rho=j, xi_rho=i)
+        #         df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
+        #         df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i)
 
-            except RuntimeError as e:
-                logging.exception(e)
-                logging.warning('Model timing %s, buoy %s. Reading ocean model output did not work due to RuntimeError. Trying to read from %s' % (timing, buoy, ds.file))
-                return df
-
-            except Exception as e:
-                logging.exception(e)
-                logging.warning('Model timing %s, buoy %s. Reading ocean model output did not work. Trying to read from %s' % (timing, buoy, ds.file))
-                return df
+        # except RuntimeError as e:
+        #     logging.exception(e)
+        #     logging.warning('Model timing %s, buoy %s. Reading ocean model output did not work due to RuntimeError. Trying to read from %s' % (timing, buoy, ds.file))
+        #     return df
+        #
+        # except Exception as e:
+        #     logging.exception(e)
+        #     logging.warning('Model timing %s, buoy %s. Reading ocean model output did not work. Trying to read from %s' % (timing, buoy, ds.file))
+        #     return df
 
         # Project along- and across-shelf velocity rather than use from model
         # so that angle matches buoy
-        if which in ['ven', 'sum']:
-            df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(along, across, anglev)  # approximately to east, north
-            theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
-            df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
-            df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
-        if which in ['salt', 'sum']:
-            df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
+        # if which in ['ven', 'sum']:
+        df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(along, across, anglev)  # approximately to east, north
+        theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
+        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
+        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+        # if which in ['salt', 'sum']:
+        df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
 
-    # skip last past if don't need met model info read in
-    if which not in ['met', 'ndbc', 'ndbc-met', 'ndbc-nowave', 'tcoon', 'nos-met', 'nos', 'nos-cond']:
-        return df
+    # # skip last past if don't need met model info read in
+    # if which not in ['met', 'ndbc', 'ndbc-met', 'ndbc-nowave', 'tcoon', 'nos-met', 'nos', 'nos-cond']:
+    #     return df
 
-    # check meteorological timing separately since can be different
-    if dsf is None or dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
-       dstart >= pd.Timestamp(dsf['time'].isel(time=-1).data, tz='utc'):
-        # fill in met keys so they exist
-        keys = ['AtmPr [MB]', 'AirT [deg C]']
-        if which == 'met': keys += ['RelH [%]']
-        for key in keys:
-            df[key] = np.nan
-        return df
-    else:
-        j, i = bp.model(buoy, 'rho')  # get model indices
-        df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
-        df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
-        if which == 'met':
-            df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
+    # # check meteorological timing separately since can be different
+    # if dsf is None or dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
+    #    dstart >= pd.Timestamp(dsf['time'].isel(time=-1).data, tz='utc'):
+    #     # fill in met keys so they exist
+    #     keys = ['AtmPr [MB]', 'AirT [deg C]']
+    #     if which == 'met': keys += ['RelH [%]']
+    #     for key in keys:
+    #         df[key] = np.nan
+    #     return df
+    # else:
+        # j, i = bp.model(buoy, 'rho')  # get model indices
+        # df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
+        # df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
+        # if which == 'met':
+        #     df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
+
+        df['AtmPr [MB]'] = ds['Pair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+        df['AirT [deg C]'] = ds['Tair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+        df['RelH [%]'] = 100*ds['Qair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
 
     return df

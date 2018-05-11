@@ -174,9 +174,9 @@ def station(buoy):
 
     New version has all buoys.'''
 
-    oldstations = ['wasB', 'D', 'F', 'J', 'N', 'R', 'V', 'W', '42019', '42020', '42035',
-                'BURL1', 'PTAT2', 'SRST2', 'was8761724', '8764227', 'was8760922']
-    newstations = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X', '42019',
+    # oldstations = ['wasB', 'D', 'F', 'J', 'N', 'R', 'V', 'W', '42019', '42020', '42035',
+    #             'BURL1', 'PTAT2', 'SRST2', 'was8761724', '8764227', 'was8760922']
+    stations = ['B', 'D', 'F', 'J', 'K', 'N', 'R', 'V', 'W', 'X', '42019',
                    '42040', '42020', '42035', 'SRST2', 'PTAT2', 'BURL1',
                    '8761724', '8764227', '8760922', 'A', 'C', 'E', 'G', 'H',
                    'L', 'M', 'P', '8770475', '8770520', '8770613', '8770733',
@@ -190,13 +190,13 @@ def station(buoy):
                    '8741003', '8741094', '8741041', '8741501', '8741533',
                    '8761305', '8766072', '8747437']
 
+    # try:
+    #     old = oldstations.index(buoy)
+    # except:
+    #     old = -999
     try:
-        old = oldstations.index(buoy)
-    except:
-        old = -999
-    try:
-        new = newstations.index(buoy)
+        new = stations.index(buoy)
     except:
         new = -999
 
-    return old, new
+    return new
