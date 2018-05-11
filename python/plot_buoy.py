@@ -866,7 +866,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
-        add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[2], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
@@ -913,7 +913,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'ndbc':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric\npressure [mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -933,7 +933,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'ndbc-nowave':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -950,7 +950,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which in ['ndbc-met', 'nos-met']:
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -966,7 +966,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'tcoon' or which == 'nos':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -1006,7 +1006,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'nos-cond':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric\npressure [MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',

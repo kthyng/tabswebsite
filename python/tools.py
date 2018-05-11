@@ -142,7 +142,7 @@ def convert_units(df, units=None, tz=None):
 
     df = df.copy()  # to avoid editing original df
     if units == 'E':
-        units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[MB]', '[m]']
+        units_to_change = ['[cm/s]', '[m/s]', '[deg C]', '[mb]', '[m]']
         conversions = ['cps2kts', 'mps2kts', 'c2f', 'mb2hg', 'm2ft']
         new_units = ['[kts]', '[kts]', '[deg F]', '[inHg]', '[ft]']
         rints = [2, 2, 1, 2, 1]  # integers for number of decimal places for rounding

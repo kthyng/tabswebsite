@@ -215,10 +215,10 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
         # calculate salinity from conductivity, if available
         if 'Conductivity [mS/cm]' in df.keys():
-            if not 'AtmPr [MB]' in df.keys():
+            if not 'AtmPr [mb]' in df.keys():
                 pr = np.zeros(len(df))
             else:
-                pr = df['AtmPr [MB]']/100. - 10.1325
+                pr = df['AtmPr [mb]']/100. - 10.1325
             df['Salinity'] = gsw.SP_from_C(df['Conductivity [mS/cm]'],
                                            df['WaterT [deg C]'],
                                            pr)
@@ -242,7 +242,7 @@ def read_nos_df(dataname):
 
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
     if 'type=met' in dataname:
-        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
+        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [mb]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
         df = df.drop([' VIS'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {'East [m/s]': 2, 'North [m/s]': 2}
@@ -349,7 +349,7 @@ def read_ndbc_df(dataname):
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
         df = df.drop(['station', 'date', 'time', 'windgust2'], axis=1)
-        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
+        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [mb]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
         df[df == -99.0] = np.nan  # replace missing values
 
     elif isinstance(dataname, str):  # go to ndbc
@@ -373,7 +373,7 @@ def read_ndbc_df(dataname):
             df.rename(columns={'WDIR': 'winddir', 'WSPD': 'windspeed'}, inplace=True)
         else:
             df.rename(columns={'WD': 'winddir', 'WSPD': 'windspeed'}, inplace=True)
-        names = ['Dir from [deg T]', 'Speed [m/s]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'WaterT [deg C]', 'Dew pt [deg C]', 'East [m/s]', 'North [m/s]']
+        names = ['Dir from [deg T]', 'Speed [m/s]', 'Gust [m/s]', 'AtmPr [mb]', 'AirT [deg C]', 'WaterT [deg C]', 'Dew pt [deg C]', 'East [m/s]', 'North [m/s]']
 
     rdict = {'East [m/s]': 2, 'North [m/s]': 2}
 
@@ -434,7 +434,7 @@ def read_tabs(table, buoy, dstart, dend):
         rdict = {}
 
     elif table == 'met':
-        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
+        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [mb]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
         df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
         df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
         rdict = {'Speed [m/s]': 2, 'Dir from [deg T]': 0}
@@ -653,14 +653,14 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     if dsf is None or dend <= pd.Timestamp(dsf['time'].isel(time=0).data, tz='utc') or \
        dstart >= pd.Timestamp(dsf['time'].isel(time=-1).data, tz='utc'):
         # fill in met keys so they exist
-        keys = ['AtmPr [MB]', 'AirT [deg C]']
+        keys = ['AtmPr [mb]', 'AirT [deg C]']
         if which == 'met': keys += ['RelH [%]']
         for key in keys:
             df[key] = np.nan
         return df
     else:
         j, i = bp.model(buoy, 'rho')  # get model indices
-        df['AtmPr [MB]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
+        df['AtmPr [mb]'] = dsf['Pair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Pair'].resample('60T').interpolate()
         df['AirT [deg C]'] = dsf['Tair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Tair'].resample('60T').interpolate()
         if which == 'met':
             df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
