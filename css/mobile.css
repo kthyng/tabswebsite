@@ -128,17 +128,26 @@ div#gerg{overflow: hidden}}
 @media screen and (max-height: 900px) {
 div#buoycontainer{margin-top: 6em;}}
 @media screen and (max-height: 640px) {
-div#buoycontainer{margin-top: 6em;}}
-@media screen and (max-height: 420px) {
 div#buoycontainer{margin-top: 7em;}}
-@media screen and (max-height: 405px) {
+@media screen and (max-height: 420px) {
 div#buoycontainer{margin-top: 8em;}}
+@media screen and (max-height: 405px) {
+div#buoycontainer{margin-top: 9em;}}
 @media screen and (max-height: 390px) {
-div#buoycontainer{margin-top: 10em;}}
+div#buoycontainer{margin-top: 11em;}}
 @media screen and (max-height: 355px) {
-div#buoycontainer{margin-top: 12em;}}
-@media screen and (max-height: 320px) {
 div#buoycontainer{margin-top: 13em;}}
+@media screen and (max-height: 320px) {
+div#buoycontainer{margin-top: 15em;}}
+
+/* map frame sizing */
+@media screen and (max-height: 900px) {
+div#map iframe{
+margin-bottom: -4em;
+-ms-zoom: 0.8;
+-moz-transform: scale(0.8);
+-o-transform: scale(0.8);
+-webkit-transform: scale(0.8);}
 
 
 
@@ -200,13 +209,13 @@ background: #FFFFFF;
 font-size: 27px;
 /*width:100%;
 height: 100%;*/
-margin-bottom: -0.5em;
--ms-zoom: 1.0;
--moz-transform: scale(1.0);
+/* margin-bottom: -0.5em; */
+/* -ms-zoom: 1.0;
+-moz-transform: scale(1.0); */
 -moz-transform-origin: 0 0;
--o-transform: scale(1.0);
+/* -o-transform: scale(1.0); */
 -o-transform-origin: 0 0;
--webkit-transform: scale(1.0);
+/* -webkit-transform: scale(1.0); */
 -webkit-transform-origin: 0 0;
 }
 
