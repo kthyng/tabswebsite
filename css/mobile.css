@@ -150,10 +150,10 @@
 
   div#map iframe{
       margin-bottom: -10em;
-      -ms-zoom: 0.38;
-      -moz-transform: scale(0.38);
-      -o-transform: scale(0.38);
-      -webkit-transform: scale(0.38);}
+      -ms-zoom: 0.35;
+      -moz-transform: scale(0.35);
+      -o-transform: scale(0.35);
+      -webkit-transform: scale(0.35);}
 }
 
 /* Navigation bar separately */
