@@ -61,17 +61,17 @@
 
     <h2><a href=#tglo>Legacy Gulf-wide Model</a></h2>
 
-    <h3>Links</h3>
+    <!-- <h3>Links</h3>
 
     <ul>
     <li> <a href=http://seawater.tamu.edu/tglo/index.html>Animations</a> of model output</li>
-    </ul>
+    </ul> -->
 
     <h3>Description</h3>
 
     <p>This model covers the full Gulf and is being run operationally. It is lower resolution than the shelf model and is driven only by winds (i.e., it does not include the Loop Current).</p>
 
-    <a href=http://seawater.tamu.edu/tglo/RG17051507.gif><img src="http://seawater.tamu.edu/tglo/RG17051507.gif" width="50%"></a>
+    <a href=http://seawater.tamu.edu/tglo/RGanimation.gif><img src="http://seawater.tamu.edu/tglo/RGanimation.gif" width="50%"></a>
 
     <!-- include footer from separate file -->
     <?php include("../includes/footer.html");?>
