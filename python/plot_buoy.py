@@ -960,7 +960,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        df3=df3, dolegend=True, tlims=tlims)
 
     elif which == 'tcoon-tide':
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Height [m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[0], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, dolegend=True)
 
     elif which == 'tcoon' or which == 'nos':
@@ -979,7 +982,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dolegend = True
         else:
             dolegend = False
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[3], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=dolegend)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
@@ -994,7 +1000,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         else:
             dolegend = True
         # df4 is an optional input containing NOAA tidal height prediction
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height [m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[0], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=dolegend)
         add_var_2units(axes[1], df, 'WaterT [deg C]',
@@ -1015,7 +1024,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
         # df4 is an optional input containing NOAA tidal height prediction
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[3], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=True)
         add_var_2units(axes[4], df, 'WaterT [deg C]',

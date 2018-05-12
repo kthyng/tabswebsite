@@ -17,20 +17,22 @@ bys = bp.load() # load in buoy data
 
 
 def read(buoy, dstart, dend, table=None, units=None, tz='utc',
-         usemodel=False, userecent=True):
+         usemodel=False, userecent=True, datum='MSL'):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are datetime objects.
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
+
+    datum (str) can be 'MSL', 'MHHW', 'MHW', 'MLW', 'MLLW', 'MTL'; for tidal height
     '''
 
-    # import pdb; pdb.set_trace()
     # read from recent file
     if dstart is None:
         df = pd.read_table(buoy, index_col=0, parse_dates=True)
     # read in model output but not ports model output
     elif isinstance(usemodel,str):
+        # this does not catch NOAA model case for tides
         # assert isinstance(usemodel, str), \
         #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
         df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
@@ -83,11 +85,20 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
     else:
         df = None
 
+
+    # Convert sea level datum from MSL to whatever user chose
+    if datum != 'MSL':  # it is 'MSL' by default
+        key = 'Water Level [m, MSL]'
+        dz = tools.datum(buoy, datum)  # finds delta z between datums
+        df[key] += dz
+        # Change column label to include new datum
+        df.rename(columns={key: key.replace('MSL', datum)}, inplace=True)
+
     return df
 
 
 def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
-         usemodel=False, userecent=True):
+         usemodel=False, userecent=True, datum='MSL'):
 
     # need table if TABS buoy
     if len(buoy) == 1:
@@ -185,8 +196,9 @@ def read_nos(buoy, dstart, dend, usemodel=False):
     '''Set up urls and then read from them to get TCOON and NOS data.
 
     Most stations have several data sources, so they are aggregated here.
-    This calls to read_tcoon_df() to do the reading and rearranging.
-    dstart and dend are datetime objects.'''
+    This calls to read_nos_df() to do the reading and rearranging.
+    dstart and dend are datetime objects.
+    '''
 
     if not usemodel:
         # tide, met, and phys data
@@ -238,7 +250,7 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
 
 def read_nos_df(dataname):
-    '''Read in individual tcoon datasets and arrange variables.'''
+    '''Read in individual tcoon/nos datasets and arrange variables.'''
 
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
     if 'type=met' in dataname:
@@ -255,7 +267,7 @@ def read_nos_df(dataname):
         df['North [m/s]'] = df[' WINDSPEED']*np.sin(np.deg2rad(theta))
 
     elif 'product=water_level' in dataname:
-        names = ['Water Level [m]']
+        names = ['Water Level [m, MSL]']
         df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
@@ -270,7 +282,7 @@ def read_nos_df(dataname):
         rdict = {}
 
     elif 'prediction' in dataname:  # tidal height prediction
-        names = ['Water Level [m]']
+        names = ['Water Level [m, MSL]']
         # dictionary for rounding decimal places
         rdict = {}
 

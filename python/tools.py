@@ -11,14 +11,22 @@ from numpy import sign, loadtxt
 from os import system
 
 
-# def write_log(note, logfile):
-#     '''Append note to logfile.'''
-#
-#     # add time on before note
-#     tstart = pd.Timestamp('now', tz='US/Central').strftime('%a %b %d, %H:%M:%S %Z, %Y')
-#     note = tstart + '\n' + note
-#     command = 'echo "%s" >> %s' % (note, logfile)
-#     system(command)
+def datum(buoy, datum):
+    '''Query NOAA website for station tidal datum change.
+
+    Information about datums:
+    https://tidesandcurrents.noaa.gov/datum_options.html
+    '''
+
+    url = 'https://opendap.co-ops.nos.noaa.gov/axis/webservices/datums/response.jsp?epoch=A&unit=0&format=text&Submit=Submit&stationId=' + buoy
+
+    # reads in values for datums
+    d = pd.read_table(url,skiprows=1, delim_whitespace=True, nrows=7, usecols=[0,1], header=17, names=['Datum', 'Value [m]'], index_col=0)
+
+    # dz to add is difference between desired datum and 'MSL' (default)
+    dz = d.loc['MSL']['Value [m]'] - d.loc[datum]['Value [m]']
+
+    return dz
 
 
 def send_email():
@@ -198,7 +206,6 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w', append=Fa
     else:
         header = True
 
-    # import pdb; pdb.set_trace()
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
     if filetype == 'hdf':
