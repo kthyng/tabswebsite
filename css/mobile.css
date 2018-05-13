@@ -242,6 +242,8 @@ div#buoycontainer{margin-top: 11em;}}
 div#buoycontainer{margin-top: 13em;}}
 @media screen and (max-height: 320px) {
 div#buoycontainer{margin-top: 8em;}}
+@media screen and (max-height: 900px) and (max-width: 400px){
+div#buoycontainer{margin-top: 4em;}}
 
 
 
