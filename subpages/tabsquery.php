@@ -240,10 +240,10 @@ else {
 // check all model cases
 if (($row[$txlacol] == "TRUE") or ($row[$table2] == "currentspredict")
     or ($row[$table2] == "tidepredict")) {
-    $model = True;  // this buoy should have model output
+    $havemodel = True;  // this buoy should have model output
 }
 else {
-    $model = False;
+    $havemodel = False;
 }
 
 // Warning about data being out of data if most recent point is more than 3 days old
@@ -259,12 +259,12 @@ if ($datepicker=="recent") {
         $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         print "<font color='red'><br><br><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
         // Image selected, model output available, no recent data
-        if ($table != 'eng' and $table != 'wave' and $model and $datatype == 'pic') {
+        if ($table != 'eng' and $table != 'wave' and $havemodel and $datatype == 'pic') {
             print "<font color='red'><i> Model output is shown instead.</i></font>";
             $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
         }
         // Image selected, no model output available (wave or eng), no recent data
-        elseif ($model and $datatype == 'pic') {
+        elseif ($havemodel and $datatype == 'pic') {
             print "<font color='red'><i> Model output might be available for other data types.</i></font>";
         }
     }
@@ -304,7 +304,7 @@ elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata){
     passthru($command);
 }
 
-if ($datatype=="pic" && ($model or !$norecentdata)){
+if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
