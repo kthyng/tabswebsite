@@ -2,24 +2,24 @@
 var data = {
     "base" : ["Please choose from above"],
     "A": ["ven", "eng"],
-    "B": ["ven", "eng", "met", "salt"],
+    "B": ["ven", "eng", "met", "salt","sum"],
     "C": ["ven", "eng"],
-    "D": ["ven", "eng", "salt"],
+    "D": ["ven", "eng", "salt","sum"],
     "E": ["ven", "eng"],
-    "F": ["ven", "eng", "salt"],
+    "F": ["ven", "eng", "salt","sum"],
     "G": ["ven", "eng"],
-    "H": ["ven", "eng", "met"],
-    "J": ["ven", "eng", "met", "salt"],
-    "K": ["ven", "eng", "met", "salt", "wave"],
+    "H": ["ven", "eng", "met","sum"],
+    "J": ["ven", "eng", "met", "salt","sum"],
+    "K": ["ven", "eng", "met", "salt", "wave","sum"],
     "L": ["ven", "eng"],
     "M": ["ven", "eng"],
-    "N": ["ven", "eng", "met", "salt", "wave"],
+    "N": ["ven", "eng", "met", "salt", "wave","sum"],
     "P": ["ven", "eng"],
-    "R": ["ven", "eng", "salt"],
+    "R": ["ven", "eng", "salt","sum"],
     "S": ["ven", "eng"],
-    "V": ["ven", "eng", "met", "salt", "wave"],
-    "W": ["ven", "eng", "salt"],
-    "X": ["ven", "eng", "met", "salt", "wave"],
+    "V": ["ven", "eng", "met", "salt", "wave","sum"],
+    "W": ["ven", "eng", "salt","sum"],
+    "X": ["ven", "eng", "met", "salt", "wave","sum"],
     "42001": ["ndbc"],
     "42002": ["ndbc"],
     "42007": ["ndbc"],
@@ -127,6 +127,9 @@ http://jsfiddle.net/NaUAL/
         else if (valorig == "wave"){
           valnameorig = "Waves"
         }
+        else if (valorig == "sum"){
+          valnameorig = "Combined"
+        }
         else if (valorig == "ndbc"){
           valnameorig = "NDBC buoy"
         }
@@ -164,6 +167,9 @@ http://jsfiddle.net/NaUAL/
               }
               else if (val == "wave"){
                 valname = "Waves"
+              }
+              else if (val == "sum"){
+                valname = "Combined"
               }
               else if (val == "ndbc"){
                 valname = "NDBC buoy"

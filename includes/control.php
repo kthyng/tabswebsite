@@ -100,6 +100,20 @@ print "<option value='$model'>Model: $model</Option>\n";
 print "<option value='True'>True</Option>\n";
 print "<option value='False'>False</option>\n</select></td>\n";
 
+
+
+print "<td>";
+print "<Select Name=datum>";
+print "<option selected value='$datum'>Tidal datum: $datum</Option>";
+print "<option value='MHHW'>MHHW</option>";
+print "<option value='MHW'>MHW</option>";
+print "<option value='MTW'>MTW</option>";
+print "<option value='MSL'>MSL</Option>";
+print "<option value='MLW'>MLW</option>";
+print "<option value='MLLW'>MLLW</option>";
+print "</select>";
+print "</td>";
+
 print "<input NAME=Datatype TYPE=hidden value=$datatype>\n";
 // print "<input NAME=norecentdata TYPE=hidden value=$norecentdata>\n";
 // print "<input NAME=norecentdata TYPE=hidden value=$norecentdatabutmodel>\n";

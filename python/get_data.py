@@ -4,11 +4,11 @@ Or, if dstart/dend are not provided, read in previously-created daily file
 and present as table or image.
 
 example (since dstart and dend are optional)
-run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'data' --usemodel True
+run get_data.py '../tmp/tabs_F_ven_test' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'data' --usemodel 'True'
 run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
-run get_data.py '../tmp/tcoon_8770475' --dstart '2017-01-5' --dend '2017-01-5 00:00' 'pic' --usemodel False
+run get_data.py '../tmp/8770475' --dstart '2018-5-7' --dend '2018-5-12 00:00' 'pic' --usemodel 'False' --datum 'MLLW'
 '''
 
 import run_daily
@@ -32,6 +32,7 @@ parser.add_argument('datatype', type=str, help='pic or data')
 parser.add_argument('--units', type=str, help='units', default='M')
 parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "CST"', default='UTC')
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
+parser.add_argument('--datum', type=str, help='Which tidal datum to use: "MHHW", "MHW", "MTL", "MSL", "MLW", "MLLW"', default='MSL')
 args = parser.parse_args()
 
 fname = args.fname
@@ -41,6 +42,7 @@ tzname = args.tzname
 usemodel = args.usemodel
 dstart = args.dstart
 dend = args.dend
+datum = args.datum
 
 if tzname.lower() in ['utc', 'gmt']:
     tz = 'UTC'
@@ -78,7 +80,7 @@ else:
 # from daily file, only for showing table since images created in run_daily.py
 if dstart is None:
 
-    df = read.read(fname, dstart=None, dend=None, table=table, units=units, tz=tz)
+    df = read.read(fname, dstart=None, dend=None, table=table, units=units, tz=tz, datum=datum)
     dfmodelhindcast = None
     dfmodelrecent = None
     dfmodelforecast = None
@@ -86,7 +88,7 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
-    df = read.read(buoy, dstart, dend, table=table, units=units, tz=tz)
+    df = read.read(buoy, dstart, dend, table=table, units=units, tz=tz, datum=datum)
     if df is not None:  # won't work if data isn't available in this time period
         tools.write_file(df, fname)
 
@@ -117,7 +119,7 @@ else:
         if bys[buoy]['table2'] == 'tidepredict':
             # import pdb; pdb.set_trace()
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
-                                     userecent=True, tz=tz, units=units)
+                                     userecent=True, tz=tz, units=units, datum=datum)
         else:
             dfmodeltides = None
 

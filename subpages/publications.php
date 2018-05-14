@@ -46,6 +46,11 @@
     <ul style="list-style: none;">
 
     <li>
+    Thyng, K. M., &amp; Hetland, R. D. (2018). Seasonal and interannual cross-shelf transport over the Texas and Louisiana continental shelf. <i>Continental Shelf Research</i>, 160, 23-35. doi:10.1016/j.csr.2018.03.006.
+    <a href=https://www.sciencedirect.com/science/article/pii/S0278434317302509>link</a>
+    <li> <br>
+
+    <li>
     Thyng, K. M., &amp; Hetland, R. D. (2017). Texas and Louisiana coastal vulnerability and shelf connectivity. <i>Marine Pollution Bulletin</i>, Volume 116, Issues 1&ndash;2, Pages 226&ndash;233. doi:10.1016/j.marpolbul.2016.12.074.
     <a href=http://www.sciencedirect.com/science/article/pii/S0025326X16310773>link</a>
     </li> <br>

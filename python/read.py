@@ -16,21 +16,23 @@ import logging
 bys = bp.load() # load in buoy data
 
 
-def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
-         usemodel=False, userecent=True):
+def read(buoy, dstart, dend, table=None, units=None, tz='utc',
+         usemodel=False, userecent=True, datum='MSL'):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are datetime objects.
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
+
+    datum (str) can be 'MSL', 'MHHW', 'MHW', 'MLW', 'MLLW', 'MTL'; for tidal height
     '''
 
-    # import pdb; pdb.set_trace()
     # read from recent file
     if dstart is None:
         df = pd.read_table(buoy, index_col=0, parse_dates=True)
     # read in model output but not ports model output
     elif isinstance(usemodel,str):
+        # this does not catch NOAA model case for tides
         # assert isinstance(usemodel, str), \
         #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
         df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
@@ -83,11 +85,20 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     else:
         df = None
 
+
+    # Convert sea level datum from MSL to whatever user chose
+    if datum != 'MSL':  # it is 'MSL' by default
+        key = 'Water Level [m, MSL]'
+        dz = tools.datum(buoy, datum)  # finds delta z between datums
+        df[key] += dz
+        # Change column label to include new datum
+        df.rename(columns={key: key.replace('MSL', datum)}, inplace=True)
+
     return df
 
 
 def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
-         usemodel=False, userecent=True):
+         usemodel=False, userecent=True, datum='MSL'):
 
     # need table if TABS buoy
     if len(buoy) == 1:
@@ -185,8 +196,9 @@ def read_nos(buoy, dstart, dend, usemodel=False):
     '''Set up urls and then read from them to get TCOON and NOS data.
 
     Most stations have several data sources, so they are aggregated here.
-    This calls to read_tcoon_df() to do the reading and rearranging.
-    dstart and dend are datetime objects.'''
+    This calls to read_nos_df() to do the reading and rearranging.
+    dstart and dend are datetime objects.
+    '''
 
     if not usemodel:
         # tide, met, and phys data
@@ -215,10 +227,10 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
         # calculate salinity from conductivity, if available
         if 'Conductivity [mS/cm]' in df.keys():
-            if not 'AtmPr [MB]' in df.keys():
+            if not 'AtmPr [mb]' in df.keys():
                 pr = np.zeros(len(df))
             else:
-                pr = df['AtmPr [MB]']/100. - 10.1325
+                pr = df['AtmPr [mb]']/100. - 10.1325
             df['Salinity'] = gsw.SP_from_C(df['Conductivity [mS/cm]'],
                                            df['WaterT [deg C]'],
                                            pr)
@@ -238,11 +250,11 @@ def read_nos(buoy, dstart, dend, usemodel=False):
 
 
 def read_nos_df(dataname):
-    '''Read in individual tcoon datasets and arrange variables.'''
+    '''Read in individual tcoon/nos datasets and arrange variables.'''
 
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
     if 'type=met' in dataname:
-        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
+        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [mb]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
         df = df.drop([' VIS'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {'East [m/s]': 2, 'North [m/s]': 2}
@@ -255,7 +267,7 @@ def read_nos_df(dataname):
         df['North [m/s]'] = df[' WINDSPEED']*np.sin(np.deg2rad(theta))
 
     elif 'product=water_level' in dataname:
-        names = ['Water Level [m]']
+        names = ['Water Level [m, MSL]']
         df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
@@ -270,7 +282,7 @@ def read_nos_df(dataname):
         rdict = {}
 
     elif 'prediction' in dataname:  # tidal height prediction
-        names = ['Water Level [m]']
+        names = ['Water Level [m, MSL]']
         # dictionary for rounding decimal places
         rdict = {}
 
@@ -349,7 +361,7 @@ def read_ndbc_df(dataname):
         query = dataname[0]; engine = dataname[1]
         df = pd.read_sql_query(query, engine, index_col=['obs_time'])
         df = df.drop(['station', 'date', 'time', 'windgust2'], axis=1)
-        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
+        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AtmPr [mb]', 'AirT [deg C]', 'Dew pt [deg C]', 'WaterT [deg C]', 'RelH [%]', 'Wave Ht [m]', 'Wave Pd [s]', 'East [m/s]', 'North [m/s]']
         df[df == -99.0] = np.nan  # replace missing values
 
     elif isinstance(dataname, str):  # go to ndbc
@@ -373,7 +385,7 @@ def read_ndbc_df(dataname):
             df.rename(columns={'WDIR': 'winddir', 'WSPD': 'windspeed'}, inplace=True)
         else:
             df.rename(columns={'WD': 'winddir', 'WSPD': 'windspeed'}, inplace=True)
-        names = ['Dir from [deg T]', 'Speed [m/s]', 'Gust [m/s]', 'AtmPr [MB]', 'AirT [deg C]', 'WaterT [deg C]', 'Dew pt [deg C]', 'East [m/s]', 'North [m/s]']
+        names = ['Dir from [deg T]', 'Speed [m/s]', 'Gust [m/s]', 'AtmPr [mb]', 'AirT [deg C]', 'WaterT [deg C]', 'Dew pt [deg C]', 'East [m/s]', 'North [m/s]']
 
     rdict = {'East [m/s]': 2, 'North [m/s]': 2}
 
@@ -434,7 +446,7 @@ def read_tabs(table, buoy, dstart, dend):
         rdict = {}
 
     elif table == 'met':
-        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [MB]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
+        names = ['East [m/s]', 'North [m/s]', 'AirT [deg C]', 'AtmPr [mb]', 'Gust [m/s]', 'Comp [deg M]', 'Tx', 'Ty', 'PAR ', 'RelH [%]', 'Speed [m/s]', 'Dir from [deg T]']
         df['Speed [m/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
         df['Dir from [deg T]'] = 90 - np.rad2deg(np.arctan2(-df['vnorth'], -df['veast']))
         rdict = {'Speed [m/s]': 2, 'Dir from [deg T]': 0}

@@ -16,9 +16,11 @@ $table = isset($_GET["table"]) ? $_GET["table"] : "";
 $datepicker = isset($_GET["datepicker"]) ? $_GET["datepicker"] : "";
 $tz = isset($_GET["tz"]) ? $_GET["tz"] : "";
 $units = isset($_GET["units"]) ? $_GET["units"] : "";
+$datum = isset($_GET["datum"]) ? $_GET["datum"] : "";
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
+if (! $datum) {$datum = 'MSL';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -104,12 +106,24 @@ print <<<_HTML_
 <br>
 <br>
 <TR><TD><B>Output Format: </B></TD><TD>
-<input type=radio name="Datatype" value="pic" checked>Graphic
-<input type=radio name="Datatype" value="data">Data table
+<input type=radio name="Datatype" value="pic" checked>Graphic&nbsp;
+<input type=radio name="Datatype" value="data">Data table&nbsp;
 <input type=radio name="Datatype" value="download">Download
 </TD></TR>
 <TR><TD><br></TD></TR>
 
+<tr>
+<TD><B>Timezone:&nbsp; </b></td>
+<td>
+<Select Name="tz">
+<option selected value=$tz>$tzname</Option>
+<option value='UTC'>UTC</Option>
+<option value='US/Central'>Local</option>
+<option value='Etc/GMT+6'>CST</option>
+</select>
+</td>
+</tr>
+<TR><TD><br></TD></TR>
 
 
 <TR>
@@ -121,31 +135,36 @@ print <<<_HTML_
 <option value='E'>English</option>
 </select>
 </td>
-
-<TD>Timezone:&nbsp;
-<Select Name="tz">
-<option selected value=$tz>$tzname</Option>
-<option value='UTC'>UTC</Option>
-<option value='US/Central'>Local</option>
-<option value='Etc/GMT+6'>CST</option>
-</select>
-</td><tr>
+<tr>
 
 
 <TR>
 <td><b>&nbsp;for graphic:</b></td>
 <TD>Include model:&nbsp;
-<input type=radio name="model" value=False checked>No
-<input type=radio name="model" value=True>Yes
+<input type=radio name="model" value="False" checked>No
+<input type=radio name="model" value="True">Yes
 </td>
 </TR>
 
-<TR><TD><br></TD></TR>
-
 
 <TR>
-<TD></TD><TD><i>Archives are available on the <a href="buoy_status.php">status</a> page.</i></TD>
-</TR>
+<td><b>&nbsp;for tidal heights:</b> (if available) &nbsp; &nbsp;</td>
+<TD><a href="https://tidesandcurrents.noaa.gov/datum_options.html">Tidal Datum:</a>&nbsp;
+<Select Name="datum">
+<option selected value=$datum>$datum</Option>
+<option value='MHHW'>MHHW</option>
+<option value='MHW'>MHW</option>
+<option value='MTW'>MTW</option>
+<option value='MSL'>MSL</Option>
+<option value='MLW'>MLW</option>
+<option value='MLLW'>MLLW</option>
+</select>
+</td>
+<tr>
+
+
+<TR><TD><br></TD></TR>
+<TR><TD><br></TD></TR>
 
 <TR>
 <!-- <TD><input type=reset name="Reset" Value="Reset Fields"></TD> -->
@@ -154,6 +173,11 @@ print <<<_HTML_
 </TABLE>
 </form>
 <br><br>
+
+
+<TR>
+<TD></TD><TD><i>Archives are available on the <a href="buoy_status.php">buoy information</a> page. You can also <a href="query_notes.php">build your own database query</a>.</i></TD>
+</TR>
 
 _HTML_;
 

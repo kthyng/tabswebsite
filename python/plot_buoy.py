@@ -866,7 +866,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
-        add_var_2units(axes[2], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[2], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var(axes[3], df, 'RelH [%]', 'Relative Humidity [%]',
@@ -913,7 +913,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'ndbc':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric\npressure [mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -933,7 +933,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'ndbc-nowave':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -950,7 +950,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which in ['ndbc-met', 'nos-met']:
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -960,13 +960,16 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        df3=df3, dolegend=True, tlims=tlims)
 
     elif which == 'tcoon-tide':
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Height [m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[0], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, dolegend=True)
 
     elif which == 'tcoon' or which == 'nos':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric pressure\n[MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric pressure\n[mb]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -979,7 +982,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dolegend = True
         else:
             dolegend = False
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[3], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=dolegend)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
@@ -994,7 +1000,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         else:
             dolegend = True
         # df4 is an optional input containing NOAA tidal height prediction
-        add_var_2units(axes[0], df, 'Water Level [m]', 'Sea surface height [m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[0], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=dolegend)
         add_var_2units(axes[1], df, 'WaterT [deg C]',
@@ -1006,7 +1015,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     elif which == 'nos-cond':
         add_currents(axes[0], df, 'wind', 'East [m/s]', 'North [m/s]', df1=df1,
                      df2=df2, df3=df3, tlims=tlims)
-        add_var_2units(axes[1], df, 'AtmPr [MB]', 'Atmospheric\npressure [MB]',
+        add_var_2units(axes[1], df, 'AtmPr [mb]', 'Atmospheric\npressure [MB]',
                        'mb2hg', '[inHg]', ymaxrange=[1000,1060], df1=df1,
                        df2=df2, df3=df3, tlims=tlims)
         add_var_2units(axes[2], df, 'AirT [deg C]',
@@ -1015,7 +1024,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                         ymaxrange=[-25,40], df1=df1, df2=df2,
                        df3=df3, tlims=tlims)
         # df4 is an optional input containing NOAA tidal height prediction
-        add_var_2units(axes[3], df, 'Water Level [m]', 'Sea surface height\n[m, MSL]',
+        # will be something like 'Water Level [m, MSL]'
+        sshcol = [col for col in df.columns if 'Water Level' in col][0]
+        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+        add_var_2units(axes[3], df, sshcol, sshlabel,
                        'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
                        dolegend=True)
         add_var_2units(axes[4], df, 'WaterT [deg C]',

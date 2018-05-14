@@ -68,10 +68,12 @@ $datatype=$_GET["Datatype"];
 $tz=$_GET["tz"];
 $units = $_GET["units"];
 $model = $_GET["model"];
+$datum = $_GET["datum"];
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 if (! $model) {$model = 'False';}
+if (! $datum) {$datum = 'MSL';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -176,11 +178,11 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'"');
+        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'"');
     }
     # checks for Mac and assumes Kristen's mac
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'"');
     }
     chmod($tempfile, 0644);
 
@@ -238,10 +240,10 @@ else {
 // check all model cases
 if (($row[$txlacol] == "TRUE") or ($row[$table2] == "currentspredict")
     or ($row[$table2] == "tidepredict")) {
-    $model = True;  // this buoy should have model output
+    $havemodel = True;  // this buoy should have model output
 }
 else {
-    $model = False;
+    $havemodel = False;
 }
 
 // Warning about data being out of data if most recent point is more than 3 days old
@@ -257,12 +259,12 @@ if ($datepicker=="recent") {
         $norecentdata = True;  # flag to use for rest of page for when data is not up-to-date
         print "<font color='red'><br><br><i>Data is not coming in right now for buoy ".$Buoyname.".</i></font>";
         // Image selected, model output available, no recent data
-        if ($table != 'eng' and $table != 'wave' and $model and $datatype == 'pic') {
+        if ($table != 'eng' and $table != 'wave' and $havemodel and $datatype == 'pic') {
             print "<font color='red'><i> Model output is shown instead.</i></font>";
             $norecentdatabutmodel = True;  # flag to use for rest of page for when data is not up-to-date but model is available
         }
         // Image selected, no model output available (wave or eng), no recent data
-        elseif ($model and $datatype == 'pic') {
+        elseif ($havemodel and $datatype == 'pic') {
             print "<font color='red'><i> Model output might be available for other data types.</i></font>";
         }
     }
@@ -302,7 +304,7 @@ elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata){
     passthru($command);
 }
 
-if ($datatype=="pic" && ($model or !$norecentdata)){
+if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
     }
