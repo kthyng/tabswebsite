@@ -511,7 +511,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         #         'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_frc_f_previous_day.nc',
         #         'http://copano.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc',
         #         'http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_frc_f_previous_day.nc']
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
     ibuoy = bp.station(buoy)  # get location in stations file for buoy
@@ -679,7 +679,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         # if which == 'met':
         #     df['RelH [%]'] = dsf['Qair'].sel(time=slice(dstart, dend)).isel(eta_rho=j, xi_rho=i).to_dataframe()['Qair'].resample('60T').interpolate()
 
-        df['AtmPr [MB]'] = ds['Pair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
+        df['AtmPr [mb]'] = ds['Pair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
         df['AirT [deg C]'] = ds['Tair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
         df['RelH [%]'] = 100*ds['Qair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
 
