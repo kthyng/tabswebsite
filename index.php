@@ -89,6 +89,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 </tr>
 
 <?php
+print "<tr><td></td><td><i>TABS</i></td></tr>";  // Label before TABS buoys
 
 // read in buoy list from csv file with buoy info
 $csv = array_map("str_getcsv", file("includes/buoys.csv"));
