@@ -14,14 +14,17 @@ bys = bp.load() # load in buoy data
 tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
 
 
-def remake_hdf():
+def remake_hdf(buoys=None):
     '''Remake HDF files from text files if messed up.
 
     Overwrites existing HDF files.
     '''
 
+    if buoys is None:
+        buoys = bys.keys()
+
     # loop through buoys
-    for buoy in bys.keys():
+    for buoy in buoys:
 
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
@@ -34,8 +37,7 @@ def remake_hdf():
                 fname = path.join('..', 'daily', buoy + '_all')
             # read from text file, write to hdf
             df = pd.read_table(fname, na_values=-999, parse_dates=True, index_col=0)
-            df.astype(float).tz_localize(None).to_hdf(fname + '.hdf', key='df', mode='w',
-                                        format='table', complib='zlib')#, dropna=True)
+            tools.write_file(df, fname, filetype='hdf', mode='w', append=False)
 
 
 def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
@@ -48,7 +50,7 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
 
     # bring data in file up through yesterday. This way files are
     # consistent regardless of what time of day script is run.
-    dend = pd.Timestamp('now', tz='utc').normalize()
+    dend = pd.Timestamp('now', tz='UTC').normalize()
     # file write flag
     mode = 'w'
     append = False  # for hdf file
@@ -60,7 +62,7 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
         fname = path.join('..', 'daily', buoy + '_all')
 
     # if buoy is inactive and its "all" file exists, don't read
-    if not bys[buoy]['active'] and path.exists(fname):
+    if buoy in bys.keys() and not bys[buoy]['active'] and path.exists(fname):
         return
 
     # if file already exists, overwrite dstart with day after day from last line of file
@@ -93,6 +95,12 @@ if __name__ == "__main__":
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
 
+        if 'ports' not in tables:
+            continue
+
         for table in tables:  # loop through tables for each buoy
             if 'predict' not in table:  # don't use tables for model predictions
-                readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='utc'))
+                readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
+        # for PORTS buoys, also read in full dataset
+        if 'ports' in tables:
+            readwrite(buoy + '_full', table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))

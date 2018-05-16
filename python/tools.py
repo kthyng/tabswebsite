@@ -209,7 +209,7 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w', append=Fa
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
     if filetype == 'hdf':
-        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode,
+        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
                                     format='table', complib='zlib', append=append)#, dropna=True)
     elif filetype == 'txt':
         if compression:

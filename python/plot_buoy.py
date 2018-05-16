@@ -341,7 +341,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None,
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, df4=None, tlims=None, dolegend=False,
                    add0=False, doebbflood=False, dodepth=False, dodepthm=np.nan,
-                   doangle=False):
+                   doangle=False, dodistance=False):
     '''Plot with units on both left and right sides of plot.
 
     dodepth should be a depth in meters if you want to write on the sensor depth.
@@ -384,9 +384,10 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     if doebbflood:
         ax1.text(0.02, 0.95, 'FLOOD', fontsize=10, transform=ax1.transAxes)
         ax1.text(0.02, 0.015, 'EBB', fontsize=10, transform=ax1.transAxes)
-    # add rotation angle
-    if not doangle == False:
+    if not doangle == False:  # add rotation angle onto plot
         ax1.text(0.9, 0.95, str(doangle) + '˚T', fontsize=10, transform=ax1.transAxes)
+    if not dodistance == False:  # add distance from pier onto plot
+        ax1.text(0.225, 0.95, 'Distance from pier: %2.1fm' % dodistance, color='k', fontsize=10, transform=ax1.transAxes)
     if not dodepth == False:  # data
         ax1.text(0.55, 0.95, 'Depth: %2.1fm' % dodepth, color='k', fontsize=10, transform=ax1.transAxes)
     if not np.isnan(dodepthm):  # model
@@ -1042,13 +1043,19 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
+        if ~np.isnan(bys[buoy]['Distance to center of bin [m]']):
+            dodistance = bys[buoy]['Distance to center of bin [m]']  # label it on plot
+        else:
+            dodistance = False
         add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
                        r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
                        'cps2kts', '[knots]', ymaxrange=[-150,150],
                        df4=df4,
                        dolegend=True, add0=True, tlims=tlims, doebbflood=True,
                        doangle=bys[buoy]['angle'],
-                       dodepth=bys[buoy]['depth'], dodepthm=bys[buoy]['depth_model'])
+                       dodepth=bys[buoy]['Depth to center of bin [m]'],
+                       dodepthm=bys[buoy]['Model depth to center of bin [m]'],
+                       dodistance=dodistance)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None or df4 is not None and tlims is not None:

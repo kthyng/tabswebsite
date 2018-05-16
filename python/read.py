@@ -16,11 +16,11 @@ import logging
 bys = bp.load() # load in buoy data
 
 
-def read(buoy, dstart, dend, table=None, units=None, tz='utc',
+def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
          usemodel=False, userecent=True, datum='MSL'):
     '''Calls appropriate read function for each table type.
 
-    dstart and dend are datetime objects.
+    dstart and dend are pd.Timestamp objects.
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
 
@@ -36,7 +36,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
         # assert isinstance(usemodel, str), \
         #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
         df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
-    elif bys[buoy]['inmysql']:
+    elif buoy in bys.keys() and bys[buoy]['inmysql']:
         # Call general read function to distribute to correct buoy read function
         df = read_buoy(buoy, dstart, dend, table=table, units=units,
                        tz=tz, userecent=userecent)
@@ -56,16 +56,16 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
                 usefile = False
                 # if dstart > when data in fname ends, just go to the else on the next while loop
                 if df is not None and not df.empty:
-                    date = df.index[-1].tz_localize('utc').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
+                    date = df.index[-1].tz_localize('UTC').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
             else:
                 td = pd.Timedelta('31 days')
-                if 'ports' in bys[buoy]['table1'] and usemodel:
+                if buoy in bys.keys() and 'ports' in bys[buoy]['table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
                 # need to make sure dates are all in same time zone
                 if date.tzinfo.zone == dend.tzinfo.zone:  # if time zones the same, don't change either
                     daystoread = min(td, dend-date)
                 else:  # convert dend to utc
-                    daystoread = min(td, dend.tz_convert('utc')-date)
+                    daystoread = min(td, dend.tz_convert('UTC')-date)
                 dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
                                    tz=tz, usemodel=usemodel, userecent=userecent)
                 if df is not None:
@@ -77,7 +77,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='utc',
     # return None instead of just header if no data for time period
     if df is not None and not df.empty:
         df.index.name = 'Dates [UTC]'
-        df = df.tz_localize('utc')  # all files are read in utc
+        df = df.tz_localize('UTC')  # all files are read in utc
         df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
         if dstart is not None:
             df = df.loc[(df.index > dstart) & (df.index < dend)]
@@ -105,10 +105,14 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
         assert table is not None, 'need to input table when using TABS buoy'
 
     # if/elif statements checking which table type buoy has
-    if 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
+    # ports check more complicated in case reading in full data
+    if 'ports' in bys[buoy.split('_')[0]]['table1']:
+        if 'full' in buoy:
+            df = read_ports_depth(buoy, dstart, dend)
+        else:
+            df = read_ports(buoy, dstart, dend, usemodel=usemodel)
+    elif 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
         df = read_nos(buoy, dstart, dend, usemodel=usemodel)
-    elif 'ports' in bys[buoy]['table1']:
-        df = read_ports(buoy, dstart, dend, usemodel=usemodel)
     elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
         df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
@@ -128,6 +132,107 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
             df = read_tabs(table, buoy, dstart, dend)
 
     return df
+
+
+def read_ports_depth(buoy, dstart, dend):
+    '''Set up urls and read from them to get PORTS currents with depth or cross channel.'''
+
+    buoy = buoy.split('_')[0]  # remove '_full' on buoyname
+
+    url = 'https://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&request=GetObservation&version=1.0.0&observedProperty=sea_water_speed&direction_of_sea_water_velocity&offering=urn:ioos:station:NOAA.NOS.CO-OPS:' + buoy + '&responseFormat=text/csv&eventTime='
+    dst = pd.Timestamp(dstart)
+    den = pd.Timestamp(dend)
+    url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ')
+    # while dst < pd.Timestamp(dend):
+        # den = dst + datedelta.MONTH - pd.Timedelta('15 minutes')
+
+    # along-channel direction
+    diralong = 90 - bys[buoy]['angle']
+    if diralong < 0:
+        diralong += 360
+
+    df = read_ports_depth_df(url, diralong)
+
+    return df
+
+
+def read_ports_depth_df(dataname, diralong):
+
+    # read in data for month
+    # first check there is data
+    # d1 = pd.read_csv(url + dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ'))
+    # if len(d1) < 10:  # no data, so go to next datetime
+    #     dst += datedelta.MONTH
+    #     continue
+    # print(dataname)
+    try:
+        df = pd.read_csv(dataname, parse_dates=True, index_col=4)
+    except:
+        return None
+    # MAKE SURE TO INCLUDE TOP OF BIN AND CENTER OF BIN DEPTHS
+
+    # # pivot to get times as rows and depths as columns
+    # d = pd.pivot_table(d, index=['bin_distance (m)', 'date_time'] )
+    # depths = d.index.get_level_values(0).drop_duplicates().get_values()
+
+    # initialize columns
+    # if not 'g06010: Along [cm/s], depth ' + str(depths[0]) + ' [m]' in df.columns:
+    # for depth in depths:
+    #     df['g06010: Along [cm/s], depth ' + str(depth) + ' [m]'] = np.nan
+    #     df['g06010: Across [cm/s], depth ' + str(depth) + ' [m]'] = np.nan
+    #     df['g06010: WaterT [deg C]'] = np.nan
+
+    # # calculations
+    # for depth in depths:
+
+    theta = df['direction_of_sea_water_velocity (degree)'].copy()
+    # convert to math angles
+    theta = 90 - theta
+    theta[theta<0] += 360
+
+    # calculate u and v
+    east = df['sea_water_speed (cm/s)']*np.cos(np.deg2rad(theta))
+    north = df['sea_water_speed (cm/s)']*np.sin(np.deg2rad(theta))
+
+    # calculate along and across velocity
+    df['Along [cm/s]'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
+    df['Across [cm/s]'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
+    # d['WaterT [deg C]'] = d['sea_water_temperature (C)']
+    # dst += datedelta.MONTH
+
+    if df['orientation'][0] == 'downwardLooking':
+        dz = df['bin_size (m)'][0]
+        # add depth information for center of bins
+        df['Depth to center of bin [m]'] = df['bin_distance (m)'] + dz/2
+        df.rename(columns={'bin_distance (m)': 'Depth to top of bin [m]'}, inplace=True)
+        # change depths to negative
+        df['Depth to center of bin [m]'] = -df['Depth to center of bin [m]']
+        df['Depth to top of bin [m]'] = -df['Depth to top of bin [m]']
+
+    elif df['orientation'][0] == 'sidewaysLooking':
+        df['Depth to center of bin [m]'] = df['sensor_depth (m)']
+        df.rename(columns={'bin_distance (m)': 'Distance to center of bin [m]'}, inplace=True)
+        # change depths to negative
+        df['Depth to center of bin [m]'] = -df['Depth to center of bin [m]']
+
+
+    df.rename(columns={'sea_water_temperature (C)': 'WaterT [deg C]',
+                           'sea_water_speed (cm/s)': 'Speed [cm/s]',
+                           'direction_of_sea_water_velocity (degree)': 'Dir [deg T]'}, inplace=True)
+
+    # change this to drop instead
+    df = df.drop(['station_id','sensor_id','latitude (degree)',
+                   'longitude (degree)','sensor_depth (m)',
+                   'platform_orientation (degree)',
+                   'platform_pitch_angle (degree)',
+                   'platform_roll_angle (degree)','orientation',
+                   'sampling_rate (Hz)','reporting_interval (s)',
+                   'processing_level','bin_size (m)','first_bin_center (m)',
+                   'number_of_bins','bin (count)'], axis=1)
+
+    df.index.rename('Dates [UTC]', inplace=True)
+    return df
+
 
 
 def read_ports(buoy, dstart, dend, usemodel=False):
