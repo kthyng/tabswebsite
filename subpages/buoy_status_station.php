@@ -150,6 +150,15 @@
             print "<tr><td>&bull; Currents</td>";
             $url = "../daily/".$buoy."_all";
             print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            // either cross-channel or with depth
+            $colsideways = array_search("Distance to center of bin [m]", $header);
+            echo $row[$colsideways];
+            if (is_numeric($row[$colsideways])) {
+                print "<tr><td>&bull; Cross-channel ADCP data</td>";}
+            else {
+                print "<tr><td>&bull; ADCP data with depth</td>";}
+            $url = "../daily/".$buoy."_full_all";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "currentspredict") == 0) {
             print "<tr><td>&bull; NOAA-modeled currents</td></tr>";
