@@ -184,7 +184,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # if data is None, use model output (if model output not all None)
     if (df is None or east not in df.keys() or df[east].isnull().all()) and not all([dft is None for dft in [df1, df2, df3]]):
         # now model output saved into df
-        df = pd.concat([df1, df2, df3])  # in case there is a df3
+        df = pd.concat([df1, df2, df3], sort=False)  # in case there is a df3
         color = c2
     # this catches when TCOON data is temporarily unavailable and model output is not available
     if (df is None or east not in df.keys() or df[east].isnull().all()) and all([dft is None for dft in [df1, df2, df3]]):
@@ -194,7 +194,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # if data is not within input time range, use model output instead
     if tlims is not None and (df1 is not None or df2 is not None or df3 is not None):
         if df['idx'][-1] < tlims[0] or df['idx'][0] > tlims[-1]:
-            df = pd.concat([df1, df2, df3])  # in case there is a df3
+            df = pd.concat([df1, df2, df3], sort=False)  # in case there is a df3
             color = c2
 
     # arrows with no heads for lines
