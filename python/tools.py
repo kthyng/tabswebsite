@@ -11,6 +11,29 @@ from numpy import sign, loadtxt
 from os import system
 
 
+def read(fname, type, lastlineonly=False):
+    '''Read in from existing file to dataframe.
+
+    To only read in last line of file, set `lastlineonly=True`.
+    '''
+
+    if lastlineonly:  # only read in last line date of file
+
+        if type == 'hdf':
+            df = pd.read_hdf(fname + '.hdf', start=-1).index[0]
+        else:
+            df = pd.Timestamp(open(fname).readlines()[-1][:19])
+
+    else:
+
+        if 'hdf' in fname:
+            df = pd.read_hdf(fname, na_values=-999, parse_dates=True, index_col=0)
+        else:
+            df = pd.read_table(fname, na_values=-999, parse_dates=True, index_col=0)
+
+    return df
+
+
 def datum(buoy, datum):
     '''Query NOAA website for station tidal datum change.
 
@@ -196,7 +219,7 @@ def present(df):
         print(df.tz_localize(None).to_html())
 
 
-def write_file(df, fname, filetype='txt', compression=False, mode='w', append=False):
+def write_file(df, fname, filetype='txt', mode='w', append=False):
     '''Write text file of data.
 
     mode is 'w' to write a new file and 'a' to append to existing file.'''
@@ -209,13 +232,8 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w', append=Fa
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
     if filetype == 'hdf':
-        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode,
+        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
                                     format='table', complib='zlib', append=append)#, dropna=True)
     elif filetype == 'txt':
-        if compression:
-            df.tz_localize(None).to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
-                      quoting=QUOTE_NONE,  escapechar='', compression='gzip',
-                      mode=mode, header=header)
-        else:
-            df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
-                      quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)
+        df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
+                  quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)

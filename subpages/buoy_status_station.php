@@ -111,83 +111,101 @@
         if (strcmp($row[$col], "ven") == 0) {
             print "<tr><td>&bull; Currents</td>";
             $url = "../daily/tabs_".$buoy."_ven_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "salt") == 0) {
             print "<tr><td>&bull; Water temperature, Salinity</td>";
             $url = "../daily/tabs_".$buoy."_salt_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "met") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Relative humidity</td>";
             $url = "../daily/tabs_".$buoy."_met_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "wave") == 0) {
             print "<tr><td>&bull; Wave height, Wave period</td>";
             $url = "../daily/tabs_".$buoy."_wave_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "ndbc") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Relative humidity, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Wave height, Wave period</td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
         }
         elseif (strcmp($row[$col], "ndbc-met") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "ndbc-nowave") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
         }
         elseif (strcmp($row[$col], "ports") == 0) {
             print "<tr><td>&bull; Currents</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
-        }
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            // either cross-channel or with depth
+            $colsideways = array_search("Distance to center of bin [m]", $header);
+            // echo $row[$colsideways];
+            // adcp is sideways if has a number in this place
+            if (is_numeric($row[$colsideways])) {
+                print "<tr><td>&bull; Cross-channel ADCP data</td>";
+                $url = "../daily/".$buoy."_full_all";
+                print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            }
+            // a few stations don't have this data
+            elseif (strcmp($buoy, "ps0201") == 0 or strcmp($buoy, "ps0301") == 0 or strcmp($buoy, "ps0401") == 0) {
+                } //nothing for these buoys
+            // adcp is with depth if made it to this point
+            else {
+                print "<tr><td>&bull; ADCP data with depth</td>";
+                $url = "../daily/".$buoy."_full_all";
+                print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
+                }
+            }
         elseif (strcmp($row[$col], "currentspredict") == 0) {
             print "<tr><td>&bull; NOAA-modeled currents</td></tr>";
         }
         elseif (strcmp($row[$col], "tcoon") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Sea surface height</td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
         }
         elseif (strcmp($row[$col], "tcoon-tide") == 0) {
             print "<tr><td>&bull; Sea surface height</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "nos") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Sea surface height</td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
         }
         elseif (strcmp($row[$col], "nos-met") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
         }
         elseif (strcmp($row[$col], "nos-water") == 0) {
             print "<tr><td>&bull; Sea surface height</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
         }
         elseif (strcmp($row[$col], "nos-cond") == 0) {
             print "<tr><td>&bull; Wind, Atmospheric pressure, Air temp</td>";
             $url = "../daily/".$buoy."_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             print "<tr><td>&bull; Sea surface height</td></tr>";
             print "<tr><td>&bull; Water temperature</td></tr>";
             print "<tr><td>&bull; Salinity</td></tr>";

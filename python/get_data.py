@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('fname', type=str, help='file name for either reading in or for saving to')
 parser.add_argument('--dstart', type=str, help='dstart', default=None)
 parser.add_argument('--dend', type=str, help='dend', default=None)
-parser.add_argument('datatype', type=str, help='pic or data')
+parser.add_argument('datatype', type=str, help='pic or data or download')
 parser.add_argument('--units', type=str, help='units', default='M')
 parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "CST"', default='UTC')
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
@@ -75,6 +75,10 @@ if 'tabs_' in fname:  # only need table name for tabs
 else:
     buoy = fname.split('/')[-1].split('_')[0]
     table = bys[buoy]['table1']
+
+# force the use of metric units if making a plot since both units shown anyway
+if datatype == 'pic':
+    units = 'M'
 
 ## Read in data ##
 # from daily file, only for showing table since images created in run_daily.py

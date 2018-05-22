@@ -123,7 +123,7 @@ def add_r2(ax, df, dfs, key, N=0.05):
     if df is not None and sum([dft is not None for dft in dfs]) > 0:
     # if df is not None and (df1 is not None or df2 is not None or df3 is not None):
         # https://github.com/pandas-dev/pandas/issues/14297
-        dfnew = pd.concat(dfs)  # combine model output
+        dfnew = pd.concat(dfs, sort=False)  # combine model output
         # interpolate on union of old and new index
         dfnew = dfnew.reindex(dfnew.index.union(df.index)).interpolate(method='time')
         # reindex to the new index
@@ -180,11 +180,11 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # TCOON has too high frequency information to plot nicely
     if df is not None and (df.index[1] - df.index[0]).seconds/60. < 30:
         # want 30 min
-        df = df.resample('30T').asfreq()
+        df = df.resample('30T').mean()  # was .asfreq()
     # if data is None, use model output (if model output not all None)
     if (df is None or east not in df.keys() or df[east].isnull().all()) and not all([dft is None for dft in [df1, df2, df3]]):
         # now model output saved into df
-        df = pd.concat([df1, df2, df3])  # in case there is a df3
+        df = pd.concat([df1, df2, df3], sort=False)  # in case there is a df3
         color = c2
     # this catches when TCOON data is temporarily unavailable and model output is not available
     if (df is None or east not in df.keys() or df[east].isnull().all()) and all([dft is None for dft in [df1, df2, df3]]):
@@ -194,7 +194,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # if data is not within input time range, use model output instead
     if tlims is not None and (df1 is not None or df2 is not None or df3 is not None):
         if df['idx'][-1] < tlims[0] or df['idx'][0] > tlims[-1]:
-            df = pd.concat([df1, df2, df3])  # in case there is a df3
+            df = pd.concat([df1, df2, df3], sort=False)  # in case there is a df3
             color = c2
 
     # arrows with no heads for lines
@@ -341,7 +341,7 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None,
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
                    df2=None, df3=None, df4=None, tlims=None, dolegend=False,
                    add0=False, doebbflood=False, dodepth=False, dodepthm=np.nan,
-                   doangle=False):
+                   doangle=False, dodistance=False):
     '''Plot with units on both left and right sides of plot.
 
     dodepth should be a depth in meters if you want to write on the sensor depth.
@@ -384,9 +384,10 @@ def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
     if doebbflood:
         ax1.text(0.02, 0.95, 'FLOOD', fontsize=10, transform=ax1.transAxes)
         ax1.text(0.02, 0.015, 'EBB', fontsize=10, transform=ax1.transAxes)
-    # add rotation angle
-    if not doangle == False:
+    if not doangle == False:  # add rotation angle onto plot
         ax1.text(0.9, 0.95, str(doangle) + '˚T', fontsize=10, transform=ax1.transAxes)
+    if not dodistance == False:  # add distance from pier onto plot
+        ax1.text(0.225, 0.95, 'Distance from pier: %2.1fm' % dodistance, color='k', fontsize=10, transform=ax1.transAxes)
     if not dodepth == False:  # data
         ax1.text(0.55, 0.95, 'Depth: %2.1fm' % dodepth, color='k', fontsize=10, transform=ax1.transAxes)
     if not np.isnan(dodepthm):  # model
@@ -1042,17 +1043,28 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
-        add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
-                       r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
-                       'cps2kts', '[knots]', ymaxrange=[-150,150],
-                       df4=df4,
-                       dolegend=True, add0=True, tlims=tlims, doebbflood=True,
-                       doangle=bys[buoy]['angle'],
-                       dodepth=bys[buoy]['depth'], dodepthm=bys[buoy]['depth_model'])
+        if ~np.isnan(bys[buoy]['Distance to center of bin [m]']):
+            dodistance = bys[buoy]['Distance to center of bin [m]']  # label it on plot
+        else:
+            dodistance = False
+
+        if buoy == 'cc0101':  # this buoy is on the shelf and is not along-channel
+            add_currents(axes[0], df, 'water', 'Along [cm/s]', 'Across [cm/s]',
+                         df1=df1, df2=df2, df3=df3, tlims=tlims)
+        else:  # all other ports buoys
+            add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
+                           r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
+                           'cps2kts', '[knots]', ymaxrange=[-150,150],
+                           df4=df4,
+                           dolegend=True, add0=True, tlims=tlims, doebbflood=True,
+                           doangle=bys[buoy]['angle'],
+                           dodepth=bys[buoy]['Depth to center of bin [m]'],
+                           dodepthm=bys[buoy]['Model depth to center of bin [m]'],
+                           dodistance=dodistance)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None or df4 is not None and tlims is not None:
-        dfm = pd.concat([df1, df2, df3, df4])
+        dfm = pd.concat([df1, df2, df3, df4], sort=False)
 
         if df is None:  # if no data
             df = dfm

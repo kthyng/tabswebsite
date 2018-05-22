@@ -89,6 +89,7 @@ The date and time at each station indicates the end of the three-hour average.<b
 </tr>
 
 <?php
+print "<tr><td></td><td><i>TABS</i></td></tr>";  // Label before TABS buoys
 
 // read in buoy list from csv file with buoy info
 $csv = array_map("str_getcsv", file("includes/buoys.csv"));
@@ -158,7 +159,7 @@ foreach ($blet as $f) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>PORTS</i></td></tr>";
     }
-    else if ($f == "mg0101") {
+    else if ($f == "cc0401") {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>TCOON</i></td></tr>";  // Label between PORTS and TCOON buoys
     }
