@@ -48,7 +48,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         df = pd.DataFrame()
         # check that we are within normal data frequency
         while date + pd.Timedelta('60 minutes') < dend:
-            print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
+            # print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
             # # if we are using data, dend cannot be in the future
             # dend = min(dend, pd.Timestamp('now', tz='utc'))
             if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
