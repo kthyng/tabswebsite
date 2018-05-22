@@ -90,7 +90,6 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
                 lastrows.append(tools.read(fname, Type, lastlineonly=True))
             # if can't get last row, remake file
             except:
-                import pdb; pdb.set_trace()
                 logging.warning('Could not access existing file %s of type %s. Will remake.' % (fname, Type))
                 # try other type of files to remake this file if needed
                 othertype = [temp for temp in Types if temp != Type]
@@ -105,7 +104,6 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
 
         # if last rows are not the same, remake shorter file
         if not lastrows[0] == lastrows[1]:
-            import pdb; pdb.set_trace()
             lastrow = lastrows[0]; lastrow2 = lastrows[1]
             Type = Types[0]; Type2 = Types[1]
             if lastrow < lastrow2:
@@ -121,7 +119,6 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
         dstart = tools.read(fname, Type, lastlineonly=True).normalize().tz_localize('UTC') + pd.Timedelta('1 days')
         mode = 'a'  # overwrite write mode
         append = True  # overwrite append mode for hdf
-    # import pdb; pdb.set_trace()
     df = read.read(buoy, dstart, dend, table=table, units='M', tz='UTC',
                    usemodel=False, userecent=False)
 
@@ -131,7 +128,6 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
             try:
                 tools.write_file(df, fname, filetype=Type, mode=mode, append=append)
             except:
-                import pdb; pdb.set_trace()
                 logging.warning('Could not write to file %s of type %s. Will remake.' % (fname, Type))
                 # try both other types of files to remake this file if needed
                 othertype = [temp for temp in Types if temp != Type]
@@ -159,9 +155,7 @@ if __name__ == "__main__":
 
         for table in tables:  # loop through tables for each buoy
             if 'predict' not in table:  # don't use tables for model predictions
-                print(buoy)
                 readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
         # for PORTS buoys, also read in full dataset
         if 'ports' in tables:
-            print(buoy + 'full')
             readwrite(buoy + '_full', table='ports', dstart=pd.Timestamp('1980-1-1', tz='UTC'))
