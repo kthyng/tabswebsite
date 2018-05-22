@@ -159,7 +159,7 @@ foreach ($blet as $f) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>PORTS</i></td></tr>";
     }
-    else if ($f == "mg0101") {
+    else if ($f == "cc0401") {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i>TCOON</i></td></tr>";  // Label between PORTS and TCOON buoys
     }
