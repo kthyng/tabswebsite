@@ -152,7 +152,7 @@
             print "<td><a href=$url>uncompressed text</a>, <a href=$url.hdf>hdf</a></td></tr>";
             // either cross-channel or with depth
             $colsideways = array_search("Distance to center of bin [m]", $header);
-            echo $row[$colsideways];
+            // echo $row[$colsideways];
             // adcp is sideways if has a number in this place
             if (is_numeric($row[$colsideways])) {
                 print "<tr><td>&bull; Cross-channel ADCP data</td>";
