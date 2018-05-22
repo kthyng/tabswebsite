@@ -144,9 +144,6 @@ def read_ports_depth(buoy, dstart, dend):
     dst = pd.Timestamp(dstart)
     den = pd.Timestamp(dend)
     url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT23:59:00Z')
-    # url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ')
-    # while dst < pd.Timestamp(dend):
-        # den = dst + datedelta.MONTH - pd.Timedelta('15 minutes')
 
     # along-channel direction
     diralong = 90 - bys[buoy]['angle']
@@ -162,11 +159,6 @@ def read_ports_depth_df(dataname, diralong):
 
     # read in data for month
     # first check there is data
-    # d1 = pd.read_csv(url + dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ'))
-    # if len(d1) < 10:  # no data, so go to next datetime
-    #     dst += datedelta.MONTH
-    #     continue
-    # print(dataname)
     try:
         df = pd.read_csv(dataname, parse_dates=True, index_col=4)
     except:
@@ -174,21 +166,6 @@ def read_ports_depth_df(dataname, diralong):
 
     if df.empty:
         return None
-    # MAKE SURE TO INCLUDE TOP OF BIN AND CENTER OF BIN DEPTHS
-
-    # # pivot to get times as rows and depths as columns
-    # d = pd.pivot_table(d, index=['bin_distance (m)', 'date_time'] )
-    # depths = d.index.get_level_values(0).drop_duplicates().get_values()
-
-    # initialize columns
-    # if not 'g06010: Along [cm/s], depth ' + str(depths[0]) + ' [m]' in df.columns:
-    # for depth in depths:
-    #     df['g06010: Along [cm/s], depth ' + str(depth) + ' [m]'] = np.nan
-    #     df['g06010: Across [cm/s], depth ' + str(depth) + ' [m]'] = np.nan
-    #     df['g06010: WaterT [deg C]'] = np.nan
-
-    # # calculations
-    # for depth in depths:
 
     theta = df['direction_of_sea_water_velocity (degree)'].copy()
     # convert to math angles
@@ -199,14 +176,9 @@ def read_ports_depth_df(dataname, diralong):
     east = df['sea_water_speed (cm/s)']*np.cos(np.deg2rad(theta))
     north = df['sea_water_speed (cm/s)']*np.sin(np.deg2rad(theta))
 
-    # if not ((np.dtype(north) == float) or (np.dtype(north) == float)):
-    #     import pdb; pdb.set_trace()
-
     # calculate along and across velocity
     df['Along [cm/s]'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))
     df['Across [cm/s]'] = (-east*np.sin(np.deg2rad(diralong)) + north*np.cos(np.deg2rad(diralong)))
-    # d['WaterT [deg C]'] = d['sea_water_temperature (C)']
-    # dst += datedelta.MONTH
 
     if df['orientation'][0] == 'downwardLooking':
         dz = df['bin_size (m)'][0]
