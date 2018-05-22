@@ -48,7 +48,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         df = pd.DataFrame()
         # check that we are within normal data frequency
         while date + pd.Timedelta('60 minutes') < dend:
-            # print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
+            print('reading buoy ' + buoy + ': date: ', date, 'dend: ', dend)
             # # if we are using data, dend cannot be in the future
             # dend = min(dend, pd.Timestamp('now', tz='utc'))
             if path.exists(fname) and usefile and not usemodel:  # usemodel here since can't read in model output
@@ -61,6 +61,8 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
                 td = pd.Timedelta('31 days')
                 if buoy in bys.keys() and 'ports' in bys[buoy]['table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
+                elif 'full' in buoy:  # ADCP full data case
+                    td = pd.Timedelta('30 days')
                 # need to make sure dates are all in same time zone
                 if date.tzinfo.zone == dend.tzinfo.zone:  # if time zones the same, don't change either
                     daystoread = min(td, dend-date)
@@ -84,7 +86,6 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         df = df.astype(float)  # makes sure that all columns are floats for consistency
     else:
         df = None
-
 
     # Convert sea level datum from MSL to whatever user chose
     if datum != 'MSL':  # it is 'MSL' by default
@@ -142,7 +143,8 @@ def read_ports_depth(buoy, dstart, dend):
     url = 'https://opendap.co-ops.nos.noaa.gov/ioos-dif-sos/SOS?service=SOS&request=GetObservation&version=1.0.0&observedProperty=sea_water_speed&direction_of_sea_water_velocity&offering=urn:ioos:station:NOAA.NOS.CO-OPS:' + buoy + '&responseFormat=text/csv&eventTime='
     dst = pd.Timestamp(dstart)
     den = pd.Timestamp(dend)
-    url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ')
+    url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT23:59:00Z')
+    # url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT%H:%M:%SZ')
     # while dst < pd.Timestamp(dend):
         # den = dst + datedelta.MONTH - pd.Timedelta('15 minutes')
 
@@ -169,6 +171,9 @@ def read_ports_depth_df(dataname, diralong):
         df = pd.read_csv(dataname, parse_dates=True, index_col=4)
     except:
         return None
+
+    if df.empty:
+        return None
     # MAKE SURE TO INCLUDE TOP OF BIN AND CENTER OF BIN DEPTHS
 
     # # pivot to get times as rows and depths as columns
@@ -193,6 +198,9 @@ def read_ports_depth_df(dataname, diralong):
     # calculate u and v
     east = df['sea_water_speed (cm/s)']*np.cos(np.deg2rad(theta))
     north = df['sea_water_speed (cm/s)']*np.sin(np.deg2rad(theta))
+
+    # if not ((np.dtype(north) == float) or (np.dtype(north) == float)):
+    #     import pdb; pdb.set_trace()
 
     # calculate along and across velocity
     df['Along [cm/s]'] = (east*np.cos(np.deg2rad(diralong)) + north*np.sin(np.deg2rad(diralong)))

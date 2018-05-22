@@ -215,7 +215,7 @@ def write_file(df, fname, filetype='txt', compression=False, mode='w', append=Fa
         if compression:
             df.tz_localize(None).to_csv(fname + '.gz', sep='\t', na_rep='-999', float_format='%3.2f',
                       quoting=QUOTE_NONE,  escapechar='', compression='gzip',
-                      mode=mode, header=header)
+                      mode=mode, header=header, encoding='ascii')
         else:
             df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
                       quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)

@@ -74,7 +74,8 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
     df = read.read(buoy, dstart, dend, table=table, units='M', tz='UTC',
                    usemodel=False, userecent=False)
 
-    if df is not None:
+    # can't append to file with empty dataframe
+    if df is not None and not (mode == 'a' and df.empty):
         tools.write_file(df, fname, filetype='hdf', mode=mode, append=append)
         tools.write_file(df, fname, filetype='txt', compression=False, mode=mode)
         tools.write_file(df, fname, filetype='txt', compression=True, mode=mode)
@@ -90,17 +91,17 @@ if __name__ == "__main__":
                         datefmt='%a %b %d, %H:%M:%S %Z, %Y')
 
     # loop through buoys: query, make text file
-    for buoy in bys.keys():
+    for buoy in ['g06010']:# bys.keys():
 
         # pulls out the non-nan table values to loop over valid table names
         tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
-
-        if 'ports' not in tables:
+        if not 'ports' in tables:
             continue
-
         for table in tables:  # loop through tables for each buoy
             if 'predict' not in table:  # don't use tables for model predictions
+                print(buoy)
                 readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
         # for PORTS buoys, also read in full dataset
         if 'ports' in tables:
-            readwrite(buoy + '_full', table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
+            print(buoy + 'full')
+            readwrite(buoy + '_full', table='ports', dstart=pd.Timestamp('1980-1-1', tz='UTC'))

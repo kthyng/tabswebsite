@@ -153,13 +153,22 @@
             // either cross-channel or with depth
             $colsideways = array_search("Distance to center of bin [m]", $header);
             echo $row[$colsideways];
+            // adcp is sideways if has a number in this place
             if (is_numeric($row[$colsideways])) {
-                print "<tr><td>&bull; Cross-channel ADCP data</td>";}
+                print "<tr><td>&bull; Cross-channel ADCP data</td>";
+                $url = "../daily/".$buoy."_full_all";
+                print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+            }
+            // a few stations don't have this data
+            elseif (strcmp($buoy, "ps0201") == 0 or strcmp($buoy, "ps0301") == 0 or strcmp($buoy, "ps0401") == 0) {
+                } //nothing for these buoys
+            // adcp is with depth if made it to this point
             else {
-                print "<tr><td>&bull; ADCP data with depth</td>";}
-            $url = "../daily/".$buoy."_full_all";
-            print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
-        }
+                print "<tr><td>&bull; ADCP data with depth</td>";
+                $url = "../daily/".$buoy."_full_all";
+                print "<td><a href=$url>uncompressed text</a>, <a href=$url.gz>gzipped</a>, <a href=$url.hdf>hdf</a></td></tr>";
+                }
+            }
         elseif (strcmp($row[$col], "currentspredict") == 0) {
             print "<tr><td>&bull; NOAA-modeled currents</td></tr>";
         }

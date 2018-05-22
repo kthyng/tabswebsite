@@ -123,7 +123,7 @@ def add_r2(ax, df, dfs, key, N=0.05):
     if df is not None and sum([dft is not None for dft in dfs]) > 0:
     # if df is not None and (df1 is not None or df2 is not None or df3 is not None):
         # https://github.com/pandas-dev/pandas/issues/14297
-        dfnew = pd.concat(dfs)  # combine model output
+        dfnew = pd.concat(dfs, sort=False)  # combine model output
         # interpolate on union of old and new index
         dfnew = dfnew.reindex(dfnew.index.union(df.index)).interpolate(method='time')
         # reindex to the new index
@@ -180,7 +180,7 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
     # TCOON has too high frequency information to plot nicely
     if df is not None and (df.index[1] - df.index[0]).seconds/60. < 30:
         # want 30 min
-        df = df.resample('30T').asfreq()
+        df = df.resample('30T').mean()  # was .asfreq()
     # if data is None, use model output (if model output not all None)
     if (df is None or east not in df.keys() or df[east].isnull().all()) and not all([dft is None for dft in [df1, df2, df3]]):
         # now model output saved into df
@@ -1047,19 +1047,24 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dodistance = bys[buoy]['Distance to center of bin [m]']  # label it on plot
         else:
             dodistance = False
-        add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
-                       r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
-                       'cps2kts', '[knots]', ymaxrange=[-150,150],
-                       df4=df4,
-                       dolegend=True, add0=True, tlims=tlims, doebbflood=True,
-                       doangle=bys[buoy]['angle'],
-                       dodepth=bys[buoy]['Depth to center of bin [m]'],
-                       dodepthm=bys[buoy]['Model depth to center of bin [m]'],
-                       dodistance=dodistance)
+
+        if buoy == 'cc0101':  # this buoy is on the shelf and is not along-channel
+            add_currents(axes[0], df, 'water', 'Along [cm/s]', 'Across [cm/s]',
+                         df1=df1, df2=df2, df3=df3, tlims=tlims)
+        else:  # all other ports buoys
+            add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
+                           r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
+                           'cps2kts', '[knots]', ymaxrange=[-150,150],
+                           df4=df4,
+                           dolegend=True, add0=True, tlims=tlims, doebbflood=True,
+                           doangle=bys[buoy]['angle'],
+                           dodepth=bys[buoy]['Depth to center of bin [m]'],
+                           dodepthm=bys[buoy]['Model depth to center of bin [m]'],
+                           dodistance=dodistance)
 
     # use longer dataframe in case data or model are cut short
     if df1 is not None or df2 is not None or df3 is not None or df4 is not None and tlims is not None:
-        dfm = pd.concat([df1, df2, df3, df4])
+        dfm = pd.concat([df1, df2, df3, df4], sort=False)
 
         if df is None:  # if no data
             df = dfm
