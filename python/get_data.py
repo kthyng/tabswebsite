@@ -164,9 +164,12 @@ elif datatype == 'pic':
 elif datatype == 'download' and modelonly:
     # combine txla model output together
     dfs = [dfmodelhindcast, dfmodelrecent, dfmodelforecast]
-    df = pd.concat(dfs, axis=1, sort=False)
-    df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
-    # add in NOAA model output
-    df = df.join(dfmodeltides, how='outer')
+    try:
+        df = pd.concat([df for df in dfs if not None], axis=1, sort=False)
+        df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
+        # add in NOAA model output
+        df = df.join(dfmodeltides, how='outer')
+    except:
+        df = dfmodeltides
 
     tools.write_file(df, fname)
