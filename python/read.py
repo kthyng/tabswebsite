@@ -88,7 +88,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         df = None
 
     # Convert sea level datum from MSL to whatever user chose
-    if datum != 'MSL':  # it is 'MSL' by default
+    if datum != 'MSL' and bys[buoy]['table1'] in ['tcoon', 'tcoon-tide', 'nos', 'nos-water', 'nos-cond']:  # it is 'MSL' by default
         key = 'Water Level [m, MSL]'
         dz = tools.datum(buoy, datum)  # finds delta z between datums
         df[key] += dz
@@ -127,7 +127,7 @@ def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
             if isinstance(bys[buoy]['table4'], str) and 'met' in bys[buoy]['table4']:
                 dfs.append(read_tabs('met', buoy, dstart, dend))
             # combine tables together
-            df = pd.concat([df for df in dfs], axis=1)
+            df = pd.concat([df for df in dfs], axis=1, sort=False)
 
         else:
             df = read_tabs(table, buoy, dstart, dend)
@@ -306,9 +306,9 @@ def read_nos(buoy, dstart, dend, usemodel=False):
         # combine the dataframes together
         # don't append if all df are empty
         if [df.empty for df in dfs].count(True) != len(dfs):
-            df = pd.concat([df for df in dfs if not df.empty], axis=1)
+            df = pd.concat([df for df in dfs if not df.empty], axis=1, sort=False)
         else:
-            df = pd.concat([df for df in dfs], axis=1)
+            df = pd.concat([df for df in dfs], axis=1, sort=False)
 
         # calculate salinity from conductivity, if available
         if 'Conductivity [mS/cm]' in df.keys():
