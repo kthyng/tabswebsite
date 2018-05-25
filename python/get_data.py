@@ -9,6 +9,7 @@ run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
 run get_data.py '../tmp/8770475' --dstart '2018-5-7' --dend '2018-5-12 00:00' 'pic' --usemodel 'False' --datum 'MLLW'
+run get_data.py '../tmp/g06010' --dstart '2017-8-1' --dend '2017-8-5 00:00' 'download' --usemodel 'True' --modelonly 'True'
 '''
 
 import run_daily
@@ -33,6 +34,7 @@ parser.add_argument('--units', type=str, help='units', default='M')
 parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "CST"', default='UTC')
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
 parser.add_argument('--datum', type=str, help='Which tidal datum to use: "MHHW", "MHW", "MTL", "MSL", "MLW", "MLLW"', default='MSL')
+parser.add_argument('--modelonly', type=str, help='Bonus option to be able to download model output. Excludes data.', default='False')
 args = parser.parse_args()
 
 fname = args.fname
@@ -43,6 +45,7 @@ usemodel = args.usemodel
 dstart = args.dstart
 dend = args.dend
 datum = args.datum
+modelonly = args.modelonly
 
 if tzname.lower() in ['utc', 'gmt']:
     tz = 'UTC'
@@ -58,6 +61,12 @@ if usemodel == 'False':
     usemodel = False
 elif usemodel == 'True':
     usemodel = True
+
+if modelonly == 'False':
+    modelonly = False
+elif modelonly == 'True':
+    modelonly = True
+
 
 # change dstart and dend to datetime objects
 if dstart is not None:
@@ -92,9 +101,10 @@ if dstart is None:
 # Call to database if needed
 else:
     ## Read data ##
-    df = read.read(buoy, dstart, dend, table=table, units=units, tz=tz, datum=datum)
-    if df is not None:  # won't work if data isn't available in this time period
-        tools.write_file(df, fname)
+    if not modelonly:
+        df = read.read(buoy, dstart, dend, table=table, units=units, tz=tz, datum=datum)
+        if df is not None:  # won't work if data isn't available in this time period
+            tools.write_file(df, fname)
 
     ## Read model ##
     # tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
@@ -151,3 +161,12 @@ elif datatype == 'pic':
                              df4=dfmodeltides, tlims=tlims)
         fig.savefig(fname + '.pdf')
         fig.savefig(fname + '.png')
+elif datatype == 'download' and modelonly:
+    # combine txla model output together
+    dfs = [dfmodelhindcast, dfmodelrecent, dfmodelforecast]
+    df = pd.concat(dfs, axis=1, sort=False)
+    df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
+    # add in NOAA model output
+    df = df.join(dfmodeltides, how='outer')
+
+    tools.write_file(df, fname)

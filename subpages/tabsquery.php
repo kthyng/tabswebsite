@@ -20,11 +20,13 @@ $tz=$_GET["tz"];
 $units = $_GET["units"];
 $model = $_GET["model"];
 $datum = $_GET["datum"];
+$modelonly = $_GET["modelonly"];
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 if (! $model) {$model = 'False';}
 if (! $datum) {$datum = 'MSL';}
+if (! $modelonly) {$modelonly = 'False';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -129,11 +131,11 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'"');
+        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'"');
     }
     # checks for Mac and assumes Kristen's mac
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'"');
     }
     chmod($tempfile, 0644);
 
