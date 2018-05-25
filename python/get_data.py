@@ -107,10 +107,8 @@ else:
             tools.write_file(df, fname)
 
     ## Read model ##
-    # tables = ['ven', 'met', 'salt', 'tcoon', 'tcoon-nomet', 'ndbc',
-            #   'ndbc-nowave-nowtemp', 'ndbc-nowave-nowtemp-nopress', 'ndbc-nowave']
     # To use NOAA-provided model predictions
-    if usemodel and bys[buoy]['table1'] == 'ports':
+    if usemodel and bys[buoy]['table1'] == 'ports' and buoy != 'cc0101':
         dfmodelhindcast = None
         dfmodelrecent = None
         dfmodelforecast = None

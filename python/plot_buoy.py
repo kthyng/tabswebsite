@@ -782,7 +782,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         which = bys[buoy]['table1']
 
     if which in ['tcoon-tide', 'ports']:
-        nsubplots = 1
+        if buoy == 'cc0101':
+            nsubplots = 3
+        else:
+            nsubplots = 1
     elif which in ['nos-water']:
         nsubplots = 2
     elif which in ['salt', 'wave', 'nos-met', 'ndbc-met']:
@@ -1047,10 +1050,15 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dodistance = bys[buoy]['Distance to center of bin [m]']  # label it on plot
         else:
             dodistance = False
-
         if buoy == 'cc0101':  # this buoy is on the shelf and is not along-channel
             add_currents(axes[0], df, 'water', 'Along [cm/s]', 'Across [cm/s]',
                          df1=df1, df2=df2, df3=df3, tlims=tlims)
+            add_vel(axes[1], df, buoy, 'Across [cm/s]', ymaxrange=[-110, 110],
+                    df1=df1, df2=df2, df3=df3,
+                    label='Cross-shelf\nflow ' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
+            add_vel(axes[2], df, buoy, 'Along [cm/s]', ymaxrange=[-110, 110],
+                    df1=df1, df2=df2, df3=df3,
+                    label='Along-shelf\nflow ' + r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$')
         else:  # all other ports buoys
             add_var_2units(axes[0], df, 'Along [cm/s]', 'Along-channel speed ' +
                            r'$\left[ \mathrm{cm} \cdot \mathrm{s}^{-1} \right]$',
