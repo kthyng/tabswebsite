@@ -621,7 +621,6 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
 
         # adjustments
         df.index.rename('Dates [UTC]', inplace=True)
-        # import pdb; pdb.set_trace()
         df.drop(['lon_rho', 'lat_rho', 's_rho'], axis=1, inplace=True)
         df.rename(columns={var: varname for var, varname in zip(vars, varnames)}, inplace=True)
         df['RelH [%]'] *= 100
@@ -640,30 +639,5 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         if ~np.isnan(theta):
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
-        # import pdb; pdb.set_trace()
-        # # Initialize model dataframe with times
-        # df = pd.DataFrame(index=ds['ocean_time'].sel(ocean_time=slice(dstart, dend)))
-
-        # along = ds['u'].sel(ocean_time=slice(dstart, dend))\
-        #                .isel(s_rho=-1, station=ibuoy)*100  # convert to cm/s
-        # across = ds['v'].sel(ocean_time=slice(dstart, dend))\
-        #                 .isel(s_rho=-1, station=ibuoy)*100
-        # df['WaterT [deg C]'] = ds['temp'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
-        # df['Salinity'] = ds['salt'].sel(ocean_time=slice(dstart, dend)).isel(s_rho=-1, station=ibuoy)
-        # df['East [m/s]'] = ds['Uwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
-        # df['North [m/s]'] = ds['Vwind'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
-
-        # rotate from curvilinear to cartesian
-        # anglev = ds['angle'][i]  # using at least nearby grid rotation angle
-        # # Project along- and across-shelf velocity rather than use from model
-        # # so that angle matches buoy
-        # df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(along, across, anglev)  # approximately to east, north
-        # theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
-        # df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
-        # df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
-        # df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
-        # df['AtmPr [mb]'] = ds['Pair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
-        # df['AirT [deg C]'] = ds['Tair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
-        # df['RelH [%]'] = 100*ds['Qair'].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy)
 
     return df.reset_index(level=0).set_index('Dates [UTC]')
