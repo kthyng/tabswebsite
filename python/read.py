@@ -572,30 +572,30 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
     ibuoy = bp.station(buoy)  # get location in stations file for buoy
-    for i, lo in enumerate(locs):
+    for i, loc in enumerate(locs):
         try:
-            ds = xr.open_dataset(lo)
+            ds = xr.open_dataset(loc)
             break
         except KeyError as e:
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.' % (timing, buoy, lo))
+                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.' % (timing, buoy, loc))
                 ds = None
         except RuntimeError as e:
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.' % (timing, buoy, lo))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.' % (timing, buoy, loc))
                 ds = None
         except IOError as e:  # if link tried is not working
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work. Trying with loc %s instead...' % (timing, buoy, lo, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work. No more options.' % (timing, buoy, lo))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work. No more options.' % (timing, buoy, loc))
                 ds = None
         except Exception as e:
             logging.exception(e)
