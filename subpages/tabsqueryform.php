@@ -178,6 +178,10 @@ print <<<_HTML_
 <TR>
 <TD></TD><TD><i>Archives are available on the <a href="buoy_status.php">buoy information</a> page. You can also <a href="query_notes.php">build your own database query</a>.</i></TD>
 </TR>
+<br>
+<TR>
+<TD></TD><TD><i>A Python package is <a href="https://github.com/kthyng/tabs">available</a> to allow easy access to both data and model time series.</i></TD>
+</TR>
 
 _HTML_;
 

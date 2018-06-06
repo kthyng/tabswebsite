@@ -63,6 +63,7 @@
     print "<br>";
     print "<h1>Station Information</h1>";
 
+    print 'Note that a Python package is <a href="https://github.com/kthyng/tabs">available</a> to allow easy access to both data and model time series.';
 
     print "<h2>Active Stations</h2>";
 
