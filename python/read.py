@@ -567,7 +567,8 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         # starts April 2018 currently
         locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc']
     elif timing == 'forecast':
-        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc']
+        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc',
+                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest2/roms_stn_f_latest.nc']
 
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
