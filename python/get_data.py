@@ -129,7 +129,6 @@ else:
         dfmodelforecast = read.read(buoy, dstart, dend, table=table,
                                           usemodel='forecast', tz=tz, units=units)
         if bys[buoy]['table2'] == 'tidepredict':
-            # import pdb; pdb.set_trace()
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
         else:
@@ -163,11 +162,14 @@ elif datatype == 'download' and modelonly:
     # combine txla model output together
     dfs = [dfmodelhindcast, dfmodelrecent, dfmodelforecast]
     try:
-        df = pd.concat([df for df in dfs if not None], axis=1, sort=False)
+        df = pd.concat([df for df in dfs if not None], axis=0, sort=False)
         df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
         # add in NOAA model output
-        df = df.join(dfmodeltides, how='outer')
+        try:
+            df = df.join(dfmodeltides, how='outer')
+        except:
+            pass
     except:
         df = dfmodeltides
-
-    tools.write_file(df, fname)
+    if df is not None:
+        tools.write_file(df, fname)
