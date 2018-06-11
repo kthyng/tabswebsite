@@ -21,6 +21,12 @@ import pandas as pd
 from matplotlib.dates import date2num
 import read
 import buoy_properties as bp
+import logging
+
+logging.basicConfig(filename=path.join('..', 'logs', 'get_data.log'),
+                    level=logging.WARNING,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%a %b %d %H:%M:%S %Z %Y')
 
 bys = bp.load() # load in buoy properties
 
