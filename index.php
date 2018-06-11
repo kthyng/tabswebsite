@@ -8,10 +8,10 @@
 
 <TITLE>Texas Automated Buoy System (TABS)</TITLE>
 
-<meta HTTP-EQUIV="REFRESH" CONTENT="300">
+<!-- <meta HTTP-EQUIV="REFRESH" CONTENT="300">
 <meta HTTP-EQUIV="Expires" CONTENT="1800">
 <meta HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
-<meta HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<meta HTTP-EQUIV="Pragma" CONTENT="no-cache"> -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="HandheldFriendly" content="true">
 <meta name="viewport" content="width=device-width,maximum-scale=1">
@@ -34,7 +34,7 @@
 <!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
 <!-- This is for the hovering images -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
 <script type="text/javascript" src="js/ddimgtooltip.js">
 /***********************************************
@@ -44,8 +44,10 @@
 ***********************************************/
 </script>
 
-</HEAD>
+<!-- this script refreshes the page if there have not been clicks in 30 min -->
+<script type="text/javascript" src="js/refresh.js"></script>
 
+</HEAD>
 
 <!-- this div centers content dynamically -->
 <div id="container">
