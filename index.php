@@ -34,7 +34,7 @@
 <!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
 <!-- This is for the hovering images -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
 <script type="text/javascript" src="js/ddimgtooltip.js">
 /***********************************************
