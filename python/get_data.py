@@ -9,7 +9,7 @@ run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
 run get_data.py '../tmp/8770475' --dstart '2018-5-7' --dend '2018-5-12 00:00' 'pic' --usemodel 'False' --datum 'MLLW'
-run get_data.py '../tmp/g06010' --dstart '2017-8-1' --dend '2017-8-5 00:00' 'download' --usemodel 'True' --modelonly 'True'
+run get_data.py '../tmp/tabs_B_ven' --dstart '2018-6-1' --dend '2018-6-5 00:00' 'download' --usemodel 'True' --modelonly 'True' --s_rho -1
 '''
 
 import run_daily
@@ -35,6 +35,7 @@ parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
 parser.add_argument('--datum', type=str, help='Which tidal datum to use: "MHHW", "MHW", "MTL", "MSL", "MLW", "MLLW"', default='MSL')
 parser.add_argument('--modelonly', type=str, help='Bonus option to be able to download model output. Excludes data.', default='False')
+parser.add_argument('--s_rho', type=int, help='Vertical layer for model output.', default=-1)
 args = parser.parse_args()
 
 fname = args.fname
@@ -46,6 +47,7 @@ dstart = args.dstart
 dend = args.dend
 datum = args.datum
 modelonly = args.modelonly
+s_rho = args.s_rho
 
 if tzname.lower() in ['utc', 'gmt']:
     tz = 'UTC'
@@ -118,16 +120,16 @@ else:
     # using model but not ports buoy
     elif usemodel: # and bys[buoy]['table1'] in tables:
         dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='hindcast', tz=tz, units=units)
+                                          usemodel='hindcast', tz=tz, units=units, s_rho=s_rho)
         # only look for nowcast model output if hindcast doesn't cover it
         # sometimes the two times overlap but hindcast output is better
         if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
             dfmodelrecent = None
         else:
             dfmodelrecent = read.read(buoy, dstart, dend, table=table,
-                                            usemodel='recent', tz=tz, units=units)
+                                            usemodel='recent', tz=tz, units=units, s_rho=s_rho)
         dfmodelforecast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='forecast', tz=tz, units=units)
+                                          usemodel='forecast', tz=tz, units=units, s_rho=s_rho)
         if bys[buoy]['table2'] == 'tidepredict':
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
