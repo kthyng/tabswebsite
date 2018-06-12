@@ -21,12 +21,14 @@ $units = $_GET["units"];
 $model = $_GET["model"];
 $datum = $_GET["datum"];
 $modelonly = $_GET["modelonly"];
+$s_rho = $_GET["s_rho"];
 
 if (! $units) {$units = 'M';}
 if (! $tz) {$tz = 'UTC';}
 if (! $model) {$model = 'False';}
 if (! $datum) {$datum = 'MSL';}
 if (! $modelonly) {$modelonly = 'False';}
+if (! $s_rho) {$s_rho = '-1';}
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -131,11 +133,11 @@ else{
 
     # set up command for later use. Different python location on different machines.
     if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'"');
+        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
     }
     # checks for Mac and assumes Kristen's mac
     else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'"');
+        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
     }
     chmod($tempfile, 0644);
 

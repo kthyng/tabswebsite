@@ -7,17 +7,19 @@ import numpy as np
 from matplotlib.dates import date2num
 import buoy_properties as bp
 import xarray as xr
-import gsw
 from os import system, path
 import tools
 import requests
 import logging
+import netCDF4 as netCDF
+import octant
+import gsw
 
 bys = bp.load() # load in buoy data
 
 
 def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
-         usemodel=False, userecent=True, datum='MSL'):
+         usemodel=False, userecent=True, datum='MSL', s_rho=-1):
     '''Calls appropriate read function for each table type.
 
     dstart and dend are pd.Timestamp objects.
@@ -35,7 +37,8 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         # this does not catch NOAA model case for tides
         # assert isinstance(usemodel, str), \
         #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
-        df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz, units=units)
+        df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz,
+                        units=units, s_rho=s_rho)
     elif buoy in bys.keys() and bys[buoy]['inmysql']:
         # Call general read function to distribute to correct buoy read function
         df = read_buoy(buoy, dstart, dend, table=table, units=units,
@@ -554,10 +557,14 @@ def read_tabs(table, buoy, dstart, dend):
     return df
 
 
-def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='utc', s_rho=-1):
+def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
+               tz='utc', s_rho=-1):
     '''Read in model output.
 
-    dstart and dend are datetime objects.'''
+    dstart and dend are datetime objects.
+    s_rho (-1, surface) is the index of model output depth. -1 for surface, a
+      number between 0 and 29 for other depth levels, and -999 for all depths.
+    '''
 
     # separate out which model type we want
     # links in list are in order they are tried by the system
@@ -565,10 +572,14 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
     elif timing == 'recent':
         # starts April 2018 currently
-        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc']
+        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc']
     elif timing == 'forecast':
         locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc',
-                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest2/roms_stn_f_latest.nc']
+                'http://terrebonne.tamu.edu:8080/thredds/dodsC/forecast_latest2/roms_stn_f_latest.nc',
+                'http://copano.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc']
 
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
@@ -580,27 +591,30 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         except KeyError as e:
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.' % (timing, buoy, loc))
                 ds = None
         except RuntimeError as e:
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.' % (timing, buoy, loc))
                 ds = None
         except IOError as e:  # if link tried is not working
             logging.exception(e)
             if i < len(loc)-1:  # in case there is another option to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work. Trying with loc %s instead...' % (timing, buoy, loc, loc[i+1]))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
-                logging.warning('For model timing %s and buoy %s, loc %s did not work. No more options.' % (timing, buoy, loc))
+                logging.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. No more options.' % (timing, buoy, loc))
                 ds = None
         except Exception as e:
             logging.exception(e)
-            logging.warning('For model timing %s and buoy %s, some weird error happened. Giving up.' % (timing, buoy))
+            if i < len(loc)-1:  # in case there is another option to try
+                logging.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...' % (timing, buoy, loc, locs[i+1]))
+            else:  # no more options to try
+                logging.warning('For model timing %s and buoy %s, an unexpected exception occurred. No more options.' % (timing, buoy))
             ds = None
 
     # only do this if dend is less than or equal to the first date in the model output
@@ -618,11 +632,30 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
         varnames = ['Along [cm/s]', 'Across [cm/s]', 'WaterT [deg C]', 'Salinity',
                     'East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
                     'RelH [%]']
-        df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+        # additional variables to read in
+        vars += ['zeta', 'w', 'dye_01', 'dye_02', 'dye_03', 'dye_04',
+          'shflux', 'sustr', 'svstr']
+        varnames += ['Free surface [m]', 'Vertical velocity [m/s]',
+          'Dissolved oxygen concentration [uM]',
+          'Mississippi passive tracer', 'Atchafalaya passive tracer',
+          'Brazos passive tracer', 'Surface net heat flux [W/m^2]',
+          'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
+        if s_rho == -999:  # all depths at once
+            df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+            # this brings in all times but cannot easily separate times. Just average.
+            zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
+            df = df.reset_index(['s_w','s_rho'])
+        else:
+            df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+            # this brings in all times but cannot easily separate times. Just average.
+            zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
+            df = df.reset_index(level=0).set_index('ocean_time')
 
         # adjustments
+        df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+        df.rename(columns={'s_rho': 'Depth [m]'}, inplace=True)
         df.index.rename('Dates [UTC]', inplace=True)
-        df.drop(['lon_rho', 'lat_rho', 's_rho'], axis=1, inplace=True)
+        df.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
         df.rename(columns={var: varname for var, varname in zip(vars, varnames)}, inplace=True)
         df['RelH [%]'] *= 100
         df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
@@ -641,4 +674,4 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric', tz='u
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
-    return df.reset_index(level=0).set_index('Dates [UTC]')
+    return df

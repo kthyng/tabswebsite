@@ -9,7 +9,7 @@ run get_data.py '../tmp/tabs_F_ven_test' 'data'
 run get_data.py '../tmp/ndbc_PTAT2_test' 'pic'
 run get_data.py '../tmp/tabs_F_ven_test' 'data' --units 'E'
 run get_data.py '../tmp/8770475' --dstart '2018-5-7' --dend '2018-5-12 00:00' 'pic' --usemodel 'False' --datum 'MLLW'
-run get_data.py '../tmp/tabs_B_ven' --dstart '2018-6-1' --dend '2018-6-5 00:00' 'download' --usemodel 'True' --modelonly 'True' --s_rho -1
+run get_data.py '../tmp/tabs_B_ven' --dstart '2018-6-1' --dend '2018-6-5 00:00' 'download' --usemodel 'True' --modelonly 'True' --s_rho '-999'
 '''
 
 import run_daily
@@ -41,7 +41,8 @@ parser.add_argument('--tzname', type=str, help='time zone: "UTC" or "local" or "
 parser.add_argument('--usemodel', type=str, help='plot model output', default='True')
 parser.add_argument('--datum', type=str, help='Which tidal datum to use: "MHHW", "MHW", "MTL", "MSL", "MLW", "MLLW"', default='MSL')
 parser.add_argument('--modelonly', type=str, help='Bonus option to be able to download model output. Excludes data.', default='False')
-parser.add_argument('--s_rho', type=int, help='Vertical layer for model output.', default=-1)
+parser.add_argument('--s_rho', type=str,
+                    help='Vertical layer for model output. Default gives surface of "-1". Input "-999" for full water column. There are 30 vertical layers to index.', default='-1')
 args = parser.parse_args()
 
 fname = args.fname
@@ -126,16 +127,16 @@ else:
     # using model but not ports buoy
     elif usemodel: # and bys[buoy]['table1'] in tables:
         dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='hindcast', tz=tz, units=units, s_rho=s_rho)
+                                          usemodel='hindcast', tz=tz, units=units, s_rho=int(s_rho))
         # only look for nowcast model output if hindcast doesn't cover it
         # sometimes the two times overlap but hindcast output is better
         if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
             dfmodelrecent = None
         else:
             dfmodelrecent = read.read(buoy, dstart, dend, table=table,
-                                            usemodel='recent', tz=tz, units=units, s_rho=s_rho)
+                                            usemodel='recent', tz=tz, units=units, s_rho=int(s_rho))
         dfmodelforecast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='forecast', tz=tz, units=units, s_rho=s_rho)
+                                          usemodel='forecast', tz=tz, units=units, s_rho=int(s_rho))
         if bys[buoy]['table2'] == 'tidepredict':
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
@@ -171,7 +172,9 @@ elif datatype == 'download' and modelonly:
     dfs = [dfmodelhindcast, dfmodelrecent, dfmodelforecast]
     try:
         df = pd.concat([df for df in dfs if not None], axis=0, sort=False)
-        df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
+        # only remove duplicates if not multiple depths per time
+        if df['Depth [m]'][0] == df['Depth [m]'][1]:
+            df = df[~df.index.duplicated(keep='first')]  # remove any duplicated indices
         # add in NOAA model output
         try:
             df = df.join(dfmodeltides, how='outer')
