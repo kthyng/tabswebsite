@@ -628,24 +628,46 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         return df
     else:
 
-        vars = ['u', 'v', 'temp', 'salt', 'Uwind', 'Vwind', 'Pair', 'Tair', 'Qair']
+        vars = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04']
         varnames = ['Along [cm/s]', 'Across [cm/s]', 'WaterT [deg C]', 'Salinity',
-                    'East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
-                    'RelH [%]']
-        # additional variables to read in
-        vars += ['zeta', 'w', 'dye_01', 'dye_02', 'dye_03', 'dye_04',
-          'shflux', 'sustr', 'svstr']
-        varnames += ['Free surface [m]', 'Vertical velocity [m/s]',
-          'Dissolved oxygen concentration [uM]',
-          'Mississippi passive tracer', 'Atchafalaya passive tracer',
-          'Brazos passive tracer', 'Surface net heat flux [W/m^2]',
-          'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
+                    'Dissolved oxygen concentration [uM]',
+                    'Mississippi passive tracer', 'Atchafalaya passive tracer',
+                    'Brazos passive tracer']
+        vars_w = ['w']  # on vertical grid w
+        varnames_w = ['Vertical velocity [m/s]']
         if s_rho == -999:  # all depths at once
+            # don't add 2d variables if all depths requested
+            # need to deal separately with s_rho and s_w grid
             df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
             # this brings in all times but cannot easily separate times. Just average.
             zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
-            df = df.reset_index(['s_w','s_rho'])
+            df = df.reset_index(['s_rho'])
+            df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+
+            df2 = ds[vars_w].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+            # this brings in all times but cannot easily separate times. Just average.
+            zw = octant.roms.nc_depths(netCDF.Dataset(loc), 'w').get_station_depths().mean(axis=0)[:,ibuoy]
+            df2 = df2.reset_index(['s_w'])
+            df2['s_w'] = np.tile(zw, int(len(df2)/zw.size))
+            # df2.rename(columns={'s_w': 'Depth [m]'}, inplace=True)
+            df2.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
+
+            # interpolate ws to rho vertical grid
+            df['w'] = np.nan
+            ii = 0
+            for i in range(0,int(len(df2)/31),31):
+                # i is for df2, ii is for df
+                df['w'].iloc[ii*30:ii*30+30] = (df2['w'][i:i+30] + df2['w'][i+1:i+31])/2
+                ii += 1
+
         else:
+            if s_rho in [-1, 29]:  # surface, more variables
+                vars += ['Uwind', 'Vwind', 'Pair',
+                        'Tair', 'Qair', 'zeta',
+                          'shflux', 'sustr', 'svstr']
+                varnames += ['East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
+                            'RelH [%]', 'Free surface [m]', 'Surface net heat flux [W/m^2]',
+                            'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
             df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
             # this brings in all times but cannot easily separate times. Just average.
             zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
@@ -657,15 +679,16 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         df.index.rename('Dates [UTC]', inplace=True)
         df.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
         df.rename(columns={var: varname for var, varname in zip(vars, varnames)}, inplace=True)
-        df['RelH [%]'] *= 100
         df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
+        if s_rho in [-1, 29]:
+            df['RelH [%]'] *= 100
 
         # un-rotate velocities, then rerotate to match TABS website angles
         # also convert to cm/s
         df['Along [cm/s]'] *= 100
         df['Across [cm/s]'] *= 100
         # rotate from curvilinear to cartesian
-        anglev = ds['angle'][i]  # using at least nearby grid rotation angle
+        anglev = ds['angle'][ibuoy]  # using at least nearby grid rotation angle
         # Project along- and across-shelf velocity rather than use from model
         # so that angle matches buoy
         df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(df['Along [cm/s]'], df['Across [cm/s]'], anglev)  # approximately to east, north
