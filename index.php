@@ -72,8 +72,7 @@ mozallowfullscreen msallowfullscreen></iframe>
 <center>
 <p><i><font class=bkvsm style="font-size:6pt;">
 The vectors on the map point toward the direction that the currents or winds are flowing and represent the average for the
-last three hours of the available data.<br>
-The date and time at each station indicates the end of the three-hour average.<br>
+last three hours of the available data, potentially with a delay indicated.<br>
 </font></i></p>
 </center>
 </div>
