@@ -60,7 +60,6 @@ if __name__ == "__main__":
             tzoffset = (dend.tz_localize(None) - dend.tz_convert(tz).tz_localize(None)).seconds/3600.
             dstart = (dend - pd.Timedelta('5 days')).normalize() + pd.Timedelta(str(tzoffset) + ' hours')
             dend += pd.Timedelta(str(tzoffset) + ' hours')
-            # import pdb; pdb.set_trace()
             df = read.read(buoy, dstart, dend, table=table, usemodel=False,
                            userecent=True, tz=tz)
             if len(buoy) == 1:
