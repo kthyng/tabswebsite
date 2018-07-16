@@ -569,9 +569,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
     # separate out which model type we want
     # links in list are in order they are tried by the system
     if timing == 'hindcast':
-        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
+        locs = ['http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg']
     elif timing == 'recent':
-        # starts April 2018 currently
         locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
                 'http://copano.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc']
