@@ -581,12 +581,18 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 'http://copano.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_stn_f_latest.nc']
 
+
+    varstot = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04',
+               'Uwind', 'Vwind', 'Pair', 'Tair', 'Qair', 'zeta', 'shflux', 'sustr', 'svstr']
+
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
     ibuoy = bp.station(buoy)  # get location in stations file for buoy
     for i, loc in enumerate(locs):
         try:
             ds = xr.open_dataset(loc)
+            # make sure all variables present
+            assert np.asarray([var in ds for var in varstot]).all()
             break
         except KeyError as e:
             logging.exception(e)
