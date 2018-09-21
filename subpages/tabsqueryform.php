@@ -1,3 +1,6 @@
+<!-- include header from separate file -->
+<?php include("../includes/header.html");?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
@@ -9,7 +12,10 @@
 
 <div id="container">
 
+
 <?php
+
+include("../includes/navigation.html");
 
 $buoy = isset($_GET["Buoyname"]) ? $_GET["Buoyname"] : "";
 $table = isset($_GET["table"]) ? $_GET["table"] : "";
@@ -56,8 +62,6 @@ foreach ($csv as $row) {  // loop over each row in csv file
 }
 
 
-include("../includes/header.html");
-include("../includes/navigation.html");
 
 print "<form action=\"/tabswebsite/subpages/tabsquery.php\" method=\"get\">\n";
 
