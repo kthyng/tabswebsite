@@ -24,6 +24,9 @@ tz = 'US/Central'
 # Email flag. Set to true in script if anything notable is wrong.
 eflag = False
 
+# Capture warnings in log instead of emailing me
+logging.captureWarnings(True)
+
 if __name__ == "__main__":
 
     logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
