@@ -20,11 +20,11 @@
     <h3>THREDDS Server</h3>
 
     <ul>
-    <li><a href='http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc'>Latest 5-day forecast (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest_surface.nc">Latest 5-day forecast (Surface only) (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc
+    <li><a href='http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc.html'>Latest 5-day forecast (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest_surface.nc.html">Latest 5-day forecast (Surface only) (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc.html
 ">Forecast archives (Recent output) (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg">Hindcast archives (1993 &ndash; recent past) (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg.html">Hindcast archives (1993 &ndash; recent past) (OPeNDAP)</a></li>
     </ul>
 
     <h3>NetCDF subset</h3>
