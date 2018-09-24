@@ -20,27 +20,28 @@
     <h3>THREDDS Server</h3>
 
     <ul>
-    <li><a href='http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest.nc.html'>Latest 5-day forecast (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/oof_other/roms_his_f_latest_surface.nc.html">Latest 5-day forecast (Surface only) (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/oof_archive_agg.html">Forecast archives (Recent output) (OPeNDAP)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg.html">Hindcast archives (1993 &ndash; recent past) (OPeNDAP)</a></li>
+    <li><a href='http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest.nc'>Latest 5-day forecast (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest_surface.nc">Latest 5-day forecast (Surface only) (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_his_archive_agg.nc
+">Forecast archives (Recent output) (OPeNDAP)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_agg">Hindcast archives (1993 &ndash; recent past) (OPeNDAP)</a></li>
     </ul>
 
     <h3>NetCDF subset</h3>
 
     <ul>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/ncss/oof_other/roms_his_f_latest.nc/dataset.html">Latest 5-day forecast (NetCDF Subset)</a></li>
-    <li><a href="http://barataria.tamu.edu:8080/thredds/ncss/NcML/txla_hindcast_agg/dataset.html">Hindcast archives (2002-2016) (NetCDF Subset)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/ncss/forecast_latest/roms_his_f_latest.nc/dataset.html">Latest 5-day forecast (NetCDF Subset)</a></li>
+    <li><a href="http://barataria.tamu.edu:8080/thredds/ncss/NcML/txla_hindcast_agg/dataset.html">Hindcast archives (1993-almost present) (NetCDF Subset)</a></li>
     </ul>
 
-    <h3>HTTP server</h3>
+    <!-- <h3>HTTP server</h3>
     Note: when you click a link below, the model output file will be downloaded.
 
     <ul>
         <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/oof_other/roms_his_f_latest.nc">Latest 5-day forecast (Full 3-D) (~15 GB)</a></li>
         <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/oof_other/roms_his_f_latest_surface.nc">Latest 5-day forecast (surface only) (~1 GB)</a></li>
         <li><a href="http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/roms_his_f_latest_bottom.nc">Latest 5-day forecast (bottom only) (~1 GB)</a></li>
-    </ul>
+    </ul> -->
 
     <h3>GNOME-ready files</h3>
     Based on the latest 5-day forecast.
@@ -49,8 +50,8 @@
 
     <ul>
         <li><a href="http://pong.tamu.edu/oof_v2/main/coast.bna">Coastline map file (coast.bna)</a></li>
-        <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/oof_other/roms2gnome_wind_2d.nc">Variable surface wind (NetCDF format) (~50 MB)</a></li>
-        <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/oof_other/roms2gnome_current_2d.nc">Variable surface current (NetCDF format) (~50 MB)</a></li>
+        <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/forecast_latest/roms2gnome_wind_surface.nc">Variable surface wind (NetCDF format) (~50 MB)</a></li>
+        <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/forecast_latest/roms2gnome_current_surface.nc">Variable surface current (NetCDF format) (~50 MB)</a></li>
         <li><a href="http://barataria.tamu.edu:8080/thredds/fileServer/forecast_latest/roms2gnome_current_bottom.nc">Variable bottom current (NetCDF format) (~50 MB)</a></li>
     </ul>
 
