@@ -243,7 +243,6 @@ include("../includes/control.php");
 
 
 // Show results of query
-print "<br>";
 print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 print "<TD valign=top><br>";
 
