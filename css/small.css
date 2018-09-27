@@ -36,6 +36,7 @@ div#map{
 }
 
 div#map iframe{
+
     /*height: 350px;*/
     overflow:visible;
     float:none;
@@ -76,7 +77,7 @@ div#navmenu{
 }
 
 div#navmenu ul li a {
-    width: 184px;
+    width: 200px;
 }
 
 

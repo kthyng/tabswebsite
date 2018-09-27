@@ -89,6 +89,13 @@ last three hours of the available data, potentially with a delay indicated.<br>
 <TD valign=top colspan=2><div id="Report"><b><a href="subpages/currents.php"><font size='3em'>Last data report</font></a></b></div></td>
 </tr>
 
+<tr>
+<td><font size='2em'>jump below:</font></td>
+<td><font size='2em'><a href="#ndbc">NDBC</a>, <a href="#ports">PORTS</a>, <a href="#tcoon">TCOON</a>, <a href="#nos">NOS</a></font></td>
+</tr>
+
+<!-- <tr><br></tr> -->
+
 <?php
 print "<tr><td></td><td><i>TABS</i></td></tr>";  // Label before TABS buoys
 
@@ -126,19 +133,27 @@ foreach ($blet as $f) {
             $datestr=$data[0];
     		$timestr=substr($data[1],0,5);
 
+            # last data datetime, for local time
             $dtTX = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
             $dtTXstr = $dtTX->format('M d, Y H:i');
             $dtTXtz = $dtTX->format('T');
+
+            # last data datetime, for UTC
+            $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
+            $UTCtz = new DateTimeZone('UTC');
+            $dtUTC->setTimezone($UTCtz);
+            $dtUTCstr = $dtUTC->format('H:i');
+            $dtUTCtz = $dtUTC->format('T');
 
             // check for if report is more than about 3 days old (ignoring time zones, etc)
             $today = new DateTime('now', new DateTimeZone('America/Chicago'));
             $interval = date_diff($dtTX, $today);  # difference in days between now and most recent data
             $intervalstr = $interval->format('%R%a days');
             if ($intervalstr>3){ // old report
-                $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz\n</div></td>";
+                $buoystr = "<td nowrap valign=top><div id=\"Report\">$dtTXstr $dtTXtz ($dtUTCstr $dtUTCtz)\n</div></td>";
             }
             elseif ($intervalstr<=7) { // bold for recent report
-                $buoystr =  "<td nowrap valign=top><div id=\"Report\"><b>$dtTXstr $dtTXtz\n</div></b></td>";
+                $buoystr =  "<td nowrap valign=top><div id=\"Report\"><b>$dtTXstr $dtTXtz ($dtUTCstr $dtUTCtz)\n</div></b></td>";
             }
             else {  // missing plot
                 $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
@@ -154,19 +169,19 @@ foreach ($blet as $f) {
     $bidx++;
     if ($f == "X") {
     print "<tr><td><br></td></tr>";  // space
-    print "<tr><td></td><td><i>NDBC</i></td></tr>";  // Label between TABS and NDBC buoys
+    print "<tr><td></td><td><i><a name='ndbc'>NDBC</a></i></td></tr>";  // Label between TABS and NDBC buoys
     }
     else if ($f == "BURL1") {
     print "<tr><td><br></td></tr>";  // space
-    print "<tr><td></td><td><i>PORTS</i></td></tr>";
+    print "<tr><td></td><td><i><a name='ports'>PORTS</a></i></td></tr>";
     }
     else if ($f == "cc0401") {
     print "<tr><td><br></td></tr>";  // space
-    print "<tr><td></td><td><i>TCOON</i></td></tr>";  // Label between PORTS and TCOON buoys
+    print "<tr><td></td><td><i><a name='tcoon'>TCOON</a></i></td></tr>";  // Label between PORTS and TCOON buoys
     }
     else if ($f == "8779749") {
     print "<tr><td><br></td></tr>";  // space
-    print "<tr><td></td><td><i>NOS</i></td></tr>";  // Label between PORTS and TCOON buoys
+    print "<tr><td></td><td><i><a name='nos'>NOS</a></i></td></tr>";  // Label between PORTS and TCOON buoys
     }
 }
 print "<tr></tr>";

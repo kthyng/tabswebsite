@@ -278,6 +278,7 @@ div#mapbuoycontainer
 {
  width: auto;
 overflow: auto;
+clear: both;
 }
 
 
