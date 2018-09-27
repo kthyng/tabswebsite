@@ -225,6 +225,23 @@ if ($datepicker=="recent") {
     }
 }
 
+
+if ($datepicker=="recent") {
+    if ($intervalstr<=2){
+        // show header file contents for "recent" data, below table
+        if (strlen($Buoyname) == 1) {
+            echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
+        }
+        else {
+            echo file_get_contents( "../daily/".$Buoyname."_header" );
+        }
+    }
+}
+
+// show bottom control options
+include("../includes/control.php");
+
+
 // Show results of query
 print "<TABLE cellspacing=0 cellpadding=0  border=0 width=100%>";
 print "<TD valign=top><br>";
@@ -266,21 +283,6 @@ if ($datatype=="pic" && ($havemodel or !$norecentdata)){
 }
 print "</TD></TR></TABLE>\n";
 
-if ($datepicker=="recent") {
-    if ($intervalstr<=2){
-        // show header file contents for "recent" data, below table
-        if (strlen($Buoyname) == 1) {
-            echo file_get_contents( "../daily/tabs_".$Buoyname."_header" );
-        }
-        else {
-            echo file_get_contents( "../daily/".$Buoyname."_header" );
-        }
-    }
-}
-
-
-// show bottom control options
-include("../includes/control.php");
 
 }
 
