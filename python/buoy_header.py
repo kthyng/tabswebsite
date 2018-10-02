@@ -18,10 +18,11 @@ tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
 def top(buoy, ll, time, time2):
     head = []
     # html
-    head.append('<table id=header width=850px>')  # id is for test_tabsquery.py
+    head.append('<table id=header style="width:900px">')  # id is for test_tabsquery.py
     # this is to buffer the left side
     head.append('<tr>')
-    head.append('<td><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, ll))
+    # sum of colspan in following two lines matches mod number in html()
+    head.append('<td colspan=2 ><b><big>Buoy %s </big></b>&nbsp;&nbsp;%s</td>' % (buoy, ll))
     head.append('<TD colspan=3 style="text-align:left"><b>' + time + '</b> (' + time2 + ')</td>')
     head.append('</TR>')
     head.append('<tr></tr>')  # blank row
@@ -48,14 +49,15 @@ def html(head, tablename, dftail, dftaile):
         if value != -999.00:
             metric = '{:4.2f} {}'.format(value, unit)
             head.append('<td>' + name + metric)
-            if unit != '':
-                head.append(',')
-            head.append('&nbsp;')
-            if not unit == unite:
+            if (unit != unite):
+                head.append(',&nbsp;')
+            head.append('<br>&nbsp;')
+            if (unit != unite):
                 english = '{:4.2f} {}'.format(dftaile[keye].values[0], unite)
                 head.append(english)
             head.append('&nbsp;&nbsp;&nbsp;</td>')
-            if i != 1 and i%3 == 0:
+            # modulo number controls number of columns
+            if i != 1 and i%5 == 0:
                 head.append('</tr><tr>')
         i += 1
     head.append('<tr></tr><tr></tr>')
