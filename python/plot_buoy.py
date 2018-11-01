@@ -124,6 +124,8 @@ def add_r2(ax, df, dfs, key, N=0.05):
     # if df is not None and (df1 is not None or df2 is not None or df3 is not None):
         # https://github.com/pandas-dev/pandas/issues/14297
         dfnew = pd.concat(dfs, sort=False)  # combine model output
+        # remove any duplicated rows
+        dfnew = dfnew[~dfnew.index.duplicated()]
         # interpolate on union of old and new index
         dfnew = dfnew.reindex(dfnew.index.union(df.index)).interpolate(method='time')
         # reindex to the new index
