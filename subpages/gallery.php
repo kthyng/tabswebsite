@@ -23,7 +23,7 @@
         if (! $res) {$res = "high";}  # high resolution by default
 
         $base = "http://pong.tamu.edu/movies/";
-        $years = range(1993, 2016);
+        $years = range(1993, 2017);
 
         // for individual variable pages
         if ($gallery) {
@@ -51,15 +51,18 @@
         if (! $gallery) {
             $base = "http://pong.tamu.edu/movies/";
             $year = 1993;
-            $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort", "oxygen");
+            $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort",
+                          "oxygen", "dye_miss", "dye_atch", "dye_brazos");
             $varnames = array("Salinity", "Speed", "Sea surface height",
                                 "Temperature", "Along-shore velocity",
                                 "Across-shore velocity", "Vertical vorticity",
-                                "Bottom oxygen");
+                                "Bottom oxygen", "Mississippi river dye",
+                                "Atchafalaya river dye", "Brazos river dye");
             $imagedate = $year."-07-01T00";
 
             // check box for resolution
            print "<select id=\"res_id\" name=\"res\"  onchange=\"this.form.submit();\">";
+           print "<option type=radio value=\"$res\">selected resolution: $res</option> ";
            print "<option type=radio value=\"high\">High resolution animations (70-400MB)</option> ";
            print "<option type=radio value=\"low\">Low resolution animations (20-130MB)</option> ";
            print "</select><br><br>";
