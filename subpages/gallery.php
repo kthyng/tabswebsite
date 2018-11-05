@@ -52,12 +52,12 @@
             $base = "http://pong.tamu.edu/movies/";
             $year = 1993;
             $vars = array("salt", "speed", "ssh", "temp", "u", "v", "vort",
-                          "oxygen", "dye_miss", "dye_atch", "dye_brazos");
+                          "dye_miss", "dye_atch", "dye_brazos", "oxygen");
             $varnames = array("Salinity", "Speed", "Sea surface height",
                                 "Temperature", "Along-shore velocity",
                                 "Across-shore velocity", "Vertical vorticity",
-                                "Bottom oxygen", "Mississippi river dye",
-                                "Atchafalaya river dye", "Brazos river dye");
+                                "Mississippi river dye", "Atchafalaya river dye",
+                                "Brazos river dye", "Bottom oxygen");
             $imagedate = $year."-07-01T00";
 
             // check box for resolution
