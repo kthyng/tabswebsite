@@ -33,16 +33,31 @@
 <!-- <link rel="stylesheet" href="css/zentools.css" type="text/css" /> -->
 <!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
+<!-- allow for low bandwidth option -->
+<?php
+$bandwidth=$_GET["bandwidth"];
+if (! $bandwidth) {$bandwidth = 'high';}
+if ($bandwidth=='low') {$bandwidthnew = 'high';}
+else if ($bandwidth=='high') {$bandwidthnew = 'low';}
+?>
+
 <!-- This is for the hovering images -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
-<script type="text/javascript" src="js/ddimgtooltip.js">
-/***********************************************
-* Image w/ description tooltip v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
-* This notice MUST stay intact for legal use
-* Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
-***********************************************/
-</script>
+<?php
+if ($bandwidth == "high") {
+print <<<_HTML_
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/ddimgtooltip.css" />
+    <script type="text/javascript" src="js/ddimgtooltip.js">
+    /***********************************************
+    * Image w/ description tooltip v2.0- (c) Dynamic Drive DHTML code library (www.dynamicdrive.com)
+    * This notice MUST stay intact for legal use
+    * Visit Dynamic Drive at http://www.dynamicdrive.com/ for this script and 100s more
+    ***********************************************/
+    </script>
+_HTML_;
+
+}
+?>
 
 <!-- this script refreshes the page if there have not been clicks in 30 min -->
 <script type="text/javascript" src="js/refresh.js"></script>
@@ -66,8 +81,10 @@
 <div id="map" >
   <!-- <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="100%" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen -->
 <!-- mozallowfullscreen msallowfullscreen></iframe> -->
-  <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="800px" height="480px" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen
-mozallowfullscreen msallowfullscreen></iframe>
+<?php
+  print "<iframe frameborder='0' scrolling='no' marginheight='0' marginwidth='0' width='800px' height='480px' src=http://pong.tamu.edu/tabs_map/?framed&bandwidth=$bandwidth  allowfullscreen webkitallowfullscreen
+mozallowfullscreen msallowfullscreen></iframe>\n"
+?>
 <!-- text below map -->
 <center>
 <p><i><font class=bkvsm style="font-size:6pt;">
@@ -76,6 +93,12 @@ last three hours of the available data, potentially with a delay indicated.<br>
 </font></i></p>
 </center>
 </div>
+
+<!-- bandwidth button -->
+<?php
+    print "<a style='background-color:mintcream;' href=/tabswebsite/index.php?bandwidth=$bandwidthnew>Click for $bandwidthnew bandwidth</a>\n";
+?>
+
 </div>
 <!-- end map -->
 
@@ -164,7 +187,13 @@ foreach ($blet as $f) {
         $buoystr = "<td><div id=\"Report\">Not reporting</div></td></tr>";
     }
     // print letter of buoy with link to query page with image and hover of image
-    print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=US/Central&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
+    // in low bandwidth case, don't load hover images
+    if ($bandwidth == "low") {
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=US/Central&units=M>$f</a></div></TD>\n";
+    }
+    else {
+        print "<TR bgcolor=\"#f8f8f8\"><td valign=top><div id=\"Report\"><a href=subpages/tabsquery.php?Buoyname=$f&table=$table&Datatype=pic&datepicker=recent&tz=US/Central&units=M rel=\"imgtip[$bidx]\">$f</a></div></TD>\n";
+    }
     print $buoystr;
     $bidx++;
     if ($f == "X") {
