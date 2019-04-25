@@ -7,6 +7,7 @@ import pandas as pd
 import tools
 import os
 from numpy import isnan
+import logging
 
 relloc = '../'
 bys = bp.load() # load in buoy data
@@ -67,12 +68,14 @@ def html(head, tablename, dftail, dftaile):
 def make(buoy):
     '''Make header'''
 
+    # initialize head
+    head = None
 
     lon, lat = bys[buoy]['lon'], bys[buoy]['lat']
     ll = '%2.3f&deg; N &nbsp;&nbsp; %2.3f&deg; W' % (lat, abs(lon))
     # pulls out the non-nan table values to loop over valid table names
     tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
-    for table in tables:  # loop through tables for each buoy
+    for i, table in enumerate(tables):  # loop through tables for each buoy
         # table entries with "predict" in them are not really separate tables
         if 'predict' in table:
             continue
@@ -100,15 +103,18 @@ def make(buoy):
         dftaile = tools.convert_units(dftail, units='E', tz=None)
         time = dftail.index.strftime("%Y-%m-%d %H:%M %Z")[0]
         time2 = dftail.index.tz_convert('US/Central').strftime("%Y-%m-%d %H:%M %Z")[0]
-        try:
-            head = html(head, tablename, dftail, dftaile)
-        except:
+        # catch first TABS table or the one of another type of buoy
+        if (tablename is not None and i == 0) or tablename is None:        
             head = top(buoy, ll, time, time2)
             head = html(head, tablename, dftail, dftaile)
+        elif tablename is not None and i > 0:  # a subsequent TABS table
+            head = html(head, tablename, dftail, dftaile)
 
-    head.append('</table>')
+    # check for case of missing file when head cannot be made
+    if head is not None:
+        head.append('</table>')
 
-    f = open(fnameh, 'w')
-    for headline in head:
-        f.write('%s' % (headline))
-    f.close()
+        f = open(fnameh, 'w')
+        for headline in head:
+            f.write('%s' % (headline))
+        f.close()

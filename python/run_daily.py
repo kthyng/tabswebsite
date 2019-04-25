@@ -139,7 +139,11 @@ if __name__ == "__main__":
             continue
 
         # write header
-        bh.make(buoy)
+        try:    
+            bh.make(buoy)
+        except Exception as e:
+            logging.exception(e)
+            logging.warning('Cannot make header file for buoy %s' % buoy)
 
     # separate for making currents summaries
     # use data that was calculated previously in this script

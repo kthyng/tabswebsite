@@ -818,7 +818,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         # reindex to the new index
         df2 = df_union.reindex(newindex)
 
-    elif 'ndbc' in which and 'Wave Ht [m]' in df.keys() and not df['Wave Ht [m]'].isnull().all():  # NDBC with wave
+    elif 'ndbc' in which and df is not None and 'Wave Ht [m]' in df.keys() and not df['Wave Ht [m]'].isnull().all():  # NDBC with wave
         # fill in missing data with nan's so not plotted across.
         base = 50
         df = df.resample('60 T', base=base).interpolate(method='time', limit=1)

@@ -146,10 +146,10 @@ foreach ($blet as $f) {
     }
 
     // $venfile="http://tabs.gerg.tamu.edu/tglo/DailyData/Data/tabs_".$f."_ven.txt";
-    if (file_exists($venfile)) {
+    if (file_exists($venfile) and count(file($venfile)) > 1) {
 
         $lines=file($venfile);
-    	$l=array_pop($lines);  // grab last line in file
+        $l=array_pop($lines);  // grab last line in file
     	if (trim($l)) {
     		$line=trim($l);  # strip white space from beginning and end of string
             $data = preg_split('/\s+/', $line);  # split by white space or by tab
