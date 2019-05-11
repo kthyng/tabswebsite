@@ -189,14 +189,19 @@ def convert_units(df, units=None, tz=None):
                 df.rename(columns={col: newname}, inplace=True)
                 df = df.round({newname: rint})
 
-    if tz is not None and tz != 'UTC':
+    if tz is not None:
         df = df.tz_convert(tz)
         if tz == 'US/Central':  # time zone
             tzlabel = 'CST/CDT'
         elif tz == 'Etc/GMT+6':
             tzlabel = 'CST'
+        elif tz == 'UTC':
+            tzlabel = 'UTC'
 
-        df.index.rename(df.index.name.replace('UTC', tzlabel), inplace=True)
+        # change unit name
+        # original name always in brackets at end of string
+        oldname = df.index.name.split('[')[1][:-1]
+        df.index.rename(df.index.name.replace(oldname, tzlabel), inplace=True)
 
     return df
 
@@ -231,9 +236,11 @@ def write_file(df, fname, filetype='txt', mode='w', append=False):
 
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
+    # convert to UTC before removing timezone information to be sure it is
+    # in UTC since saved files should always be in UTC only.
     if filetype == 'hdf':
-        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
+        df.tz_convert('UTC').tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
                                     format='table', complib='zlib', append=append)#, dropna=True)
     elif filetype == 'txt':
-        df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
+        df.tz_convert('UTC').tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
                   quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)

@@ -25,6 +25,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     dstart and dend are pd.Timestamp objects.
     table is necessary if buoy is a TABS buoy (length=1).
     usemodel can be: False, True (for ports), or 'hindcast', 'recent', 'forecast' (ROMS)
+    userecent is for NDBC data, for using the most recent 45 days of data
 
     datum (str) can be 'MSL', 'MHHW', 'MHW', 'MLW', 'MLLW', 'MTL'; for tidal height
     '''

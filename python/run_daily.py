@@ -59,6 +59,8 @@ if __name__ == "__main__":
                         dend = tools.query_setup_recent(engine, buoy, table).tz_localize('utc')
                 else:
                     dend = pd.Timestamp('now', tz='utc')
+                # add to dend to be sure to catch last available time
+                dend += pd.Timestamp('1 hour')
                 # start 5 days earlier from 00:00 on day of last data, and account for time zones
                 # so that enough data is read in for time zone conversion
                 # dstart and dend are in UTC
@@ -71,6 +73,8 @@ if __name__ == "__main__":
                 # dend += pd.Timedelta(str(tzoffset) + ' hours')
                 df = read.read(buoy, dstart, dend, table=table, usemodel=False,
                                userecent=True, tz=tz)
+
+                # after reading in this data for "recent" plots, save it
                 if len(buoy) == 1:
                     fname = path.join('..', 'daily', 'tabs_' + buoy + '_' + table)
                 else:
