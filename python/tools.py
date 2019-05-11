@@ -234,13 +234,16 @@ def write_file(df, fname, filetype='txt', mode='w', append=False):
     else:
         header = True
 
-    # Remove the time zone offset from the datetimes before saving and put
-    # time zone information in the header instead.
     # convert to UTC before removing timezone information to be sure it is
     # in UTC since saved files should always be in UTC only.
+    # this will update units label in column name too
+    convert_units(df, units=None, tz='UTC')
+
+    # Remove the time zone offset from the datetimes before saving and put
+    # time zone information in the header instead.
     if filetype == 'hdf':
-        df.tz_convert('UTC').tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
+        df.tz_localize(None).to_hdf(fname + '.hdf', key='df', mode=mode, complevel=1,
                                     format='table', complib='zlib', append=append)#, dropna=True)
     elif filetype == 'txt':
-        df.tz_convert('UTC').tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
+        df.tz_localize(None).to_csv(fname, sep='\t', na_rep='-999', float_format='%3.2f',
                   quoting=QUOTE_NONE,  escapechar='', mode=mode, header=header)
