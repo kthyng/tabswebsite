@@ -237,7 +237,7 @@ def write_file(df, fname, filetype='txt', mode='w', append=False):
     # convert to UTC before removing timezone information to be sure it is
     # in UTC since saved files should always be in UTC only.
     # this will update units label in column name too
-    convert_units(df, units=None, tz='UTC')
+    df = convert_units(df, units=None, tz='UTC')
 
     # Remove the time zone offset from the datetimes before saving and put
     # time zone information in the header instead.
