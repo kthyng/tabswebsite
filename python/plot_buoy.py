@@ -1125,6 +1125,9 @@ def currents(dfs, buoys):
         # otherwise it squishes up the labels a lot
         if df.index[-1] - df.index[0] > pd.Timedelta('4 days'):
             dfsave = df  # save for using with bottom labeling
+        else:
+            dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('5 days'), pd.Timestamp.now()))
+            dfsave = dfsave.tz_localize(df.index.tzinfo.zone)  # get tz
 
     add_xlabels(axes[len(dfs)-1], dfsave, fig)
 
