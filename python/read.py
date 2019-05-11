@@ -521,7 +521,9 @@ def read_tabs(table, buoy, dstart, dend):
     if table == 'ven':
         ind = df.tx.isnull()
         df.drop(df.index[ind], inplace=True)  # drop bad rows
-        names = ['East [cm/s]', 'North [cm/s]', 'Dir [deg T]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]']            # df.columns = names
+        # drop compass column — what even is it?
+        df.drop(['compass'], inplace=True, axis=1)
+        names = ['East [cm/s]', 'North [cm/s]', 'WaterT [deg C]', 'Tx', 'Ty', 'Speed [cm/s]', 'Across [cm/s]', 'Along [cm/s]', 'Dir [deg T]']            # df.columns = names
         df['Speed [cm/s]'] = np.sqrt(df['veast']**2 + df['vnorth']**2)
         df['Speed [cm/s]'] = df['Speed [cm/s]'].round(2)
         # Calculate along- and across-shelf
@@ -529,6 +531,12 @@ def read_tabs(table, buoy, dstart, dend):
         theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
         df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
         df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
+        # calculate direction that currents are pointing toward. This is not "compass".
+        # calculate math direction from east/north currents, direction to,
+        # then convert to compass angles. Then add 360 if negative.
+        dto = 90 - np.rad2deg(np.arctan2(df['vnorth'], df['veast']))
+        dto[dto<0] += 360
+        df['Dir [deg T]'] = dto
         # dictionary for rounding decimal places
         rdict = {'Speed [cm/s]': 2, 'Across [cm/s]': 2, 'Along [cm/s]': 2, 'Dir [deg T]': 0}
 
