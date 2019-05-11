@@ -156,15 +156,15 @@ foreach ($blet as $f) {
             $datestr=$data[0];
     		$timestr=substr($data[1],0,5);
 
-            # last data datetime, for local time
-            $dtTX = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
+            # last data datetime is in UTC -> for local time
+            $dtTX = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
+            $TXtz = new DateTimeZone('America/Chicago');
+            $dtTX->setTimezone($TXtz);
             $dtTXstr = $dtTX->format('M d, Y H:i');
             $dtTXtz = $dtTX->format('T');
 
             # last data datetime, for UTC
-            $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('America/Chicago'));
-            $UTCtz = new DateTimeZone('UTC');
-            $dtUTC->setTimezone($UTCtz);
+            $dtUTC = new DateTime($datestr.$timestr, new DateTimeZone('UTC'));
             $dtUTCstr = $dtUTC->format('H:i');
             $dtUTCtz = $dtUTC->format('T');
 
