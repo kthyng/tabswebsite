@@ -60,7 +60,7 @@ if __name__ == "__main__":
                 else:
                     dend = pd.Timestamp('now', tz='utc')
                 # add to dend to be sure to catch last available time
-                dend += pd.Timestamp('1 hour')
+                dend += pd.Timedelta('1 hour')
                 # start 5 days earlier from 00:00 on day of last data, and account for time zones
                 # so that enough data is read in for time zone conversion
                 # dstart and dend are in UTC
