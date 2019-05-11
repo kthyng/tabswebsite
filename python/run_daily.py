@@ -19,7 +19,7 @@ import logging
 
 bys = bp.load() # load in buoy data
 
-tz = 'US/Central'
+tz = 'US/Central'  # present model output on front page in central time zone
 
 # Email flag. Set to true in script if anything notable is wrong.
 eflag = False
@@ -137,6 +137,8 @@ if __name__ == "__main__":
                 else:
                     logging.warning('No figure was created for buoy %s (table %s)' % (buoy, table))
             except Exception as e:
+                # email if exception since there shouldn't be random exceptions here
+                eflag = True
                 logging.exception(e)
                 logging.warning('Problem reading in data or model for buoy %s (table %s)' % (buoy, table))
 
