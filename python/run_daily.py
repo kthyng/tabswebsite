@@ -61,9 +61,14 @@ if __name__ == "__main__":
                     dend = pd.Timestamp('now', tz='utc')
                 # start 5 days earlier from 00:00 on day of last data, and account for time zones
                 # so that enough data is read in for time zone conversion
+                # dstart and dend are in UTC
                 tzoffset = (dend.tz_localize(None) - dend.tz_convert(tz).tz_localize(None)).seconds/3600.
                 dstart = (dend - pd.Timedelta('5 days')).normalize() + pd.Timedelta(str(tzoffset) + ' hours')
-                dend += pd.Timedelta(str(tzoffset) + ' hours')
+                # do not shift hours for time zone since dend is either now,
+                # so dend shifted would be in the future, or dend is the last
+                # available data time, in which case there is no more data to
+                # find
+                # dend += pd.Timedelta(str(tzoffset) + ' hours')
                 df = read.read(buoy, dstart, dend, table=table, usemodel=False,
                                userecent=True, tz=tz)
                 if len(buoy) == 1:
@@ -139,7 +144,7 @@ if __name__ == "__main__":
             continue
 
         # write header
-        try:    
+        try:
             bh.make(buoy)
         except Exception as e:
             logging.exception(e)

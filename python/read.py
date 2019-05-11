@@ -42,12 +42,12 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     elif buoy in bys.keys() and bys[buoy]['inmysql']:
         # Call general read function to distribute to correct buoy read function
         df = read_buoy(buoy, dstart, dend, table=table, units=units,
-                       tz=tz, userecent=userecent)
+                       userecent=userecent)
     else:
 
         usefile = True  # initially True, set to False once we've read from the file
         fname = '../daily/' + buoy + '_all.hdf'
-        date = dstart
+        date = dstart  # in UTC
         df = pd.DataFrame()
         # check that we are within normal data frequency
         while date + pd.Timedelta('60 minutes') < dend:
@@ -59,6 +59,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
                 usefile = False
                 # if dstart > when data in fname ends, just go to the else on the next while loop
                 if df is not None and not df.empty:
+                    # date is redefined and is in UTC
                     date = df.index[-1].tz_localize('UTC').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
             else:
                 td = pd.Timedelta('31 days')
@@ -72,7 +73,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
                 else:  # convert dend to utc
                     daystoread = min(td, dend.tz_convert('UTC')-date)
                 dftemp = read_buoy(buoy, date, date+daystoread, table=table, units=units,
-                                   tz=tz, usemodel=usemodel, userecent=userecent)
+                                   usemodel=usemodel, userecent=userecent)
                 if df is not None:
                     df = df.append(dftemp, sort=False)
                 else:  # if df is None, rename dftemp to df
@@ -101,7 +102,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     return df
 
 
-def read_buoy(buoy, dstart, dend, table=None, units=None, tz=None,
+def read_buoy(buoy, dstart, dend, table=None, units=None,
          usemodel=False, userecent=True, datum='MSL'):
 
     # need table if TABS buoy
@@ -494,7 +495,8 @@ def read_ndbc_df(dataname):
 def read_tabs(table, buoy, dstart, dend):
     '''Read in TABS data from mysql. Also process variables as needed.
 
-    Time from database is in UTC. dstart, dend are datetime objects.'''
+    Time from database is in UTC. dstart, dend are datetime objects.
+    Time zone information from dstart,dend is ignored. This is in UTC.'''
 
     engine = tools.setup_engine()
     query = tools.query_setup(engine, buoy, table, dstart.strftime("%Y-%m-%d"),
