@@ -604,6 +604,9 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             ds = xr.open_dataset(loc)
             # make sure all variables present
             assert np.asarray([var in ds for var in varstot]).all()
+            # make sure any variable value is accessible to see if there is
+            # secretly a netcdf problem
+            assert ds['u'][0,0,0]
             break
         except KeyError as e:
             logging.exception(e)
