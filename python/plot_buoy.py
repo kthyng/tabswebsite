@@ -721,7 +721,7 @@ These data are not suitable for navigation purposes.'''
              horizontalalignment='left', verticalalignment='top')
 
 
-def setup(nsubplots, table=None, buoy=None):
+def setup(nsubplots, table=None, buoy=None, title=True):
     '''Set up plot'''
 
     if nsubplots == 1:
@@ -744,34 +744,35 @@ def setup(nsubplots, table=None, buoy=None):
     # bottom controlled later
     fig.subplots_adjust(**props)
     # title
-    if buoy is not None:
-        lat = tools.dd2dm(bys.loc[buoy,'lat'])
-        lon = tools.dd2dm(bys.loc[buoy,'lon'])
-        ll = str(lat[0]) + r'$\!^\circ$' + str(lat[1]) + '\'N' + '  ' \
-                + str(abs(lon[0])) + r'$\!^\circ$' + str(lon[1]) + '\'W'
-        if len(buoy) == 1:
-            prefix = 'TABS Buoy'
-        elif len(buoy) == 5:  # NDBC
-            prefix = 'NDBC Station'
-        elif 'tcoon' in table:
-            prefix = 'TCOON Station'
-        elif 'nos' in table:
-            prefix = 'NOS Station'
-        elif 'ports' in table:
-            prefix = 'PORTS Station'
+    if title:
+        if buoy is not None:
+            lat = tools.dd2dm(bys.loc[buoy,'lat'])
+            lon = tools.dd2dm(bys.loc[buoy,'lon'])
+            ll = str(lat[0]) + r'$\!^\circ$' + str(lat[1]) + '\'N' + '  ' \
+                    + str(abs(lon[0])) + r'$\!^\circ$' + str(lon[1]) + '\'W'
+            if len(buoy) == 1:
+                prefix = 'TABS Buoy'
+            elif len(buoy) == 5:  # NDBC
+                prefix = 'NDBC Station'
+            elif 'tcoon' in table:
+                prefix = 'TCOON Station'
+            elif 'nos' in table:
+                prefix = 'NOS Station'
+            elif 'ports' in table:
+                prefix = 'PORTS Station'
 
-        title = '%s %s' % (prefix, buoy)
-        # add other name for buoy if exists
-        if isinstance(bys.loc[buoy,'alias'], str):
-            title += '/%s' % bys.loc[buoy,'alias']
-        title += ': %s' % ll  # add on lat/lon
-        # add description of buoy location if exists
-        if isinstance(bys.loc[buoy,'description'], str):
-            title += '\n%s' % bys.loc[buoy,'description']
+            title = '%s %s' % (prefix, buoy)
+            # add other name for buoy if exists
+            if isinstance(bys.loc[buoy,'alias'], str):
+                title += '/%s' % bys.loc[buoy,'alias']
+            title += ': %s' % ll  # add on lat/lon
+            # add description of buoy location if exists
+            if isinstance(bys.loc[buoy,'description'], str):
+                title += '\n%s' % bys.loc[buoy,'description']
 
-        # title = '%s %s: %s\n%s, %s' % \
-        #         (prefix, buoy, ll, bys.loc[buoy,'alias'], bys.loc[buoy,'description'])
-        axes[0].set_title(title, fontsize=18)
+            # title = '%s %s: %s\n%s, %s' % \
+            #         (prefix, buoy, ll, bys.loc[buoy,'alias'], bys.loc[buoy,'description'])
+            axes[0].set_title(title, fontsize=18)
 
     return fig, axes
 
@@ -1097,7 +1098,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
 def currents(dfs, buoys):
     '''Plot currents for all active buoys.'''
 
-    fig, axes = setup(nsubplots=len(dfs), buoy=buoys[0])
+    fig, axes = setup(nsubplots=len(dfs), buoy=buoys[0], title=False)
 
     # initialize this to be sure one is defined
     dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('4 days'), pd.Timestamp.now()))
