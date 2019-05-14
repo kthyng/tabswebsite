@@ -262,12 +262,17 @@ def add_currents(ax, df, which, east, north, compass=True, df1=None, df2=None, d
         # fill in after the data if more than an hour gap
         if (tlims[1] - idxmax) > 1./24:  # more than an hour
             plotmodel = True
+            idxmaxsave = idxmax  # initialize max data value, might be updated
             for dft, c in zip(dfs, colors):
-                dft = dft.loc[(dft['idx'] < tlims[1]) & (dft['idx'] > idxmax + 0.5/24)]
+                dft = dft.loc[(dft['idx'] < tlims[1]) & (dft['idx'] > idxmaxsave + 0.5/24)]
                 if plotmodel and not dft[east].isnull().all():  # only plot model in this area once
-                    ax.quiver(dft['idx'][::ddt], np.zeros(len(dft[::ddt])), dft[::ddt][east], dft[::ddt][north], headaxislength=0,
-                              headlength=0, width=width, units='y', scale_units='y', scale=1, color=c)
-                    plotmodel = False
+                    ax.quiver(dft['idx'][::ddt], np.zeros(len(dft[::ddt])),
+                              dft[::ddt][east], dft[::ddt][north],
+                              headaxislength=0, headlength=0, width=width,
+                              units='y', scale_units='y', scale=1, color=c)
+                    # plotmodel = False
+                    # update max so that can plot multiple model output sources
+                    idxmaxsave = max((dft.loc[(~dft[east].isnull())]['idx'].max(),idxmaxsave))
 
     if which == 'water':
         varmax = cmax
