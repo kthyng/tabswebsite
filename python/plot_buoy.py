@@ -1096,6 +1096,9 @@ def currents(dfs, buoys):
 
     fig, axes = setup(nsubplots=len(dfs), buoy=buoys[0])
 
+    # initialize this to be sure one is defined
+    dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('4 days'), pd.Timestamp.now()))
+    dfsave = dfsave.tz_localize(df.index.tzinfo.zone)  # get tz
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):
 
@@ -1123,11 +1126,8 @@ def currents(dfs, buoys):
 
         # save a df for labeling the bottom axis if it has at least 4 days of data
         # otherwise it squishes up the labels a lot
-        if df.index[-1] - df.index[0] > pd.Timedelta('4 days'):
+        if (df.index[-1] - df.index[0]) > (dfsave.index[-1] - dfsave.index[0]):
             dfsave = df  # save for using with bottom labeling
-        else:
-            dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('5 days'), pd.Timestamp.now()))
-            dfsave = dfsave.tz_localize(df.index.tzinfo.zone)  # get tz
 
     add_xlabels(axes[len(dfs)-1], dfsave, fig)
 
