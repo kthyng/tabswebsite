@@ -19,6 +19,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
 <!-- Script to make refresh user-controlled with a button -->
+<!-- https://stackoverflow.com/questions/7351725/auto-submit-a-radio-button-but-keep-it-selected -->
 <script>
 function autoSubmit()
 {
