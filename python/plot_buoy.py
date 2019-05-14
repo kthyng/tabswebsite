@@ -1098,7 +1098,11 @@ def currents(dfs, buoys):
 
     # initialize this to be sure one is defined
     dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('4 days'), pd.Timestamp.now()))
-    dfsave = dfsave.tz_localize(df.index.tzinfo.zone)  # get tz
+    tz = 'UTC'  # default choice
+    for df in dfs:
+        if df not None:
+            tz = df.index.tzinfo.zone
+    dfsave = dfsave.tz_localize(tz)  # get tz
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):
 
