@@ -584,8 +584,8 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta_agg',
                 'http://barataria.tamu.edu:6060/thredds/dodsC/NcML/txla_hindcast_sta']
     elif timing == 'recent':
-        locs = ['http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
-                'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
+        locs = ['http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
+                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
                 'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive2_agg.nc',
                 'http://terrebonne.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive2_agg.nc']
     elif timing == 'forecast':
