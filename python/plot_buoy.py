@@ -1110,11 +1110,6 @@ def currents(dfs, buoys):
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):
 
-        if df is None or df.empty or df['East [cm/s]'].isnull().all():
-            ax.text(0.2, 0.5, 'Data not available for buoy ' + buoy + ' at this time.', transform=ax.transAxes)
-            ax.get_yaxis().set_ticks([])
-            continue
-
         # label buoy plots
         if len(dfs) == 5:
             ax.text(0.95, 0.75, buoy, transform=ax.transAxes,
@@ -1122,6 +1117,11 @@ def currents(dfs, buoys):
         elif len(dfs) == 4:
             ax.text(0.95, 0.8, buoy, transform=ax.transAxes,
                     horizontalalignment='center', fontsize=30, alpha=0.3)
+
+        if df is None or df.empty or df['East [cm/s]'].isnull().all():
+            ax.text(0.2, 0.5, 'Data not available at this time.', transform=ax.transAxes)
+            ax.get_yaxis().set_ticks([])
+            continue
 
         # have to implement timezone to get shift into idx
         df.insert(0, 'idx', date2num(df.index.tz_localize(None).to_pydatetime()))
