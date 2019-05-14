@@ -18,31 +18,33 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
+<!-- Script to make refresh user-controlled with a button -->
+<script>
+function autoSubmit()
+{
+    var formObject = document.forms['theForm'];
+    formObject.submit();
+}
+</script>
 
-<!-- <link href="css/leaflet.css"  rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- allow for user to turn off refresh
+Default to refresh being on. If refresh is on, refresh every 300 seconds. -->
+<?php
+$refresh=$_GET["refresh"];
+if (! $refresh) {$refresh = 'on';}
 
+if ($refresh == "on") {
+print <<<_HTML_
+    <meta HTTP-EQUIV="REFRESH" CONTENT="300">
+_HTML_;
+}
+?>
 
-<!-- <link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/default.css" media="all" rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/style.css" media="all" rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css"> -->
-<!-- <link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css"> -->
-
-<!-- <link rel="stylesheet" href="css/zentools.css" type="text/css" /> -->
-<!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
-
-<!-- allow for low bandwidth option -->
+<!-- allow for low bandwidth option. Turn off hover images on front page to
+save on loading. -->
 <?php
 $bandwidth=$_GET["bandwidth"];
 if (! $bandwidth) {$bandwidth = 'high';}
-if ($bandwidth=='low') {$bandwidthnew = 'high';}
-else if ($bandwidth=='high') {$bandwidthnew = 'low';}
-?>
-
-<!-- This is for the hovering images -->
-<?php
 if ($bandwidth == "high") {
 print <<<_HTML_
     <script type="text/javascript" src="js/jquery.min.js"></script>
@@ -59,8 +61,19 @@ _HTML_;
 }
 ?>
 
-<!-- this script refreshes the page if there have not been clicks in 30 min -->
-<script type="text/javascript" src="js/refresh.js"></script>
+<!-- <link href="css/leaflet.css"  rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/bootstrap.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/bootstrap-responsive.css" media="all" rel="stylesheet" type="text/css"> -->
+
+
+<!-- <link href="css/leaflet.ie.css"  rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/default.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/style.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/SAglobal.css" media="all" rel="stylesheet" type="text/css"> -->
+<!-- <link href="css/SAprint.css" media="print" rel="stylesheet" type="text/css"> -->
+
+<!-- <link rel="stylesheet" href="css/zentools.css" type="text/css" /> -->
+<!-- <link href="images/favicon.ico" rel="icon" type="image/x-icon" /> -->
 
 </HEAD>
 
@@ -94,10 +107,16 @@ last three hours of the available data, potentially with a delay indicated.<br>
 </center>
 </div>
 
-<!-- bandwidth button -->
-<?php
-    print "<a style='background-color:mintcream;' href=/tabswebsite/index.php?bandwidth=$bandwidthnew>Click for $bandwidthnew bandwidth</a>\n";
-?>
+
+<!-- Refresh and bandwidth buttons -->
+<form name='theForm' id='theForm'><b>Refresh:</b>
+    <input type="radio" name="refresh" <?php if ($refresh == 'on') { ?>checked='checked' <?php } ?>value="on" onChange="autoSubmit();" />On
+    <input type="radio" name="refresh" <?php if ($refresh == 'off') { ?>checked='checked' <?php } ?> value="off" onChange="autoSubmit();" />Off
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Bandwidth:</b>
+    <input type="radio" name="bandwidth" <?php if ($bandwidth == 'high') { ?>checked='checked' <?php } ?>value="high" onChange="autoSubmit();" />Normal
+    <input type="radio" name="bandwidth" <?php if ($bandwidth == 'low') { ?>checked='checked' <?php } ?> value="low" onChange="autoSubmit();" />Low
+</form>
+
 
 </div>
 <!-- end map -->
