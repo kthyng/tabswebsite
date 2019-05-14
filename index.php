@@ -147,15 +147,17 @@ $csv = array_map("str_getcsv", file("includes/buoys.csv"));
 $header = array_shift($csv); // Seperate the header from data
 $col = array_search("buoy", $header);  # save column name for buoys
 $active = array_search("active", $header);  # save column name for buoys being active
+$table1 = array_search("table1", $header);  # save column name for buoy table1
 
 foreach ($csv as $row) {  // loop over each row in csv file
     // check if buoy is active
     if (strcmp($row[$active], "TRUE") == 0) {
     	$blet[] = $row[$col];  // if so, save buoy name
+        $btable1[] = $row[$table1];  // also save table1 value to know when to put in headers
     }
 }
 
-$bidx=0;
+$bidx=0;  // counter for each line
 foreach ($blet as $f) {
     if (strlen($f) == 1) {
     	$venfile="daily/tabs_".$f."_sum";
@@ -216,19 +218,20 @@ foreach ($blet as $f) {
     }
     print $buoystr;
     $bidx++;
-    if ($f == "X") {
+    // looks at next buoy since count + already happened
+    if ((strpos($btable1[$bidx],'ndbc')===0) and (strpos($btable1[$bidx-1],'ndbc')!==0)) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i><a name='ndbc'>NDBC</a></i></td></tr>";  // Label between TABS and NDBC buoys
     }
-    else if ($f == "BURL1") {
+    else if ((strpos($btable1[$bidx],'ports')===0) and (strpos($btable1[$bidx-1],'ports')!==0)) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i><a name='ports'>PORTS</a></i></td></tr>";
     }
-    else if ($f == "cc0401") {
+    else if ((strpos($btable1[$bidx],'tcoon')===0) and (strpos($btable1[$bidx-1],'tcoon')!==0)) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i><a name='tcoon'>TCOON</a></i></td></tr>";  // Label between PORTS and TCOON buoys
     }
-    else if ($f == "8779749") {
+    else if ((strpos($btable1[$bidx],'nos')===0) and (strpos($btable1[$bidx-1],'nos')!==0)) {
     print "<tr><td><br></td></tr>";  // space
     print "<tr><td></td><td><i><a name='nos'>NOS</a></i></td></tr>";  // Label between PORTS and TCOON buoys
     }
