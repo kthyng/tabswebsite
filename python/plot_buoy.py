@@ -1103,7 +1103,7 @@ def currents(dfs, buoys):
     # initialize this to be sure one is defined
     dfsave = pd.DataFrame(index=pd.date_range(pd.Timestamp.now() - pd.Timedelta('4 days'), pd.Timestamp.now()))
     tz = 'UTC'  # default choice
-    dfsave = dfsave.tz_localize(tz)
+    dfsave = dfsave.tz_localize(tz)  # get tz
     first = True  # flag for first currents plot
     for ax, df, buoy in zip(axes, dfs, buoys):
 
@@ -1116,7 +1116,7 @@ def currents(dfs, buoys):
                     horizontalalignment='center', fontsize=30, alpha=0.3)
 
         if df is None or df.empty or df['East [cm/s]'].isnull().all():
-            ax.text(0.2, 0.5, 'Data not available at this time.', transform=ax.transAxes)
+            ax.text(0.2, 0.5, 'Data not available for buoy ' + buoy + ' at this time.', transform=ax.transAxes)
             ax.get_yaxis().set_ticks([])
             continue
 
