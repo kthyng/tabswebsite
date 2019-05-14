@@ -3,7 +3,6 @@ Update long-term data files.
 '''
 
 import tools
-import buoy_properties as bp
 import pandas as pd
 from os import path
 import run_daily as rd
@@ -11,7 +10,7 @@ import read
 import logging
 import numpy as np
 
-bys = bp.load() # load in buoy data
+bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5']
 
 
@@ -30,14 +29,15 @@ def remake_file(buoys=None, tables=None, remaketype='hdf', remakefrom='txt'):
     '''
 
     if buoys is None:
-        buoys = bys.keys()
+        buoys = bys.index
 
     # loop through buoys
     for buoy in buoys:
 
         # pulls out the non-nan table values to loop over valid table names
         if len(buoy) == 1 and tables is None:
-            tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
+            tables = [bys.loc[buoy,table] for table in tablekeys if not
+                      pd.isnull(bys.loc[buoy,table])]
         elif tables is None:
             tables = ['unused']
 
@@ -75,7 +75,7 @@ def readwrite(buoy, table=None, dstart=pd.Timestamp('1980-1-1', tz='utc')):
         fname = path.join('..', 'daily', buoy + '_all')
 
     # if buoy is inactive and its "all" file exists, don't read
-    if buoy in bys.keys() and not bys[buoy]['active'] and path.exists(fname):
+    if buoy in bys.index and not bys.loc[buoy,'active'] and path.exists(fname):
         return
 
     # two types of files
@@ -148,10 +148,10 @@ if __name__ == "__main__":
                         datefmt='%a %b %d, %H:%M:%S %Z, %Y')
 
     # loop through buoys: query, make text file
-    for buoy in bys.keys():
+    for buoy in bys.index:
 
         # pulls out the non-nan table values to loop over valid table names
-        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table])]
+        tables = [bys.loc[buoy,table] for table in tablekeys if not pd.isnull(bys.loc[buoy,table])]
 
         for table in tables:  # loop through tables for each buoy
             if 'predict' not in table:  # don't use tables for model predictions

@@ -11,13 +11,12 @@ import plot_buoy
 from os import path
 from matplotlib.pyplot import close
 import tools
-import buoy_properties as bp
 import buoy_header as bh
 import read
 from matplotlib.dates import date2num
 import logging
 
-bys = bp.load() # load in buoy data
+bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 tz = 'US/Central'  # present model output on front page in central time zone
 
@@ -38,19 +37,20 @@ if __name__ == "__main__":
     tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5', 'table6']
 
     # loop through buoys: query, make text file, make plot
-    for buoy in bys.keys():
+    for buoy in bys.index:
         # pulls out the non-nan table values to loop over valid table names
         # exclude "tidepredict" since it is not a separate table
-        tables = [bys[buoy][table] for table in tablekeys if not pd.isnull(bys[buoy][table]) and 'predict' not in bys[buoy][table]]
-
+        tables = [bys.loc[buoy,table] for table in tablekeys if not
+                  pd.isnull(bys.loc[buoy,table]) and 'predict' not in
+                  bys.loc[buoy,table]]
         for table in tables:  # loop through tables for each buoy
             # only do this for active buoys
-            if not bys[buoy]['active']:
+            if not bys.loc[buoy,'active']:
                 continue
             # print(buoy)
             try:
                 # read in data in UTC
-                if bys[buoy]['inmysql']:  # mysql tables
+                if bys.loc[buoy,'inmysql']:  # mysql tables
                     if table == 'sum':
                         # need to have this choose most recent data available
                         # choose to look for ven since sum mostly shows ven data
@@ -90,7 +90,8 @@ if __name__ == "__main__":
                 now = pd.Timestamp('now', tz='utc').normalize()
                 past = now - pd.Timedelta('5 days')
                 future = now + pd.Timedelta('4 days')
-                if bp.model(buoy, 'rho') and table != 'eng':
+                # look for model output when buoy is in model domain
+                if ~np.isnan(bys.loc[buoy,'station_number']) and table != 'eng':
                     # read in recent model output, not tied to when data output was found
                     dfmodelrecent = read.read(buoy, past, now, table=table,
                                                     usemodel='recent', tz=tz)
@@ -106,7 +107,7 @@ if __name__ == "__main__":
                     dfmodelrecent = None
                     dfmodelforecast = None
 
-                if bys[buoy]['table2'] == 'tidepredict' or bys[buoy]['table2'] == 'currentspredict':
+                if bys.loc[buoy,'table2'] in ['tidepredict', 'currentspredict']:
                     # import pdb; pdb.set_trace()
                     dfmodeltides = read.read(buoy, past, future, usemodel=True, tz=tz)
                 else:
@@ -116,7 +117,7 @@ if __name__ == "__main__":
                 if dfmodeltides is not None:  # catches PORTS and tide prediction
                     tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(future).to_pydatetime())]
                 # none of these use model output, so no forecast and therefore no
-                elif table == 'wave' or table == 'eng' or not bp.model(buoy, 'rho'):
+                elif table == 'wave' or table == 'eng' or np.isnan(bys.loc[buoy,'station_number']):
                     # tlims = None
                     tlims = [date2num(pd.to_datetime(past).to_pydatetime()), date2num(pd.to_datetime(now).to_pydatetime())]
                 else:
@@ -145,8 +146,8 @@ if __name__ == "__main__":
     engine.dispose()
 
 
-    for buoy in bys.keys():  # loop through buoys separately for buoy headers
-        if not bys[buoy]['active']:  # only do this for active buoys
+    for buoy in bys.index:  # loop through buoys separately for buoy headers
+        if not bys.loc[buoy,'active']:  # only do this for active buoys
             continue
 
         # write header
@@ -159,8 +160,8 @@ if __name__ == "__main__":
     # separate for making currents summaries
     # use data that was calculated previously in this script
     dfs = []; buoys = []
-    for buoy in bys.keys():
-        if len(buoy) > 1 or not bys[buoy]['active']:  # don't include other buoys
+    for buoy in bys.index:
+        if len(buoy) > 1 or not bys.loc[buoy,'active']:  # don't include other buoys
             continue
         fname = 'tabs_' + buoy + '_ven'
         df = pd.read_table(path.join('..', 'daily/', fname), parse_dates=True,

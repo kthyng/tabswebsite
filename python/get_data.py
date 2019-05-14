@@ -20,7 +20,6 @@ from os import path
 import pandas as pd
 from matplotlib.dates import date2num
 import read
-import buoy_properties as bp
 import logging
 
 logging.basicConfig(filename=path.join('..', 'logs', 'get_data.log'),
@@ -28,7 +27,7 @@ logging.basicConfig(filename=path.join('..', 'logs', 'get_data.log'),
                     format='%(asctime)s %(message)s',
                     datefmt='%a %b %d %H:%M:%S %Z %Y')
 
-bys = bp.load() # load in buoy properties
+bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 # parse the input arguments
 parser = argparse.ArgumentParser()
@@ -92,7 +91,7 @@ if 'tabs_' in fname:  # only need table name for tabs
     buoy = fname.split('/')[-1].split('_')[1]
 else:
     buoy = fname.split('/')[-1].split('_')[0]
-    table = bys[buoy]['table1']
+    table = bys.loc[buoy,'table1']
 
 # force the use of metric units if making a plot since both units shown anyway
 if datatype == 'pic':
@@ -117,7 +116,7 @@ else:
 
     ## Read model ##
     # To use NOAA-provided model predictions
-    if usemodel and bys[buoy]['table1'] == 'ports' and buoy != 'cc0101':
+    if usemodel and bys.loc[buoy,'table1'] == 'ports' and buoy != 'cc0101':
         dfmodelhindcast = None
         dfmodelrecent = None
         dfmodelforecast = None
@@ -125,7 +124,7 @@ else:
                                     userecent=True, tz=tz, units=units)
 
     # using model but not ports buoy
-    elif usemodel: # and bys[buoy]['table1'] in tables:
+    elif usemodel: # and bys.loc[buoy,'table1'] in tables:
         dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
                                           usemodel='hindcast', tz=tz, units=units, s_rho=int(s_rho))
         # only look for nowcast model output if hindcast doesn't cover it
@@ -137,7 +136,7 @@ else:
                                             usemodel='recent', tz=tz, units=units, s_rho=int(s_rho))
         dfmodelforecast = read.read(buoy, dstart, dend, table=table,
                                           usemodel='forecast', tz=tz, units=units, s_rho=int(s_rho))
-        if bys[buoy]['table2'] == 'tidepredict':
+        if bys.loc[buoy,'table2'] == 'tidepredict':
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
         else:

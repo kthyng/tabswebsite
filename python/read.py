@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 from matplotlib.dates import date2num
-import buoy_properties as bp
 import xarray as xr
 from os import system, path
 import tools
@@ -15,7 +14,7 @@ import netCDF4 as netCDF
 import octant
 import gsw
 
-bys = bp.load() # load in buoy data
+bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 
 def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
@@ -40,7 +39,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         #     'usemodel should be a string containing "hindcast", "recent", or "forecast"'
         df = read_model(buoy, table, dstart, dend, timing=usemodel, tz=tz,
                         units=units, s_rho=s_rho)
-    elif buoy in bys.keys() and bys[buoy]['inmysql']:
+    elif buoy in bys.index and bys.loc[buoy,'inmysql']:
         # Call general read function to distribute to correct buoy read function
         df = read_buoy(buoy, dstart, dend, table=table, units=units,
                        userecent=userecent)
@@ -64,7 +63,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
                     date = df.index[-1].tz_localize('UTC').normalize() + pd.Timedelta('1 day')  # bump up to start of next day
             else:
                 td = pd.Timedelta('31 days')
-                if buoy in bys.keys() and 'ports' in bys[buoy]['table1'] and usemodel:
+                if buoy in bys.index and 'ports' in bys.loc[buoy,'table1'] and usemodel:
                     td = pd.Timedelta('6 days')  # tidal model gives 7 days of output
                 elif 'full' in buoy:  # ADCP full data case
                     td = pd.Timedelta('30 days')
@@ -93,7 +92,7 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
         df = None
 
     # Convert sea level datum from MSL to whatever user chose
-    if datum != 'MSL' and bys[buoy]['table1'] in ['tcoon', 'tcoon-tide', 'nos', 'nos-water', 'nos-cond']:  # it is 'MSL' by default
+    if datum != 'MSL' and bys.loc[buoy,'table1'] in ['tcoon', 'tcoon-tide', 'nos', 'nos-water', 'nos-cond']:  # it is 'MSL' by default
         key = 'Water Level [m, MSL]'
         dz = tools.datum(buoy, datum)  # finds delta z between datums
         df[key] += dz
@@ -112,24 +111,24 @@ def read_buoy(buoy, dstart, dend, table=None, units=None,
 
     # if/elif statements checking which table type buoy has
     # ports check more complicated in case reading in full data
-    if 'ports' in bys[buoy.split('_')[0]]['table1']:
+    if 'ports' in bys.loc[buoy.split('_')[0],'table1']:
         if 'full' in buoy:
             df = read_ports_depth(buoy, dstart, dend)
         else:
             df = read_ports(buoy, dstart, dend, usemodel=usemodel)
-    elif 'tcoon' in bys[buoy]['table1'] or 'nos' in bys[buoy]['table1']:
+    elif 'tcoon' in bys.loc[buoy,'table1'] or 'nos' in bys.loc[buoy,'table1']:
         df = read_nos(buoy, dstart, dend, usemodel=usemodel)
-    elif 'ndbc' in bys[buoy]['table1']:  # whether or not in mysql database
+    elif 'ndbc' in bys.loc[buoy,'table1']:  # whether or not in mysql database
         df = read_ndbc(buoy, dstart, dend, userecent=userecent)
     elif len(buoy) == 1:  # tabs buoys
         # sum goes across tables
         dfs = []
         if table == 'sum':
             dfs.append(read_tabs('ven', buoy, dstart, dend))
-            if isinstance(bys[buoy]['table3'], str) and 'salt' in bys[buoy]['table3']:
+            if isinstance(bys.loc[buoy,'table3'], str) and 'salt' in bys.loc[buoy,'table3']:
                 # drop water temp from here so that there aren't two in dataframe
                 dfs.append(read_tabs('salt', buoy, dstart, dend).drop(['WaterT [deg C]'], axis=1))
-            if isinstance(bys[buoy]['table4'], str) and 'met' in bys[buoy]['table4']:
+            if isinstance(bys.loc[buoy,'table4'], str) and 'met' in bys.loc[buoy,'table4']:
                 dfs.append(read_tabs('met', buoy, dstart, dend))
             # combine tables together
             df = pd.concat([df for df in dfs], axis=1, sort=False)
@@ -151,7 +150,7 @@ def read_ports_depth(buoy, dstart, dend):
     url += dst.strftime('%Y-%m-%dT00:00:00Z/') + den.strftime('%Y-%m-%dT23:59:00Z')
 
     # along-channel direction
-    diralong = 90 - bys[buoy]['angle']
+    diralong = 90 - bys.loc[buoy,'angle']
     if diralong < 0:
         diralong += 360
 
@@ -263,7 +262,7 @@ def read_ports_df(dataname, dates=None):
         theta[theta<0] += 360
         # tidal data needs to be converted into along-channel direction
         # along-channel flood direction (from website for data), converted from compass to math angle
-        diralong = 90 - bys[buoy]['angle']
+        diralong = 90 - bys.loc[buoy,'angle']
         if diralong < 0:
             diralong += 360
         # first convert to east/west, north/south
@@ -364,7 +363,7 @@ def read_nos_df(dataname):
 
     elif 'type=phys' in dataname:
         buoy = dataname.split('id=')[1][:7]
-        if 'cond' in bys[buoy]['table1']:
+        if 'cond' in bys.loc[buoy,'table1']:
             names = ['WaterT [deg C]', 'Conductivity [mS/cm]']
         else:
             names = ['WaterT [deg C]']
@@ -396,7 +395,7 @@ def read_ndbc(buoy, dstart, dend, userecent=True):
     userecent=True will use recent 45 days of data. userecent=False will not.
     '''
 
-    if bys[buoy]['inmysql']:  # mysql
+    if bys.loc[buoy,'inmysql']:  # mysql
 
         engine = tools.setup_engine()
         q = tools.query_setup(engine, buoy, 'ndbc',
@@ -528,7 +527,7 @@ def read_tabs(table, buoy, dstart, dend):
         df['Speed [cm/s]'] = df['Speed [cm/s]'].round(2)
         # Calculate along- and across-shelf
         # along-shelf rotation angle in math angle convention
-        theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
+        theta = np.deg2rad(-(bys.loc[buoy,'angle']-90))  # convert from compass to math angle
         df['Across [cm/s]'] = df['veast']*np.cos(-theta) - df['vnorth']*np.sin(-theta)
         df['Along [cm/s]'] = df['veast']*np.sin(-theta) + df['vnorth']*np.cos(-theta)
         # calculate direction that currents are pointing toward. This is not "compass".
@@ -601,7 +600,14 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
 
     # Try different locations for model output. If won't work, give up.
     # loop over station files first since faster if can use, then regular files
-    ibuoy = bp.station(buoy)  # get location in stations file for buoy
+    ibuoy = bys.loc[buoy,'station_number']  # get location in stations file for buoy
+
+    # stop if no station for buoy
+    if np.isnan(ibuoy):
+        return None
+    else:
+        ibuoy = int(ibuoy)
+
     for i, loc in enumerate(locs):
         try:
             ds = xr.open_dataset(loc)
@@ -715,7 +721,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         # Project along- and across-shelf velocity rather than use from model
         # so that angle matches buoy
         df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(df['Along [cm/s]'], df['Across [cm/s]'], anglev)  # approximately to east, north
-        theta = np.deg2rad(-(bys[buoy]['angle']-90))  # convert from compass to math angle
+        theta = np.deg2rad(-(bys.loc[buoy,'angle']-90))  # convert from compass to math angle
         if ~np.isnan(theta):
             df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
             df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)

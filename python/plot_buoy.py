@@ -10,13 +10,11 @@ if platform == 'linux':
     mpl.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import buoy_properties as bp
 from datetime import datetime, timedelta
 import tools
 from matplotlib.dates import date2num, num2date
 import pandas as pd
 import pytz
-
 
 mpl.rcParams.update({'font.size': 14})
 
@@ -28,7 +26,7 @@ c2 = 'cornflowerblue'  # #6495ed
 c1 = '#4B70B2'  # darker shade of cornflowerblue
 c3 = '#7764ED'
 
-bys = bp.load() # load in buoy data
+bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 
 def shifty(ax, N=0.05, which='both'):
@@ -332,12 +330,12 @@ def add_vel(ax, df, buoy, which, ymaxrange=None, df1=None, df2=None, df3=None,
         ax.text(0.02, 0.9, 'OFFSHORE', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'ONSHORE', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.9, str(bys[buoy]['angle']) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.9, str(bys.loc[buoy,'angle']) + '˚T', fontsize=10, transform=ax.transAxes)
     elif which == 'Along [cm/s]':
         ax.text(0.02, 0.9, 'UPCOAST (to LA)', fontsize=10, transform=ax.transAxes)
         ax.text(0.02, 0.03, 'DOWNCOAST (to MX)', fontsize=10, transform=ax.transAxes)
         # add angle
-        ax.text(0.9, 0.9, str(bys[buoy]['angle']-90) + '˚T', fontsize=10, transform=ax.transAxes)
+        ax.text(0.9, 0.9, str(bys.loc[buoy,'angle']-90) + '˚T', fontsize=10, transform=ax.transAxes)
 
 
 def add_var_2units(ax1, df, key, label1, con, label2, ymaxrange=None, df1=None,
@@ -742,8 +740,8 @@ def setup(nsubplots, table=None, buoy=None):
     fig.subplots_adjust(**props)
     # title
     if buoy is not None:
-        lat = tools.dd2dm(bys[buoy]['lat'])
-        lon = tools.dd2dm(bys[buoy]['lon'])
+        lat = tools.dd2dm(bys.loc[buoy,'lat'])
+        lon = tools.dd2dm(bys.loc[buoy,'lon'])
         ll = str(lat[0]) + r'$\!^\circ$' + str(lat[1]) + '\'N' + '  ' \
                 + str(abs(lon[0])) + r'$\!^\circ$' + str(lon[1]) + '\'W'
         if len(buoy) == 1:
@@ -759,15 +757,15 @@ def setup(nsubplots, table=None, buoy=None):
 
         title = '%s %s' % (prefix, buoy)
         # add other name for buoy if exists
-        if isinstance(bys[buoy]['alias'], str):
-            title += '/%s' % bys[buoy]['alias']
+        if isinstance(bys.loc[buoy,'alias'], str):
+            title += '/%s' % bys.loc[buoy,'alias']
         title += ': %s' % ll  # add on lat/lon
         # add description of buoy location if exists
-        if isinstance(bys[buoy]['description'], str):
-            title += '\n%s' % bys[buoy]['description']
+        if isinstance(bys.loc[buoy,'description'], str):
+            title += '\n%s' % bys.loc[buoy,'description']
 
         # title = '%s %s: %s\n%s, %s' % \
-        #         (prefix, buoy, ll, bys[buoy]['alias'], bys[buoy]['description'])
+        #         (prefix, buoy, ll, bys.loc[buoy,'alias'], bys.loc[buoy,'description'])
         axes[0].set_title(title, fontsize=18)
 
     return fig, axes
@@ -781,7 +779,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
     '''
 
     if which is None:  # can read in table if not tabs buoy
-        which = bys[buoy]['table1']
+        which = bys.loc[buoy,'table1']
 
     if which in ['tcoon-tide', 'ports']:
         if buoy == 'cc0101':
@@ -1048,8 +1046,8 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                        tlims=tlims, cc1='k', cc2='#559349')
 
     elif which == 'ports':
-        if ~np.isnan(bys[buoy]['Distance to center of bin [m]']):
-            dodistance = bys[buoy]['Distance to center of bin [m]']  # label it on plot
+        if ~np.isnan(bys.loc[buoy,'Distance to center of bin [m]']):
+            dodistance = bys.loc[buoy,'Distance to center of bin [m]']  # label it on plot
         else:
             dodistance = False
         if buoy == 'cc0101':  # this buoy is on the shelf and is not along-channel
@@ -1067,9 +1065,9 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
                            'cps2kts', '[knots]', ymaxrange=[-150,150],
                            df4=df4,
                            dolegend=True, add0=True, tlims=tlims, doebbflood=True,
-                           doangle=bys[buoy]['angle'],
-                           dodepth=bys[buoy]['Depth to center of bin [m]'],
-                           dodepthm=bys[buoy]['Model depth to center of bin [m]'],
+                           doangle=bys.loc[buoy,'angle'],
+                           dodepth=bys.loc[buoy,'Depth to center of bin [m]'],
+                           dodepthm=bys.loc[buoy,'Model depth to center of bin [m]'],
                            dodistance=dodistance)
 
     # use longer dataframe in case data or model are cut short
