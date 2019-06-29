@@ -618,28 +618,28 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             assert ds['u'][0,0,0]
             break
         except KeyError as e:
-            logging.exception(e)
+            logging.info(e)  # set logging level to info so that is only logged if level is changed
             if i < len(locs)-1:  # in case there is another option to try
                 logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except RuntimeError as e:
-            logging.exception(e)
+            logging.info(e)
             if i < len(locs)-1:  # in case there is another option to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except IOError as e:  # if link tried is not working
-            logging.exception(e)
+            logging.info(e)
             if i < len(locs)-1:  # in case there is another option to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except Exception as e:
-            logging.exception(e)
+            logging.exception(e)  # keep this as exception level since error isn't known in this case
             if i < len(locs)-1:  # in case there is another option to try
                 logging.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
