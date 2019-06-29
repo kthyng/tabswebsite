@@ -136,12 +136,12 @@ if __name__ == "__main__":
                     fig.savefig(fname + '_low.png', dpi=60)
                     close(fig)
                 else:
-                    logging.warning('No figure was created for buoy %s (table %s)' % (buoy, table))
+                    logging.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
             except Exception as e:
                 # email if exception since there shouldn't be random exceptions here
                 eflag = True
                 logging.exception(e)
-                logging.warning('Problem reading in data or model for buoy %s (table %s)' % (buoy, table))
+                logging.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
 
     engine.dispose()
 
