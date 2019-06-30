@@ -16,6 +16,11 @@ import gsw
 
 bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
+# log for model output messages, since they swamp all others
+logging.basicConfig(filename=path.join('..', 'logs', 'models.log'),
+                    level=logging.WARNING,
+                    format='%(asctime)s %(message)s',
+                    datefmt='%a %b %d %H:%M:%S %Z %Y')
 
 def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
          usemodel=False, userecent=True, datum='MSL', s_rho=-1):
