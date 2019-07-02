@@ -684,10 +684,12 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             # need to deal separately with s_rho and s_w grid
             try:
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+                # this brings in all times but cannot easily separate times. Just average.
+                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
             except:  # try again
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-            # this brings in all times but cannot easily separate times. Just average.
-            zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
+                # this brings in all times but cannot easily separate times. Just average.
+                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
             df = df.reset_index(['s_rho'])
             df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
 
@@ -717,10 +719,12 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                             'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
             try:
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+                # this brings in all times but cannot easily separate times. Just average.
+                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
             except:  # try again
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
-            # this brings in all times but cannot easily separate times. Just average.
-            zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
+                # this brings in all times but cannot easily separate times. Just average.
+                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
             df = df.reset_index(level=0).set_index('ocean_time')
 
         # adjustments
