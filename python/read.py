@@ -712,7 +712,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 varnames += ['East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
                             'RelH [%]', 'Free surface [m]', 'Surface net heat flux [W/m^2]',
                             'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
-            df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+            try:
+                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+            except:
+                import pdb; pdb.set_trace()
             # this brings in all times but cannot easily separate times. Just average.
             zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
             df = df.reset_index(level=0).set_index('ocean_time')
