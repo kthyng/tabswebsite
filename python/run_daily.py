@@ -28,7 +28,7 @@ logging.captureWarnings(True)
 
 if __name__ == "__main__":
 
-    logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
+    log_rd = logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
                         level=logging.WARNING,
                         format='%(asctime)s %(message)s',
                         datefmt='%a %b %d %H:%M:%S %Z %Y')
@@ -136,12 +136,12 @@ if __name__ == "__main__":
                     fig.savefig(fname + '_low.png', dpi=60)
                     close(fig)
                 else:
-                    logging.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
+                    log_rd.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
             except Exception as e:
                 # email if exception since there shouldn't be random exceptions here
                 eflag = True
-                logging.exception(e)
-                logging.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
+                log_rd.exception(e)
+                log_rd.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
 
     engine.dispose()
 
@@ -154,8 +154,8 @@ if __name__ == "__main__":
         try:
             bh.make(buoy)
         except Exception as e:
-            logging.exception(e)
-            logging.warning('Cannot make header file for buoy %s' % buoy)
+            log_rd.exception(e)
+            log_rd.warning('Cannot make header file for buoy %s' % buoy)
 
     # separate for making currents summaries
     # use data that was calculated previously in this script
