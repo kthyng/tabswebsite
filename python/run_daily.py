@@ -26,12 +26,26 @@ eflag = False
 # Capture warnings in log instead of emailing me
 logging.captureWarnings(True)
 
+# formatting for logfile
+formatter = logging.Formatter('%(asctime)s %(message)s','%a %b %d %H:%M:%S %Z %Y')
+name = 'run_daily'
+logfilename = path.join('..', 'logs', name + '.log')
+loglevel=logging.WARNING
+# logdatefmt='%a %b %d %H:%M:%S %Z %Y'
+
 if __name__ == "__main__":
 
-    log_rd = logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
-                        level=logging.WARNING,
-                        format='%(asctime)s %(message)s',
-                        datefmt='%a %b %d %H:%M:%S %Z %Y')
+    # set up logger file
+    handler = logging.FileHandler(logfilename)
+    handler.setFormatter(formatter)
+    logger_rd = logging.getLogger(name)
+    logger_rd.setLevel(loglevel)
+    logger_rd.addHandler(handler)
+
+    # log_rd = logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
+    #                     level=logging.WARNING,
+    #                     format='%(asctime)s %(message)s',
+    #                     datefmt='%a %b %d %H:%M:%S %Z %Y')
 
     engine = tools.setup_engine()
     tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5', 'table6']
@@ -136,12 +150,12 @@ if __name__ == "__main__":
                     fig.savefig(fname + '_low.png', dpi=60)
                     close(fig)
                 else:
-                    log_rd.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
+                    logger_rd.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
             except Exception as e:
                 # email if exception since there shouldn't be random exceptions here
                 eflag = True
-                log_rd.exception(e)
-                log_rd.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
+                logger_rd.exception(e)
+                logger_rd.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
 
     engine.dispose()
 
@@ -154,8 +168,8 @@ if __name__ == "__main__":
         try:
             bh.make(buoy)
         except Exception as e:
-            log_rd.exception(e)
-            log_rd.warning('Cannot make header file for buoy %s' % buoy)
+            logger_rd.exception(e)
+            logger_rd.warning('Cannot make header file for buoy %s' % buoy)
 
     # separate for making currents summaries
     # use data that was calculated previously in this script

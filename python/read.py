@@ -17,10 +17,21 @@ import gsw
 bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 # log for model output messages, since they swamp all others
-log_read = logging.basicConfig(filename=path.join('..', 'logs', 'models.log'),
-                    level=logging.WARNING,
-                    format='%(asctime)s %(message)s',
-                    datefmt='%a %b %d %H:%M:%S %Z %Y')
+# log_read = logging.basicConfig(filename=path.join('..', 'logs', 'models.log'),
+#                     level=logging.WARNING,
+#                     format='%(asctime)s %(message)s',
+#                     datefmt='%a %b %d %H:%M:%S %Z %Y')
+# formatting for logfile
+formatter = logging.Formatter('%(asctime)s %(message)s','%a %b %d %H:%M:%S %Z %Y')
+name = 'models'
+logfilename = path.join('..', 'logs', name + '.log')
+loglevel=logging.WARNING
+# set up logger file
+handler = logging.FileHandler(logfilename)
+handler.setFormatter(formatter)
+logger_read = logging.getLogger(name)
+logger_read.setLevel(loglevel)
+logger_read.addHandler(handler)
 
 def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
          usemodel=False, userecent=True, datum='MSL', s_rho=-1):
@@ -623,32 +634,32 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             assert ds['u'][0,0,0]
             break
         except KeyError as e:
-            log_read.info(e)  # set logging level to info so that is only logged if level is changed
+            logger_read.info(e)  # set logging level to info so that is only logged if level is changed
             if i < len(locs)-1:  # in case there is another option to try
-                log_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
+                logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
-                log_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.\n' % (timing, buoy, loc))
+                logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except RuntimeError as e:
-            log_read.info(e)
+            logger_read.info(e)
             if i < len(locs)-1:  # in case there is another option to try
-                log_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
+                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
-                log_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.\n' % (timing, buoy, loc))
+                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except IOError as e:  # if link tried is not working
-            log_read.info(e)
+            logger_read.info(e)
             if i < len(locs)-1:  # in case there is another option to try
-                log_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
+                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
-                log_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. No more options.\n' % (timing, buoy, loc))
+                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except Exception as e:
-            log_read.exception(e)  # keep this as exception level since error isn't known in this case
+            logger_read.exception(e)  # keep this as exception level since error isn't known in this case
             if i < len(locs)-1:  # in case there is another option to try
-                log_read.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
+                logger_read.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
-                log_read.warning('For model timing %s and buoy %s, an unexpected exception occurred. No more options.\n' % (timing, buoy))
+                logger_read.warning('For model timing %s and buoy %s, an unexpected exception occurred. No more options.\n' % (timing, buoy))
             ds = None
 
     # only do this if dend is less than or equal to the first date in the model output
