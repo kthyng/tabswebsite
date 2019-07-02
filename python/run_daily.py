@@ -31,7 +31,6 @@ formatter = logging.Formatter('%(asctime)s %(message)s','%a %b %d %H:%M:%S %Z %Y
 name = 'run_daily'
 logfilename = path.join('..', 'logs', name + '.log')
 loglevel=logging.WARNING
-# logdatefmt='%a %b %d %H:%M:%S %Z %Y'
 
 if __name__ == "__main__":
 
@@ -41,11 +40,6 @@ if __name__ == "__main__":
     logger_rd = logging.getLogger(name)
     logger_rd.setLevel(loglevel)
     logger_rd.addHandler(handler)
-
-    # log_rd = logging.basicConfig(filename=path.join('..', 'logs', 'run_daily.log'),
-    #                     level=logging.WARNING,
-    #                     format='%(asctime)s %(message)s',
-    #                     datefmt='%a %b %d %H:%M:%S %Z %Y')
 
     engine = tools.setup_engine()
     tablekeys = ['table1', 'table2', 'table3', 'table4', 'table5', 'table6']
