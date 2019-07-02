@@ -682,7 +682,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         if s_rho == -999:  # all depths at once
             # don't add 2d variables if all depths requested
             # need to deal separately with s_rho and s_w grid
-            df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+            try:
+                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+            except:  # try again
+                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
             # this brings in all times but cannot easily separate times. Just average.
             zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
             df = df.reset_index(['s_rho'])

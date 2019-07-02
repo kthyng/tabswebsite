@@ -108,9 +108,13 @@ if __name__ == "__main__":
                     dfmodelforecast = read.read(buoy, now - pd.Timedelta('1 day'),
                                                 future, table=table,
                                                 usemodel='forecast', tz=tz)
-                    # Catch if model output isn't working
-                    if dfmodelrecent is None or dfmodelforecast is None:
+                    # Email if all of a type of model output isn't working
+                    if dfmodelrecent is None:
                         eflag = True
+                        logger_rd.warning('Unavailable recent model output for buoy %s (table %s)\n' % (buoy, table))
+                    if dfmodelforecast is None:
+                        eflag = True
+                        logger_rd.warning('Unavailable forecast model output for buoy %s (table %s)\n' % (buoy, table))
                 else:
                     dfmodelrecent = None
                     dfmodelforecast = None
@@ -149,7 +153,7 @@ if __name__ == "__main__":
                 # email if exception since there shouldn't be random exceptions here
                 eflag = True
                 logger_rd.exception(e)
-                logger_rd.warning('Problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
+                logger_rd.warning('Unspecified problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
 
     engine.dispose()
 
