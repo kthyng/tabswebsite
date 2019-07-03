@@ -20,8 +20,8 @@ bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
 tz = 'US/Central'  # present model output on front page in central time zone
 
-# Email flag. Set to true in script if anything notable is wrong.
-eflag = False
+# Email flag. Add 1 in script if anything notable is wrong and email for a handful.
+eflag = 0
 
 # Capture warnings in log instead of emailing me
 logging.captureWarnings(True)
@@ -110,10 +110,10 @@ if __name__ == "__main__":
                                                 usemodel='forecast', tz=tz)
                     # Email if all of a type of model output isn't working
                     if dfmodelrecent is None:
-                        eflag = True
+                        eflag += 1
                         logger_rd.warning('Unavailable recent model output for buoy %s (table %s)\n' % (buoy, table))
                     if dfmodelforecast is None:
-                        eflag = True
+                        eflag += 1
                         logger_rd.warning('Unavailable forecast model output for buoy %s (table %s)\n' % (buoy, table))
                 else:
                     dfmodelrecent = None
@@ -151,7 +151,7 @@ if __name__ == "__main__":
                     logger_rd.warning('No figure was created for buoy %s (table %s)\n' % (buoy, table))
             except Exception as e:
                 # email if exception since there shouldn't be random exceptions here
-                eflag = True
+                eflag += 1
                 logger_rd.exception(e)
                 logger_rd.warning('Unspecified problem reading in data or model for buoy %s (table %s)\n' % (buoy, table))
 
@@ -199,5 +199,5 @@ if __name__ == "__main__":
 
 
     # send error email if eflag was set to True somewhere
-    if eflag:
+    if eflag > 5:
         tools.send_email()
