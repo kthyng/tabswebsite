@@ -199,5 +199,6 @@ if __name__ == "__main__":
 
 
     # send error email if eflag was set to True somewhere
-    if eflag > 5:
+    if eflag > 7:
+        logger_rd.warning('eflag=%i; sending email.' % eflag)
         tools.send_email()
