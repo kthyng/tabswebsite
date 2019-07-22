@@ -16,6 +16,9 @@ import gsw
 
 bys = pd.read_csv('../includes/buoys.csv', index_col=0)
 
+# number of repeats to try for internet and server hiccups
+nrepeats = 2
+
 # Capture warnings in log instead of emailing me
 logging.captureWarnings(True)
 
@@ -682,14 +685,22 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         if s_rho == -999:  # all depths at once
             # don't add 2d variables if all depths requested
             # need to deal separately with s_rho and s_w grid
-            try:
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-                # this brings in all times but cannot easily separate times. Just average.
-                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
-            except:  # try again
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-                # this brings in all times but cannot easily separate times. Just average.
-                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
+            for i in range(nrepeats):  # repeat multiple times if needed
+                try:
+                    df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+                    # this brings in all times but cannot easily separate times. Just average.
+                    zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
+                except RuntimeError as e:
+                    logger_read.info(e)
+                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+                except Exception as e:
+                    logger_read.info(e)
+                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+                if i+1 == nrepeats:  # time to give up
+                    logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work.\n' % (timing, buoy, loc, s_rho))
+                    df = None
+                    return
+
             df = df.reset_index(['s_rho'])
             df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
 
@@ -717,14 +728,22 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 varnames += ['East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
                             'RelH [%]', 'Free surface [m]', 'Surface net heat flux [W/m^2]',
                             'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
-            try:
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
-                # this brings in all times but cannot easily separate times. Just average.
-                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
-            except:  # try again
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
-                # this brings in all times but cannot easily separate times. Just average.
-                zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
+            for i in range(nrepeats):  # repeat multiple times if needed
+                try:
+                    df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+                    # this brings in all times but cannot easily separate times. Just average.
+                    zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
+                except RuntimeError as e:
+                    logger_read.info(e)
+                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+                except Exception as e:
+                    logger_read.info(e)
+                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+                if i+1 == nrepeats:  # time to give up
+                    logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work.\n' % (timing, buoy, loc, s_rho))
+                    df = None
+                    return
+
             df = df.reset_index(level=0).set_index('ocean_time')
 
         # adjustments
