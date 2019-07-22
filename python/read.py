@@ -11,7 +11,6 @@ import tools
 import requests
 import logging
 import netCDF4 as netCDF
-import octant
 import gsw
 
 bys = pd.read_csv('../includes/buoys.csv', index_col=0)
@@ -585,6 +584,30 @@ def read_tabs(table, buoy, dstart, dend):
     return df
 
 
+
+def calc_z(ds, zeta=0):
+    '''Calculate depths for model output for mean sea level.
+
+    Can input time-varying sea level height (zeta) if desired.
+    '''
+
+    if ds.Vtransform == 1:
+        Zo_rho = ds.hc * (ds.s_rho - ds.Cs_r) + ds.Cs_r * ds.h
+        z_rho = Zo_rho + zeta * (1 + Zo_rho/ds.h)
+        Zo_w = ds.hc * (ds.s_w - ds.Cs_w) + ds.Cs_w * ds.h
+        z_w = Zo_w + zeta * (1 + Zo_w/ds.h)
+    elif ds.Vtransform == 2:
+        Zo_rho = (ds.hc * ds.s_rho + ds.Cs_r * ds.h) / (ds.hc + ds.h)
+        z_rho = zeta + (zeta + ds.h) * Zo_rho
+        Zo_w = (ds.hc * ds.s_w + ds.Cs_w * ds.h) / (ds.hc + ds.h)
+        z_w = zeta + (zeta + ds.h) * Zo_w
+
+    ds.coords['z_rho'] = z_rho.transpose()   # needing transpose seems to be an xarray bug
+    ds.coords['z_w'] = z_w.transpose()
+
+    return ds
+
+
 def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                tz='utc', s_rho=-1):
     '''Read in model output.
@@ -634,6 +657,8 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             # make sure any variable value is accessible to see if there is
             # secretly a netcdf problem
             assert ds['u'][0,0,0]
+            # calculate depths at model layers
+            ds = calc_z(ds, zeta=0)
             break
         except KeyError as e:
             logger_read.info(e)  # set logging level to info so that is only logged if level is changed
@@ -684,12 +709,9 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         varnames_w = ['Vertical velocity [m/s]']
         if s_rho == -999:  # all depths at once
             # don't add 2d variables if all depths requested
-            # need to deal separately with s_rho and s_w grid
             for i in range(nrepeats):  # repeat multiple times if needed
                 try:
                     df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-                    # this brings in all times but cannot easily separate times. Just average.
-                    zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[:,ibuoy]
                 except RuntimeError as e:
                     logger_read.info(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
@@ -701,12 +723,14 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                     df = None
                     return
 
+            # depths info needed: all depths, one station
+            zr = ds.z_rho.isel(station=ibuoy)
+
             df = df.reset_index(['s_rho'])
-            df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+            # df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
 
             df2 = ds[vars_w].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-            # this brings in all times but cannot easily separate times. Just average.
-            zw = octant.roms.nc_depths(netCDF.Dataset(loc), 'w').get_station_depths().mean(axis=0)[:,ibuoy]
+            zw = ds.z_w.isel(station=ibuoy)
             df2 = df2.reset_index(['s_w'])
             df2['s_w'] = np.tile(zw, int(len(df2)/zw.size))
             # df2.rename(columns={'s_w': 'Depth [m]'}, inplace=True)
@@ -731,8 +755,6 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             for i in range(nrepeats):  # repeat multiple times if needed
                 try:
                     df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
-                    # this brings in all times but cannot easily separate times. Just average.
-                    zr = octant.roms.nc_depths(netCDF.Dataset(loc), 'rho').get_station_depths().mean(axis=0)[s_rho,ibuoy]
                 except RuntimeError as e:
                     logger_read.info(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, finding station depths did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
@@ -745,6 +767,9 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                     return
 
             df = df.reset_index(level=0).set_index('ocean_time')
+
+            # depths info needed: all depths, one station
+            zr = ds.z_rho.isel(s_rho=s_rho, station=ibuoy)
 
         # adjustments
         df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
