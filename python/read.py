@@ -661,21 +661,21 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             ds = calc_z(ds, zeta=0)
             break
         except KeyError as e:
-            logger_read.info(e)  # set logging level to info so that is only logged if level is changed
+            logger_read.warning(e)  # set logging level to info so that is only logged if level is changed
             if i < len(locs)-1:  # in case there is another option to try
                 logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except RuntimeError as e:
-            logger_read.info(e)
+            logger_read.warning(e)
             if i < len(locs)-1:  # in case there is another option to try
                 logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.\n' % (timing, buoy, loc))
                 ds = None
         except IOError as e:  # if link tried is not working
-            logger_read.info(e)
+            logger_read.warning(e)
             if i < len(locs)-1:  # in case there is another option to try
                 logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
@@ -713,10 +713,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 try:
                     df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
                 except RuntimeError as e:
-                    logger_read.info(e)
+                    logger_read.warning(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
                 except Exception as e:
-                    logger_read.info(e)
+                    logger_read.warning(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
                 if i+1 == nrepeats:  # time to give up
                     logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
@@ -756,10 +756,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 try:
                     df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
                 except RuntimeError as e:
-                    logger_read.info(e)
+                    logger_read.warning(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
                 except Exception as e:
-                    logger_read.info(e)
+                    logger_read.warning(e)
                     logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
                 if i+1 == nrepeats:  # time to give up
                     logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
