@@ -659,7 +659,6 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             assert ds['u'][0,0,0]
             # calculate depths at model layers
             ds = calc_z(ds, zeta=0)
-            break
         except KeyError as e:
             logger_read.warning(e)  # set logging level to info so that is only logged if level is changed
             if i < len(locs)-1:  # in case there is another option to try
