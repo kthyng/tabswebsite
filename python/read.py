@@ -659,6 +659,11 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             assert ds['u'][0,0,0]
             # calculate depths at model layers
             ds = calc_z(ds, zeta=0)
+            # make sure desired start date is after model start date
+            assert dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc')
+            # make sure desired end date is before model end date
+            assert dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc')
+            break
         except KeyError as e:
             logger_read.warning(e)  # set logging level to info so that is only logged if level is changed
             if i < len(locs)-1:  # in case there is another option to try
@@ -686,112 +691,114 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                 logger_read.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
             else:  # no more options to try
                 logger_read.warning('For model timing %s and buoy %s, an unexpected exception occurred. No more options.\n' % (timing, buoy))
-            ds = None
+                ds = None
+                df = None
+                return df
 
-    # only do this if dend is less than or equal to the first date in the model output
-    # check if last data datetime is less than 1st model datetime or
-    # first data date is greater than last model time, so that time periods overlap
-    # sometimes called ocean_time and sometimes time
-    # this case catches when the timing of the model is output the desired times
-    if ds is None or dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
-       dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
-        df = None
-        return df
+    # # only do this if dend is less than or equal to the first date in the model output
+    # # check if last data datetime is less than 1st model datetime or
+    # # first data date is greater than last model time, so that time periods overlap
+    # # sometimes called ocean_time and sometimes time
+    # # this case catches when the timing of the model is output the desired times
+    # if ds is None or dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
+    #    dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
+    #     df = None
+    #     return df
+    # else:
+
+    vars = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04']
+    varnames = ['Along [cm/s]', 'Across [cm/s]', 'WaterT [deg C]', 'Salinity',
+                'Dissolved oxygen concentration [uM]',
+                'Mississippi passive tracer', 'Atchafalaya passive tracer',
+                'Brazos passive tracer']
+    vars_w = ['w']  # on vertical grid w
+    varnames_w = ['Vertical velocity [m/s]']
+    if s_rho == -999:  # all depths at once
+        # don't add 2d variables if all depths requested
+        for i in range(nrepeats):  # repeat multiple times if needed
+            try:
+                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+            except RuntimeError as e:
+                logger_read.warning(e)
+                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+            except Exception as e:
+                logger_read.warning(e)
+                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+            if i+1 == nrepeats:  # time to give up
+                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
+                df = None
+                return
+
+        # depths info needed: all depths, one station
+        zr = ds.z_rho.isel(station=ibuoy)
+
+        df = df.reset_index(['s_rho'])
+        # df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+
+        df2 = ds[vars_w].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+        zw = ds.z_w.isel(station=ibuoy)
+        df2 = df2.reset_index(['s_w'])
+        df2['s_w'] = np.tile(zw, int(len(df2)/zw.size))
+        # df2.rename(columns={'s_w': 'Depth [m]'}, inplace=True)
+        df2.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
+
+        # interpolate ws to rho vertical grid
+        df['w'] = np.nan
+        ii = 0
+        for i in range(0,int(len(df2)/31),31):
+            # i is for df2, ii is for df
+            df['w'].iloc[ii*30:ii*30+30] = (df2['w'][i:i+30] + df2['w'][i+1:i+31])/2
+            ii += 1
+
     else:
+        if s_rho in [-1, 29]:  # surface, more variables
+            vars += ['Uwind', 'Vwind', 'Pair',
+                    'Tair', 'Qair', 'zeta',
+                      'shflux', 'sustr', 'svstr']
+            varnames += ['East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
+                        'RelH [%]', 'Free surface [m]', 'Surface net heat flux [W/m^2]',
+                        'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
+        for i in range(nrepeats):  # repeat multiple times if needed
+            try:
+                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+            except RuntimeError as e:
+                logger_read.warning(e)
+                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+            except Exception as e:
+                logger_read.warning(e)
+                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+            if i+1 == nrepeats:  # time to give up
+                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
+                df = None
+                return
 
-        vars = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04']
-        varnames = ['Along [cm/s]', 'Across [cm/s]', 'WaterT [deg C]', 'Salinity',
-                    'Dissolved oxygen concentration [uM]',
-                    'Mississippi passive tracer', 'Atchafalaya passive tracer',
-                    'Brazos passive tracer']
-        vars_w = ['w']  # on vertical grid w
-        varnames_w = ['Vertical velocity [m/s]']
-        if s_rho == -999:  # all depths at once
-            # don't add 2d variables if all depths requested
-            for i in range(nrepeats):  # repeat multiple times if needed
-                try:
-                    df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-                except RuntimeError as e:
-                    logger_read.warning(e)
-                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
-                except Exception as e:
-                    logger_read.warning(e)
-                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
-                if i+1 == nrepeats:  # time to give up
-                    logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
-                    df = None
-                    return
+        df = df.reset_index(level=0).set_index('ocean_time')
 
-            # depths info needed: all depths, one station
-            zr = ds.z_rho.isel(station=ibuoy)
+        # depths info needed: all depths, one station
+        zr = ds.z_rho.isel(s_rho=s_rho, station=ibuoy)
 
-            df = df.reset_index(['s_rho'])
-            # df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+    # adjustments
+    df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
+    df.rename(columns={'s_rho': 'Depth [m]'}, inplace=True)
+    df.index.rename('Dates [UTC]', inplace=True)
+    df.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
+    df.rename(columns={var: varname for var, varname in zip(vars, varnames)}, inplace=True)
+    df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
+    if s_rho in [-1, 29]:
+        df['RelH [%]'] *= 100
 
-            df2 = ds[vars_w].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
-            zw = ds.z_w.isel(station=ibuoy)
-            df2 = df2.reset_index(['s_w'])
-            df2['s_w'] = np.tile(zw, int(len(df2)/zw.size))
-            # df2.rename(columns={'s_w': 'Depth [m]'}, inplace=True)
-            df2.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
-
-            # interpolate ws to rho vertical grid
-            df['w'] = np.nan
-            ii = 0
-            for i in range(0,int(len(df2)/31),31):
-                # i is for df2, ii is for df
-                df['w'].iloc[ii*30:ii*30+30] = (df2['w'][i:i+30] + df2['w'][i+1:i+31])/2
-                ii += 1
-
-        else:
-            if s_rho in [-1, 29]:  # surface, more variables
-                vars += ['Uwind', 'Vwind', 'Pair',
-                        'Tair', 'Qair', 'zeta',
-                          'shflux', 'sustr', 'svstr']
-                varnames += ['East [m/s]', 'North [m/s]', 'AtmPr [mb]', 'AirT [deg C]',
-                            'RelH [%]', 'Free surface [m]', 'Surface net heat flux [W/m^2]',
-                            'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
-            for i in range(nrepeats):  # repeat multiple times if needed
-                try:
-                    df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
-                except RuntimeError as e:
-                    logger_read.warning(e)
-                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
-                except Exception as e:
-                    logger_read.warning(e)
-                    logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
-                if i+1 == nrepeats:  # time to give up
-                    logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
-                    df = None
-                    return
-
-            df = df.reset_index(level=0).set_index('ocean_time')
-
-            # depths info needed: all depths, one station
-            zr = ds.z_rho.isel(s_rho=s_rho, station=ibuoy)
-
-        # adjustments
-        df['s_rho'] = np.tile(zr, int(len(df)/zr.size))
-        df.rename(columns={'s_rho': 'Depth [m]'}, inplace=True)
-        df.index.rename('Dates [UTC]', inplace=True)
-        df.drop(['lon_rho', 'lat_rho', 's_w'], axis=1, inplace=True, errors='ignore')
-        df.rename(columns={var: varname for var, varname in zip(vars, varnames)}, inplace=True)
-        df['Density [kg/m^3]'] = gsw.rho(df['Salinity'], df['WaterT [deg C]'], np.zeros(len(df)))
-        if s_rho in [-1, 29]:
-            df['RelH [%]'] *= 100
-
-        # un-rotate velocities, then rerotate to match TABS website angles
-        # also convert to cm/s
-        df['Along [cm/s]'] *= 100
-        df['Across [cm/s]'] *= 100
-        # rotate from curvilinear to cartesian
-        anglev = ds['angle'][ibuoy]  # using at least nearby grid rotation angle
-        # Project along- and across-shelf velocity rather than use from model
-        # so that angle matches buoy
-        df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(df['Along [cm/s]'], df['Across [cm/s]'], anglev)  # approximately to east, north
-        theta = np.deg2rad(-(bys.loc[buoy,'angle']-90))  # convert from compass to math angle
-        if ~np.isnan(theta):
-            df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
-            df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
+    # un-rotate velocities, then rerotate to match TABS website angles
+    # also convert to cm/s
+    df['Along [cm/s]'] *= 100
+    df['Across [cm/s]'] *= 100
+    # rotate from curvilinear to cartesian
+    anglev = ds['angle'][ibuoy]  # using at least nearby grid rotation angle
+    # Project along- and across-shelf velocity rather than use from model
+    # so that angle matches buoy
+    df['East [cm/s]'], df['North [cm/s]'] = tools.rot2d(df['Along [cm/s]'], df['Across [cm/s]'], anglev)  # approximately to east, north
+    theta = np.deg2rad(-(bys.loc[buoy,'angle']-90))  # convert from compass to math angle
+    if ~np.isnan(theta):
+        df['Across [cm/s]'] = df['East [cm/s]']*np.cos(-theta) - df['North [cm/s]']*np.sin(-theta)
+        df['Along [cm/s]'] = df['East [cm/s]']*np.sin(-theta) + df['North [cm/s]']*np.cos(-theta)
 
     return df
