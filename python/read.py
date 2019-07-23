@@ -666,17 +666,21 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             break
         except AssertionError as e:
             logger_read.warning('AssertionError.\n')
+            logger_read.exception(e)
         except KeyError as e:
             logger_read.warning('KeyError.\n')
+            logger_read.exception(e)
         except RuntimeError as e:
             logger_read.warning('RuntimeError.\n')
+            logger_read.exception(e)
         except IOError as e:  # if link tried is not working
             logger_read.warning('IOError.\n')
+            logger_read.exception(e)
         except Exception as e:
             logger_read.warning('Unexpected exception')
+            logger_read.exception(e)
 
         logger_read.warning('Model timing: %s.\nBuoy %s.\nModel location: %s\n\n' % (timing, buoy, loc))
-        logger_read.exception(e)
 
         if i == len(locs)-1:  # no more options to try
             logger_read.warning('\n\nNo more model input options.\n\n\n')
