@@ -653,58 +653,36 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         try:
             ds = xr.open_dataset(loc)
             # make sure all variables present
-            assert np.asarray([var in ds for var in varstot]).all()
+            assert np.asarray([var in ds for var in varstot]).all(), 'required variables are not all present\n'
             # make sure any variable value is accessible to see if there is
             # secretly a netcdf problem
-            assert ds['u'][0,0,0]
+            assert ds['u'][0,0,0], 'actual model value cannot be accessed\n'
             # calculate depths at model layers
             ds = calc_z(ds, zeta=0)
             # make sure desired start date is after model start date
-            assert dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc')
+            assert dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc'), 'desired start date is not included in model time range\n'
             # make sure desired end date is before model end date
-            assert dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc')
+            assert dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'), 'desired end date is not included in model time range\n'
             break
+        except AssertionError as e:
+            logger_read.warning('AssertionError.\n')
         except KeyError as e:
-            logger_read.warning(e)  # set logging level to info so that is only logged if level is changed
-            if i < len(locs)-1:  # in case there is another option to try
-                logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
-            else:  # no more options to try
-                logger_read.warning('For model timing %s and buoy %s, station file loc %s did not work due to a KeyError. No more options.\n' % (timing, buoy, loc))
-                ds = None
+            logger_read.warning('KeyError.\n')
         except RuntimeError as e:
-            logger_read.warning(e)
-            if i < len(locs)-1:  # in case there is another option to try
-                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
-            else:  # no more options to try
-                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to a RuntimeError. No more options.\n' % (timing, buoy, loc))
-                ds = None
+            logger_read.warning('RuntimeError.\n')
         except IOError as e:  # if link tried is not working
-            logger_read.warning(e)
-            if i < len(locs)-1:  # in case there is another option to try
-                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
-            else:  # no more options to try
-                logger_read.warning('For model timing %s and buoy %s, loc %s did not work due to an IOError. No more options.\n' % (timing, buoy, loc))
-                ds = None
+            logger_read.warning('IOError.\n')
         except Exception as e:
-            logger_read.exception(e)  # keep this as exception level since error isn't known in this case
-            if i < len(locs)-1:  # in case there is another option to try
-                logger_read.warning('For model timing %s and buoy %s, loc %s did not work with an unexpected exception. Trying with loc %s instead...\n' % (timing, buoy, loc, locs[i+1]))
-            else:  # no more options to try
-                logger_read.warning('For model timing %s and buoy %s, an unexpected exception occurred. No more options.\n' % (timing, buoy))
-                ds = None
-                df = None
-                return df
+            logger_read.warning('Unexpected exception')
 
-    # # only do this if dend is less than or equal to the first date in the model output
-    # # check if last data datetime is less than 1st model datetime or
-    # # first data date is greater than last model time, so that time periods overlap
-    # # sometimes called ocean_time and sometimes time
-    # # this case catches when the timing of the model is output the desired times
-    # if ds is None or dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc') or \
-    #    dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'):
-    #     df = None
-    #     return df
-    # else:
+        logger_read.warning('Model timing: %s.\nBuoy %s.\nModel location: %s\n\n' % (timing, buoy, loc))
+        logger_read.exception(e)
+
+        if i == len(locs)-1:  # no more options to try
+            logger_read.warning('\n\nNo more model input options.\n\n\n')
+            ds = None
+            df = None
+            return df
 
     vars = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04']
     varnames = ['Along [cm/s]', 'Across [cm/s]', 'WaterT [deg C]', 'Salinity',
