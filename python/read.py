@@ -709,7 +709,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             if i+1 == nrepeats:  # time to give up
                 logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
                 df = None
-                return
+                return df
 
         # depths info needed: all depths, one station
         zr = ds.z_rho.isel(station=ibuoy)
@@ -752,7 +752,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             if i+1 == nrepeats:  # time to give up
                 logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
                 df = None
-                return
+                return df
 
         df = df.reset_index(level=0).set_index('ocean_time')
 
