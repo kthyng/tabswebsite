@@ -97,6 +97,8 @@ else:
 if datatype == 'pic':
     units = 'M'
 
+assert datatype=='data' and not modelonly, 'cannot select "data" option for datatype with modelonly as True'
+
 ## Read in data ##
 # from daily file, only for showing table since images created in run_daily.py
 if dstart is None:
