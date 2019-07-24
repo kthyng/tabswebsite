@@ -125,17 +125,55 @@ else:
 
     # using model but not ports buoy
     elif usemodel: # and bys.loc[buoy,'table1'] in tables:
-        dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='hindcast', tz=tz, units=units, s_rho=int(s_rho))
+        usehindcast, userecent, useforecast = False, False, False  # initialize
+        dfmodelhindcast = None
+        dfmodelrecent = None
+        dfmodelforecast = None
+        dfmodeltides = None
+
+        # check timing relative to now to decide which model output to try using
+        today = pd.Timestamp.now().normalize()  # midnight today
+        yesterday = today - pd.Timedelta('1 day')
+        thisyear = today.year
+        lastyear = thisyear - 1
+
+        # use forecast if dend after today
+        if dend >= today:
+            useforecast = True
+
+        # use hindcast if want time from before lastyear
+        if dstart.year <= lastyear:
+            usehindcast = True
+
+        # use recent if want time from thisyear or lastyear, but before yesterday
+        if (dstart.year in [lastyear, thisyear] or dend.year in [lastyear, thisyear]) and (dstart <= yesterday):
+            userecent = True
+
+        if usehindcast:
+            dfmodelhindcast = read.read(buoy, dstart, dend, table=table,
+                                        usemodel='hindcast', tz=tz, units=units,
+                                        s_rho=int(s_rho))
+
         # only look for nowcast model output if hindcast doesn't cover it
         # sometimes the two times overlap but hindcast output is better
-        if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
-            dfmodelrecent = None
-        else:
+        if usehindcast and userecent:
+            if dfmodelhindcast is not None and (dfmodelhindcast.index[-1] - dend) < pd.Timedelta('1 hour'):
+                dfmodelrecent = None
+            else:
+                dfmodelrecent = read.read(buoy, dstart, dend, table=table,
+                                          usemodel='recent', tz=tz, units=units,
+                                          s_rho=int(s_rho))
+
+        if (not usehindcast) and userecent:
             dfmodelrecent = read.read(buoy, dstart, dend, table=table,
-                                            usemodel='recent', tz=tz, units=units, s_rho=int(s_rho))
-        dfmodelforecast = read.read(buoy, dstart, dend, table=table,
-                                          usemodel='forecast', tz=tz, units=units, s_rho=int(s_rho))
+                                      usemodel='recent', tz=tz, units=units,
+                                      s_rho=int(s_rho))
+
+        if useforecast:
+            dfmodelforecast = read.read(buoy, dstart, dend, table=table,
+                                        usemodel='forecast', tz=tz, units=units,
+                                        s_rho=int(s_rho))
+            
         if bys.loc[buoy,'table2'] == 'tidepredict':
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
