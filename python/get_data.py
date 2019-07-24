@@ -132,7 +132,7 @@ else:
         dfmodeltides = None
 
         # check timing relative to now to decide which model output to try using
-        today = pd.Timestamp.now().normalize()  # midnight today
+        today = now().normalize()  # midnight today
         yesterday = today - pd.Timedelta('1 day')
         thisyear = today.year
         lastyear = thisyear - 1
@@ -173,7 +173,7 @@ else:
             dfmodelforecast = read.read(buoy, dstart, dend, table=table,
                                         usemodel='forecast', tz=tz, units=units,
                                         s_rho=int(s_rho))
-            
+
         if bys.loc[buoy,'table2'] == 'tidepredict':
             dfmodeltides = read.read(buoy, dstart, dend, usemodel=True,
                                      userecent=True, tz=tz, units=units, datum=datum)
