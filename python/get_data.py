@@ -132,7 +132,7 @@ else:
         dfmodeltides = None
 
         # check timing relative to now to decide which model output to try using
-        today = now().normalize()  # midnight today
+        today = now.normalize()  # midnight today
         yesterday = today - pd.Timedelta('1 day')
         thisyear = today.year
         lastyear = thisyear - 1
