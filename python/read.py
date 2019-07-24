@@ -700,6 +700,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         for i in range(nrepeats):  # repeat multiple times if needed
             try:
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+                break
             except RuntimeError as e:
                 logger_read.warning(e)
                 logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
@@ -743,6 +744,7 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         for i in range(nrepeats):  # repeat multiple times if needed
             try:
                 df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+                break
             except RuntimeError as e:
                 logger_read.warning(e)
                 logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
