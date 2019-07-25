@@ -659,10 +659,10 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             assert ds['u'][0,0,0], 'actual model value cannot be accessed\n'
             # calculate depths at model layers
             ds = calc_z(ds, zeta=0)
-            # make sure desired start date is after model start date
-            assert dstart >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc'), 'desired start date is not included in model time range\n'
-            # make sure desired end date is before model end date
-            assert dend <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'), 'desired end date is not included in model time range\n'
+            # make sure desired end date is after model start date
+            assert dend >= pd.Timestamp(ds['ocean_time'].isel(ocean_time=0).data, tz='utc'), 'desired start date is not included in model time range\n'
+            # make sure desired start date is before model end date
+            assert dstart <= pd.Timestamp(ds['ocean_time'].isel(ocean_time=-1).data, tz='utc'), 'desired end date is not included in model time range\n'
             break
         except AssertionError as e:
             logger_read.warning('AssertionError.\n')
