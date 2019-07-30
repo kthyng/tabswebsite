@@ -279,7 +279,6 @@ elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata){
     passthru($command);
 }
 echo $TABSPYTHON;
-
 if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
     	print "<a href=".$tempaccess.".pdf> <img src=".$tempaccess.".png></A>\n";
