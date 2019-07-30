@@ -32,7 +32,6 @@ if (! $s_rho) {$s_rho = '-1';}
 
 // get environmental variable for python to use
 $TABSPYTHON = getenv($TABSPYTHON);
-echo $TABSPYTHON;
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
@@ -175,6 +174,7 @@ print "<div id='container'>";
 
 include("../includes/header.html");
 include("../includes/navigation.html");
+echo $TABSPYTHON;
 
 // Figure out if buoy should have TXLA or NOAA model output to set flag
 $csv = array_map("str_getcsv", file("../includes/buoys.csv"));
