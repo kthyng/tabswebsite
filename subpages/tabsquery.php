@@ -278,6 +278,7 @@ if ($datepicker!="recent"){
 elseif ($datepicker == "recent" && $datatype == "data" && ! $norecentdata){
     passthru($command);
 }
+echo $TABSPYTHON;
 
 if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     if (file_exists($tempaccess.".png")){
@@ -285,7 +286,6 @@ if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     }
 }
 print "</TD></TR></TABLE>\n";
-echo $TABSPYTHON;
 
 
 }
