@@ -30,10 +30,6 @@ if (! $datum) {$datum = 'MSL';}
 if (! $modelonly) {$modelonly = 'False';}
 if (! $s_rho) {$s_rho = '-1';}
 
-// get environmental variable for python to use
-// $TABSPYTHON = getenv('TABSPYTHON');
-$TABSPYTHON = $_ENV['TABSPYTHON'];
-
 if ($tz == 'UTC') {
     $tzname = 'UTC';
 }
@@ -106,12 +102,7 @@ if ($datepicker == "recent") {
         $tempaccess = "../daily/".$Buoyname;
     }
     // command to show table (not used for pic)
-    if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
-    }
-    else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
-    }
+    $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
 else{
@@ -136,13 +127,7 @@ else{
     $tempaccess = "../tmp/".$tempout;  // relative path to buoy
 
     # set up command for later use. Different python location on different machines.
-    if (php_uname('n') == 'barataria.tamu.edu') {
-        $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
-    }
-    # checks for Mac and assumes Kristen's mac
-    else if (strpos(php_uname(), 'Darwin') !== false) {
-        $command = escapeshellcmd('/Users/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
-    }
+    $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
     chmod($tempfile, 0644);
 
 }
@@ -285,8 +270,6 @@ if ($datatype=="pic" && ($havemodel or !$norecentdata)){
     }
 }
 print "</TD></TR></TABLE>\n";
-echo $table;
-echo $TABSPYTHON;
 
 
 }
