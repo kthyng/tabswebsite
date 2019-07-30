@@ -31,7 +31,8 @@ if (! $modelonly) {$modelonly = 'False';}
 if (! $s_rho) {$s_rho = '-1';}
 
 // get environmental variable for python to use
-$TABSPYTHON = getenv('TABSPYTHON');
+// $TABSPYTHON = getenv('TABSPYTHON');
+$TABSPYTHON = $_ENV['TABSPYTHON'];
 
 if ($tz == 'UTC') {
     $tzname = 'UTC';
