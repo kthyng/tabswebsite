@@ -378,7 +378,7 @@ def read_nos_df(dataname):
 
     elif 'product=water_level' in dataname:
         names = ['Water Level [m, MSL]']
-        df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality '], axis=1, errors='ignore')
+        df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality ', ' O or I (for verified)'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
