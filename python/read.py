@@ -44,6 +44,10 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     userecent is for NDBC data, for using the most recent 45 days of data
 
     datum (str) can be 'MSL', 'MHHW', 'MHW', 'MLW', 'MLLW', 'MTL'; for tidal height
+
+    Example:
+    buoy = '8779770'; dstart = pd.Timestamp('2019-9-5').tz_localize('UTC'); dend = pd.Timestamp('2019-9-9').tz_localize('UTC')
+    df = read.read(buoy, dstart, dend)
     '''
 
     # read from recent file
