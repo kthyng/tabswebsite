@@ -834,13 +834,13 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dft.insert(0, 'idx', date2num(dft.index.tz_localize(None).to_pydatetime()))
 
     # change length of df2 if df1 overlaps with it to prioritize df1
-    if df1 is not None and df2 is not None:
+    if df1 is not None and df2 is not None and (df1.size>0) and (df2.size>0):
         if df1.index[-1] > df2.index[0]:
             stemp = df1.index[-1] + pd.Timedelta('10 minutes')
             df2 = df2[stemp:]
 
     # change length of df3 if df2 overlaps with it to prioritize df2
-    if df2 is not None and df3 is not None:
+    if df2 is not None and df3 is not None and (df2.size>0) and (df3.size>0):
         if df2.index[-1] > df3.index[0]:
             stemp = df2.index[-1] + pd.Timedelta('10 minutes')
             df3 = df3[stemp:]
