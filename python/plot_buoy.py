@@ -998,7 +998,10 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             axes[3].get_yaxis().set_ticks([])
         else:
             # will be something like 'Water Level [m, MSL]'
-            sshcol = [col for col in df.columns if 'Water Level' in col][0]
+            try:
+                sshcol = [col for col in df.columns if 'Water Level' in col][0]
+            except:
+                sshcol = [col for col in df4.columns if 'Water Level' in col][0]
             sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
             add_var_2units(axes[3], df, sshcol, sshlabel,
                            'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
