@@ -993,7 +993,7 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
         else:
             dolegend = False
         # have code here to catch if variable/data is not available
-        if (df is None) and all([dft is None for dft in [df1, df2, df3, df4]]):
+        if (df is None) and (df4 is None):
             axes[3].text(0.1, 0.5, 'Water level data not available at this time.', transform=axes[3].transAxes)
             axes[3].get_yaxis().set_ticks([])
         else:
