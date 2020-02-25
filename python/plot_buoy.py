@@ -992,12 +992,17 @@ def plot(df, buoy, which=None, df1=None, df2=None, df3=None, df4=None, tlims=Non
             dolegend = True
         else:
             dolegend = False
-        # will be something like 'Water Level [m, MSL]'
-        sshcol = [col for col in df.columns if 'Water Level' in col][0]
-        sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
-        add_var_2units(axes[3], df, sshcol, sshlabel,
-                       'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
-                       dolegend=dolegend)
+        # have code here to catch if variable/data is not available
+        if (df is None) and all([dft is None for dft in [df1, df2, df3, df4]]):
+            axes[3].text(0.1, 0.5, 'Water level data not available at this time.', transform=axes[3].transAxes)
+            axes[3].get_yaxis().set_ticks([])
+        else:
+            # will be something like 'Water Level [m, MSL]'
+            sshcol = [col for col in df.columns if 'Water Level' in col][0]
+            sshlabel = sshcol[:11] + '\n' + sshcol[12:]  # adds line break
+            add_var_2units(axes[3], df, sshcol, sshlabel,
+                           'm2ft', '[ft]', ymaxrange=[-3,3], tlims=tlims, df4=df4,
+                           dolegend=dolegend)
         add_var_2units(axes[4], df, 'WaterT [deg C]',
                        'Water temp\n' + r'$\left[\!^\circ\! \mathrm{C} \right]$',
                        'c2f', r'$\left[\!^\circ\! \mathrm{F} \right]$',
