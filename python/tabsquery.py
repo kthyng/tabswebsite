@@ -27,7 +27,8 @@ query = 'SELECT * FROM ' + args.tablename + ' WHERE (date BETWEEN "' + args.dsta
 # engine = create_engine('postgresql://scott:tiger@localhost:5432/mydatabase')
 # query = "SELECT * FROM tabs_D_ven WHERE (date BETWEEN '2016-1-1' - interval 0 day AND '2016-1-1' + interval 0 day) order by obs_time"
 # query = args.query
-engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
+engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs-os.gerg.tamu.edu/tabsdb')
+#engine = create_engine('mysql+mysqldb://tabsweb:tabs@tabs1.gerg.tamu.edu/tabsdb')
 df = pd.read_sql_query(query, engine, index_col=['obs_time'])
 # remove extra date/time columns
 df = df.drop(['date','time'], axis=1)
