@@ -102,7 +102,7 @@ if ($datepicker == "recent") {
         $tempaccess = "../daily/".$Buoyname;
     }
     // command to show table (not used for pic)
-    $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
+    $command = escapeshellcmd('/raid/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempaccess.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'"');
 }
 // If being called from tabs query form, need to interpret dates chosen, etc.
 else{
@@ -127,7 +127,7 @@ else{
     $tempaccess = "../tmp/".$tempout;  // relative path to buoy
 
     # set up command for later use. Different python location on different machines.
-    $command = escapeshellcmd('/home/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
+    $command = escapeshellcmd('/raid/kthyng/miniconda3/envs/tabs/bin/python ../python/get_data.py "'.$tempfile.'" --dstart "'.$dstart.'" --dend "'.$dend.'" "'.$datatype.'" --units "'.$units.'" --tz "'.$tzname.'" --usemodel "'.$model.'" --datum "'.$datum.'" --modelonly "'.$modelonly.'" --s_rho "'.$s_rho.'"');
     chmod($tempfile, 0644);
 
 }
