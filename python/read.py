@@ -624,16 +624,16 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
     # separate out which model type we want
     # links in list are in order they are tried by the system
     if timing == 'hindcast':
-        locs = ['http://barataria.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                'http://copano.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
-                'http://barataria.tamu.edu:6060/thredds/dodsC/NcML/txla_hindcast_sta']
+        locs = ['http://barataria.geos.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                'http://copano.geos.tamu.edu:8080/thredds/dodsC/NcML/txla_hindcast_sta',
+                'http://barataria.geos.tamu.edu:6060/thredds/dodsC/NcML/txla_hindcast_sta']
     elif timing == 'recent':
-        locs = ['http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
-                'http://barataria.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive2_agg.nc']
+        locs = ['http://barataria.geos.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive_agg.nc',
+                'http://barataria.geos.tamu.edu:8080/thredds/dodsC/NcML/forecast_stn_archive2_agg.nc']
     elif timing == 'forecast':
-        locs = ['http://barataria.tamu.edu:8080/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc',
-                'http://barataria.tamu.edu:6060/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc',
-                'http://copano.tamu.edu:8080/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc']
+        locs = ['http://barataria.geos.tamu.edu:8080/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc',
+                'http://barataria.geos.tamu.edu:6060/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc',
+                'http://copano.geos.tamu.edu:8080/thredds/dodsC/forecast_latest/txla2_stn_f_latest.nc']
 
 
     varstot = ['u', 'v', 'temp', 'salt', 'dye_01', 'dye_02', 'dye_03', 'dye_04',
