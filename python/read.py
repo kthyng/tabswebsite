@@ -378,19 +378,19 @@ def read_nos_df(dataname):
 
     elif 'air_pressure' in dataname:
         names = ['AtmPr [mb]']
-        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        df = df.drop([' X', ' N', ' R '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
     elif 'air_temperature' in dataname:
         names = ['AirT [deg C]']
-        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        df = df.drop([' X', ' N', ' R '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
     elif 'wind' in dataname:
         names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'East [m/s]', 'North [m/s]']
-        df = df.drop([' Direction.1', ' X', ' R'], axis=1, errors='ignore')
+        df = df.drop([' Direction.1', ' X', ' R '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {'East [m/s]': 2, 'North [m/s]': 2}
 
@@ -405,13 +405,13 @@ def read_nos_df(dataname):
          
     elif 'water_temperature' in dataname:
         names = ['WaterT [deg C]']
-        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        df = df.drop([' X', ' N', ' R '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
          
     elif 'conductivity' in dataname:
         names = ['Conductivity [mS/cm]']
-        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        df = df.drop([' X', ' N', ' R '], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
