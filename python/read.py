@@ -313,14 +313,20 @@ def read_nos(buoy, dstart, dend, usemodel=False):
     if not usemodel:
         # tide, met, and phys data
         prefixes = ['https://tidesandcurrents.noaa.gov/api/datagetter?product=water_level&application=NOS.COOPS.TAC.WL&station=',
-                    'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=met&id=',
-                    'https://tidesandcurrents.noaa.gov/cgi-bin/newdata.cgi?type=phys&id=']
+                    'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=air_pressure&application=NOS.COOPS.TAC.MET&station=',
+                    'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=air_temperature&application=NOS.COOPS.TAC.MET&station=',
+                    'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=wind&application=NOS.COOPS.TAC.MET&station=',
+                    'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_temperature&application=NOS.COOPS.TAC.PHYSOCEAN&station=',
+                    'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=conductivity&application=NOS.COOPS.TAC.PHYSOCEAN&station=']
         # dstart and dend need to be in format YYYYMMDD
         dstarts = dstart.strftime('%Y%m%d')
         dends = dend.strftime('%Y%m%d')
         suffixes = ['&begin_date=' + dstarts + '&end_date=' + dends + '&datum=MSL&units=metric&time_zone=GMT&format=csv',
-                    '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6',
-                    '&begin=' + dstarts + '&end=' + dends + '&units=metric&timezone=GMT&mode=csv&interval=6']
+                    '&begin_date=' + dstarts + '&end_date=' + dends + '&time_zone=GMT&units=english&interval=6&format=csv',
+                    '&begin_date=' + dstarts + '&end_date=' + dends + '&time_zone=GMT&units=english&interval=6&format=csv',
+                    '&begin_date=' + dstarts + '&end_date=' + dends + '&time_zone=GMT&units=english&interval=6&format=csv',
+                    '&begin_date=' + dstarts + '&end_date=' + dends + '&time_zone=GMT&units=english&interval=6&format=csv',
+                    '&begin_date=' + dstarts + '&end_date=' + dends + '&time_zone=GMT&units=english&interval=6&format=csv']
         dfs = []
         for prefix, suffix in zip(prefixes, suffixes):
             url = prefix + buoy + suffix
