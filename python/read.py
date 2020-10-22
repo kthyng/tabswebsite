@@ -369,32 +369,50 @@ def read_nos_df(dataname):
     '''Read in individual tcoon/nos datasets and arrange variables.'''
 
     df = pd.read_csv(dataname, parse_dates=[0], index_col=0)
-    if 'type=met' in dataname:
-        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'AirT [deg C]', 'AtmPr [mb]', 'RelH [%]', 'East [m/s]', 'North [m/s]']
-        df = df.drop([' VIS'], axis=1, errors='ignore')
-        # dictionary for rounding decimal places
-        rdict = {'East [m/s]': 2, 'North [m/s]': 2}
-
-        # angle needs to be in math convention for trig and between 0 and 360
-        # also have to switch wind from direction from to direction to with 180 switch
-        theta = 90 - (df[' DIR'] - 180)
-        theta[theta<0] += 360
-        df['East [m/s]'] = df[' WINDSPEED']*np.cos(np.deg2rad(theta))
-        df['North [m/s]'] = df[' WINDSPEED']*np.sin(np.deg2rad(theta))
-
-    elif 'product=water_level' in dataname:
+         
+    if 'product=water_level' in dataname:
         names = ['Water Level [m, MSL]']
         df = df.drop([' Sigma', ' O', ' F', ' R', ' L', ' Quality ', ' O or I (for verified)'], axis=1, errors='ignore')
         # dictionary for rounding decimal places
         rdict = {}
 
-    elif 'type=phys' in dataname:
-        buoy = dataname.split('id=')[1][:7]
-        if 'cond' in bys.loc[buoy,'table1']:
-            names = ['WaterT [deg C]', 'Conductivity [mS/cm]']
-        else:
-            names = ['WaterT [deg C]']
-            df = df.drop(['CONDUCTIVITY'], axis=1)
+    elif 'air_pressure' in dataname:
+        names = ['AtmPr [mb]']
+        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
+        rdict = {}
+
+    elif 'air_temperature' in dataname:
+        names = ['AirT [deg C]']
+        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
+        rdict = {}
+
+    elif 'wind' in dataname:
+        names = ['Speed [m/s]', 'Dir from [deg T]', 'Gust [m/s]', 'East [m/s]', 'North [m/s]']
+        df = df.drop([' Direction.1', ' X', ' R'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
+        rdict = {'East [m/s]': 2, 'North [m/s]': 2}
+
+        # angle needs to be in math convention for trig and between 0 and 360
+        # also have to switch wind from direction from to direction to with 180 switch
+        theta = 90 - (df[' Direction'] - 180)
+        theta[theta<0] += 360
+        df['East [m/s]'] = df[' speed']*np.cos(np.deg2rad(theta))
+        df['North [m/s]'] = df[' speed']*np.sin(np.deg2rad(theta))
+        # dictionary for rounding decimal places
+        rdict = {}
+         
+    elif 'water_temperature' in dataname:
+        names = ['WaterT [deg C]']
+        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
+        rdict = {}
+         
+    elif 'conductivity' in dataname:
+        names = ['Conductivity [mS/cm]']
+        df = df.drop([' X', ' N', ' R'], axis=1, errors='ignore')
+        # dictionary for rounding decimal places
         rdict = {}
 
     elif 'prediction' in dataname:  # tidal height prediction
