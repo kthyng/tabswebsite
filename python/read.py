@@ -666,19 +666,19 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
             break
         except AssertionError as e:
             logger_read.warning('AssertionError.\n')
-            logger_read.exception(e)
+            logger_read.exception(e, exc_info=True)
         except KeyError as e:
             logger_read.warning('KeyError.\n')
-            logger_read.exception(e)
+            logger_read.exception(e, exc_info=True)
         except RuntimeError as e:
             logger_read.warning('RuntimeError.\n')
-            logger_read.exception(e)
+            logger_read.exception(e, exc_info=True)
         except IOError as e:  # if link tried is not working
             logger_read.warning('IOError.\n')
-            logger_read.exception(e)
+            logger_read.exception(e, exc_info=True)
         except Exception as e:
             logger_read.warning('Unexpected exception')
-            logger_read.exception(e)
+            logger_read.exception(e, exc_info=True)
 
         logger_read.warning('Model timing: %s.\nBuoy %s.\nModel location: %s\n\n' % (timing, buoy, loc))
 
@@ -699,16 +699,16 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
         # don't add 2d variables if all depths requested
         for i in range(nrepeats):  # repeat multiple times if needed
             try:
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy).to_dataframe()
+                df = ds[vars].sel(ocean_time=slice(dstart.tz_localize(None), dend.tz_localize(None))).isel(station=ibuoy).to_dataframe()
                 break
             except RuntimeError as e:
-                logger_read.warning(e)
-                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+                logger_read.warning(e, exc_info=True)
+                logger_read.warning('\nAttempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
             except Exception as e:
-                logger_read.warning(e)
-                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+                logger_read.warning(e, exc_info=True)
+                logger_read.warning('\nAttempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
             if i+1 == nrepeats:  # time to give up
-                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
+                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n\n\n' % (timing, buoy, loc, s_rho))
                 df = None
                 return df
 
@@ -743,16 +743,16 @@ def read_model(buoy, which, dstart, dend, timing='recent', units='Metric',
                         'Surface u-momentum stress [N/m^2]', 'Surface v-momentum stress [N/m^2]']
         for i in range(nrepeats):  # repeat multiple times if needed
             try:
-                df = ds[vars].sel(ocean_time=slice(dstart, dend)).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
+                df = ds[vars].sel(ocean_time=slice(dstart.tz_localize(None), dend.tz_localize(None))).isel(station=ibuoy, s_rho=s_rho).to_dataframe()
                 break
             except RuntimeError as e:
-                logger_read.warning(e)
-                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
+                logger_read.warning(e, exc_info=True)
+                logger_read.warning('\nAttempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a RuntimeError.\n' % (i+1, timing, buoy, loc, s_rho))
             except Exception as e:
-                logger_read.warning(e)
-                logger_read.warning('Attempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
+                logger_read.warning(e, exc_info=True)
+                logger_read.warning('\nAttempt %i: For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work due to a different error.\n' % (i+1, timing, buoy, loc, s_rho))
             if i+1 == nrepeats:  # time to give up
-                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n' % (timing, buoy, loc, s_rho))
+                logger_read.warning('No more attempts. For model timing %s, buoy %s, loc %s, and s_rho %d, extracting model output did not work.\n\n\n' % (timing, buoy, loc, s_rho))
                 df = None
                 return df
 
