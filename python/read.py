@@ -398,10 +398,8 @@ def read_nos_df(dataname):
         # also have to switch wind from direction from to direction to with 180 switch
         theta = 90 - (df[' Direction'] - 180)
         theta[theta<0] += 360
-        df['East [m/s]'] = df[' speed']*np.cos(np.deg2rad(theta))
-        df['North [m/s]'] = df[' speed']*np.sin(np.deg2rad(theta))
-        # dictionary for rounding decimal places
-        rdict = {}
+        df['East [m/s]'] = df[' Speed']*np.cos(np.deg2rad(theta))
+        df['North [m/s]'] = df[' Speed']*np.sin(np.deg2rad(theta))
          
     elif 'water_temperature' in dataname:
         names = ['WaterT [deg C]']
