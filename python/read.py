@@ -546,7 +546,7 @@ def read_tabs(table, buoy, dstart, dend):
                               dend.strftime("%Y-%m-%d %H:%M"))
     df = pd.read_sql_query(query, engine, index_col=['obs_time'])
     engine.dispose()
-    df.drop(df.index[df.index.isnull()], inplace=True)  # drop bad rows
+    df.drop(df.index[df.index.isna()], inplace=True, errors='ignore')  # drop bad rows
     df[(df == -99.0) | (df == -999.0) | (df == -999.00)] = np.nan  # replace missing values
 
     if 'date' in df.keys():
