@@ -155,7 +155,11 @@ if __name__ == "__main__":
 
         for table in tables:  # loop through tables for each buoy
             if 'predict' not in table:  # don't use tables for model predictions
-                readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
+                try:
+                    readwrite(buoy, table=table, dstart=pd.Timestamp('1980-1-1', tz='UTC'))
+                except Exception as e:
+                    logging.warning('Unexpected exception')
+                    logging.exception(e, exc_info=True)
         # for PORTS buoys, also read in full dataset
         if 'ports' in tables:
             readwrite(buoy + '_full', table='ports', dstart=pd.Timestamp('1980-1-1', tz='UTC'))
