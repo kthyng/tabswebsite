@@ -104,7 +104,8 @@ def read(buoy, dstart, dend, table=None, units=None, tz='UTC',
     # return None instead of just header if no data for time period
     if df is not None and not df.empty:
         df.index.name = 'Dates [UTC]'
-        df = df.tz_localize('UTC')  # all files are read in utc
+        if df.index.tz is None:
+            df = df.tz_localize('UTC')  # all files are read in utc
         df = tools.convert_units(df, units=units, tz=tz)  # change units if necessary
         if dstart is not None:
             df = df.loc[(df.index > dstart) & (df.index < dend)]
@@ -188,10 +189,8 @@ def read_ports_depth_df(dataname, diralong):
         df = pd.read_csv(dataname, parse_dates=True, index_col=4)
     except:
         return None
-
     if df.empty:
         return None
-
     theta = df['direction_of_sea_water_velocity (degree)'].copy()
     # convert to math angles
     theta = 90 - theta
