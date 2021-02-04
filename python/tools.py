@@ -44,7 +44,7 @@ def datum(buoy, datum):
     url = 'https://opendap.co-ops.nos.noaa.gov/axis/webservices/datums/response.jsp?epoch=A&unit=0&format=text&Submit=Submit&stationId=' + buoy
 
     # reads in values for datums
-    d = pd.read_table(url,skiprows=1, delim_whitespace=True, nrows=7, usecols=[0,1], header=17, names=['Datum', 'Value [m]'], index_col=0)
+    d = pd.read_csv(url,skiprows=1, delim_whitespace=True, nrows=7, usecols=[0,1], header=17, names=['Datum', 'Value [m]'], index_col=0)
 
     # dz to add is difference between desired datum and 'MSL' (default)
     dz = d.loc['MSL']['Value [m]'] - d.loc[datum]['Value [m]']
