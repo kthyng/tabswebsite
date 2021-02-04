@@ -96,7 +96,7 @@ _HTML_;
   <!-- <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" width="100%" height="100%" src="http://pong.tamu.edu/tabs_map/?framed"  allowfullscreen webkitallowfullscreen -->
 <!-- mozallowfullscreen msallowfullscreen></iframe> -->
 <?php
-  print "<iframe frameborder='0' scrolling='no' marginheight='0' marginwidth='0' width='800px' height='480px' src=http://pong.tamu.edu/tabs_map/?framed&bandwidth=$bandwidth  allowfullscreen webkitallowfullscreen
+  print "<iframe frameborder='0' scrolling='no' marginheight='0' marginwidth='0' width='800px' height='480px' src=/tabs_map/?framed&bandwidth=$bandwidth  allowfullscreen webkitallowfullscreen
 mozallowfullscreen msallowfullscreen></iframe>\n"
 ?>
 <!-- text below map -->
